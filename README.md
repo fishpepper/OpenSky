@@ -1,35 +1,74 @@
 # OpenSky
 
-this is an open source implementation for the frsky protocol on a cc2510 chip (e.g. on a vd5m)
+Note: THIS IS WORK IN PROGRESS.
+      USE AT YOUR OWN RISK !!!
 
-_WARNING_: USE AT YOUR OWN RISK! I AM NOT RESPONSIBLE FOR ANY DAMAGE/INJURIES CAUSED BY USING THIS CODE!
+This is an open source implementation for the frsky protocol on
+a cc2510 chip. This is compatible to a DIY RX or can be flashed
+onto a FrSky vd5m.
+This implementation will give you full 8-Channel CPPM output,
+full telemetry (2Channels Analog + RSSI) and much more :)
+
+Note: this will not work on any other Frsky RXs as they do not use
+a different processor.
+
+_Features_:
+* completely open source (compiles with the opensource sdcc compiler)
+* fully compatible to frsky 2-way protocol
+* 8 Channel PPM output
+* failsafe (constant, stopped ppm output)
+* 2 analog telemetry channels
+* builtin APA102 Led control (maps to any a ppm channel)
+
+_WARNINGS_:
+* USE AT YOUR OWN RISK!
+* I AM NOT RESPONSIBLE FOR ANY DAMAGE/INJURIES CAUSED BY USING THIS CODE!
+* IF YOU BRICK YOUR RX DURING THE FLASH UPGRADE IT IS YOUR FAULT
+* THERE IS NO WAY TO GO BACK TO THE ORIGINAL FIRMWARE ONCE YOU FLASH THIS CODE!
 
 This is for educational purposes only, running the VD5M with this code
 will probably void its FCC compliance and might void any transmission laws
 depending on your country!
 
-Please note that the cc2510 withour a PA chip as on the VD5M has limited range,
-DO NOT use this on a bigger Quadcopter. Its meant to be used on indoor and/or small vehicles.
+Please note that the cc2510 without an external PA chip as on the
+VD5M will have limited range, DO NOT use this on a bigger Quadcopter.
+Its meant to be used on indoor and/or small vehicles.
 
-# Features
 
-Note: work in progress. not everything is implemented yet
+# Connections
 
-* completely open source (compiles with the opensource sdcc compiler)
-* fully compatible to frsky 2-way protocol
-* [*] 8 Channel PPM output
-* [*] failsafe (constant, stopped ppm output)
-* 2 analog telemetry channels
-* [*] builtin APA102 Led control
+CH1 = ?
+CH2 = ADC0
+CH3 = ADC1
+CH4 = CPPM OUT
+CH5 = Debug UART (if compiled with debug enabled)
 
-[*] = not yet implemented.
+(CH1 is at the same side as the LEDs)
+
+# BUGS
+
+please report any bugs!
 
 # Flashing
 
 You will need a CC debugger or an arduino flashed with this code in order to program the cc2510:
 https://github.com/fishpepper/CC2510Lib
 (theres a python script to flash the cc2510 in that repo as well)
-Connections: TODO
+
+Connections:
+
+It is handy to mount a 5pin Molex Picoblade connector to the
+5pin ISP connection on the side of the vd5m. This way it is easy
+to upgrade firmware.
+
+ISP Port connection on vd5m
+[1] = VCC (3.3V)
+(2) = P2_1 = DBG DATA
+(3) = P2_2 = DBG CLOCK
+(4) = GND
+(5) = RESET
+
+(pin 1 is on the same side as CH1-5)
 
 # Notes to Developers
 
@@ -38,10 +77,14 @@ and are _NOT_ interrupt safe! There are ways to fix this issue but we do not
 want to have such long operations in interrupts anyway. so do not use them ;)
 (@see http://fivedots.coe.psu.ac.th/~cj/masd/resources/sdcc-doc/SDCCUdoc-14.html)
 
+# Random notes:
+
+Just in case you need to mount a new antenna:
+my vd5m came with a 3.5cm antenna wire (shouldn't this by ~3cm??)...
+
 
 # Thanks
 
-Thanks to midelic from rcgroups.com for the reverse engineering and 
+Thanks to midelic from rcgroups.com for the reverse engineering and
 code for the atmega implementation of this protocol!
- 
 
