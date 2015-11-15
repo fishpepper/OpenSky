@@ -38,9 +38,13 @@ Its meant to be used on indoor and/or small vehicles.
 # Connections
 
 CH1 = ?
+
 CH2 = ADC0
+
 CH3 = ADC1
+
 CH4 = CPPM OUT
+
 CH5 = Debug UART (if compiled with debug enabled)
 
 (CH1 is at the same side as the LEDs)
@@ -63,9 +67,13 @@ to upgrade firmware.
 
 ISP Port connection on vd5m
 [1] = VCC (3.3V)
+
 (2) = P2_1 = DBG DATA
+
 (3) = P2_2 = DBG CLOCK
+
 (4) = GND
+
 (5) = RESET
 
 (pin 1 is on the same side as CH1-5)
