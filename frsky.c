@@ -73,7 +73,7 @@ void frsky_init(void){
 
     if (frsky_bind_jumper_set()){
         //do binding
-        //frsky_do_bind();
+        frsky_do_bind();
         //binding will never return/continue
     }
 
@@ -432,8 +432,14 @@ void frsky_autotune(void){
 
 
 uint8_t frsky_bind_jumper_set(void){
-    debug("frsky: BIND jumper set\n"); debug_flush();
-    return 1;
+    debug("frsky: BIND jumper set = "); debug_flush();
+    if (P0 & (1<<SERVO_1)){
+        debug("HI -> no binding\n");
+        return 0;
+    }else{
+        debug("LO -> binding\n");
+        return 1;
+    }
 }
 
 

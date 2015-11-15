@@ -1,12 +1,11 @@
 #include "portmacros.h"
 
-
 //pin layout ISP header
 #define ISP_DATA  P2_1
 #define ISP_CLOCK P2_2
 
 //pin layout servo connection
-#define SERVO_1 7 //P0_7
+#define SERVO_1 7 //P0_7 = BIND, pull down on startup to enter bind mode
 #define SERVO_2 6 //P0_6 = ADC0
 #define SERVO_3 5 //P0_5 = ADC1
 #define SERVO_4 4 //P0_4 = PPM OUT
