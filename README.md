@@ -43,11 +43,13 @@ see the debug information.
 
 # Connections
 
+<pre>
 CH1 = BIND MODE (short to GND on startup to enter bind mode)
 CH2 = ADC0
 CH3 = ADC1
 CH4 = CPPM OUT
 CH5 = Debug UART @115200 8N1 (if compiled with debug enabled)
+</pre>
 
 (CH1 is at the same side as the LEDs)
 
@@ -74,11 +76,13 @@ It is handy to mount a 5pin Molex Picoblade connector to the
 to upgrade firmware.
 
 ISP Port connection on vd5m
+<pre>
 [1] = VCC (3.3V)
 (2) = P2_1 = DBG DATA
 (3) = P2_2 = DBG CLOCK
 (4) = GND
 (5) = RESET
+</pre>
 
 (pin 1 is on the same side as CH1-5)
 

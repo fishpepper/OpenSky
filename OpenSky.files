@@ -35,3 +35,4 @@ apa102.h
 soft_spi.h
 soft_spi.c
 portmacros.h
+README.md
