@@ -15,9 +15,10 @@ a different processor.
 _Features_:
 * completely open source (compiles with the opensource sdcc compiler)
 * fully compatible to frsky 2-way protocol
-* 8 Channel PPM output
+* 8 Channel CPPM output
 * failsafe (constant, stopped ppm output)
 * 2 analog telemetry channels
+* RSSI telemetry
 * builtin APA102 Led control (maps to any a ppm channel)
 
 _WARNINGS_:
@@ -34,20 +35,27 @@ Please note that the cc2510 without an external PA chip as on the
 VD5M will have limited range, DO NOT use this on a bigger Quadcopter.
 Its meant to be used on indoor and/or small vehicles.
 
+When debug is enabled during build (default for now) you will
+get a vast amount of debug info on the serial port (CH5).
+Hook this up to a 3.3V serial to usb connector in order to
+see the debug information.
+
 
 # Connections
 
-CH1 = ?
-
+CH1 = BIND MODE (short to GND on startup to enter bind mode)
 CH2 = ADC0
-
 CH3 = ADC1
-
 CH4 = CPPM OUT
-
-CH5 = Debug UART (if compiled with debug enabled)
+CH5 = Debug UART @115200 8N1 (if compiled with debug enabled)
 
 (CH1 is at the same side as the LEDs)
+
+You can connect 6 APA102 LEDs to Pins 2 (P2_1 = APA CLOCK) and 3 (P2_2 = APA DATA).
+I uploaded a small and compact design on oshpark:
+https://oshpark.com/shared_projects/BSjfJDwT
+(I use that as a led bar on my nano quadcopters)
+
 
 # BUGS
 
@@ -66,15 +74,10 @@ It is handy to mount a 5pin Molex Picoblade connector to the
 to upgrade firmware.
 
 ISP Port connection on vd5m
-
 [1] = VCC (3.3V)
-
 (2) = P2_1 = DBG DATA
-
 (3) = P2_2 = DBG CLOCK
-
 (4) = GND
-
 (5) = RESET
 
 (pin 1 is on the same side as CH1-5)
