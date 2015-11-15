@@ -66,6 +66,7 @@ It is handy to mount a 5pin Molex Picoblade connector to the
 to upgrade firmware.
 
 ISP Port connection on vd5m
+
 [1] = VCC (3.3V)
 
 (2) = P2_1 = DBG DATA
