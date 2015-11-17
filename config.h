@@ -6,8 +6,8 @@
 
 //pin layout servo connection
 #define SERVO_1 7 //P0_7 = BIND, pull down on startup to enter bind mode
-#define SERVO_2 6 //P0_6 = ADC0
-#define SERVO_3 5 //P0_5 = ADC1
+#define SERVO_2 6 //P0_6 = ADC1 = voltage sensor (max 3.3V on I/O ! -> voltage divider necessary!)
+#define SERVO_3 5 //P0_5 = ADC0 = current sensor (max 3.3V on I/O !)
 #define SERVO_4 4 //P0_4 = PPM OUT
 #define SERVO_5 3 //P0_3 = debug UART
 
@@ -16,7 +16,10 @@
 #define ADC0 SERVO_3
 #define ADC1 SERVO_2
 //acs712 in inverted mode on adc1?
-//       2.5V = 0A, 0V = 30A -> use invert + optimum remap
+//when powered by 5V we can use a trick
+//to get a good resolution: use inverted power inputs
+// 0A = 2.5V
+//30A = 0.0V
 #define ADC1_USE_ACS712 1
 
 

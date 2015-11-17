@@ -68,6 +68,7 @@ void adc_arm_dma(void){
 
 void adc_process(void){
     if (adc_dma_done()){
+        //THIS OUTPUT BREAKS CONNECTIVITY! USE FOR DEBUGGING ONLY.
         //fine, arm dma:
         adc_arm_dma();
     }else{
@@ -101,9 +102,14 @@ uint8_t adc_dma_done(void){
 }
 
 uint8_t adc_get_scaled(uint8_t ch){
+    //adc data is HHHHHHHHLLLL0000 -> shift >>6 to get 10bit
+    //shift by >>6 and shift by 2 to get 8 bit
+    //now comes the strange part! this seems to be wrong
+    //shifting by 6+1 does work and delivers the right values
+    //i have no clue whats wrong here... or is 10bit res not 10bit values?!
     if (ch == 0){
-        //convert 10 to 8 bit:
-        return adc_data[0]>>2;
+        //convert to 8 bit (see above)
+        return adc_data[1]>>7;
     }else{
         #if ADC1_USE_ACS712
         //acs712 is connected to ADC1
@@ -112,9 +118,9 @@ uint8_t adc_get_scaled(uint8_t ch){
         //use inverted power inputs to get
         // 0A = 2.5V
         //30A = 0.0V
-        return 255-(adc_data[1]>>2);
+        return 255-(adc_data[0]>>7);
         #else
-        return adc_data[1]>>2;
+        return adc_data[0]>>7;
         #endif
     }
 }
@@ -133,13 +139,13 @@ void adc_test(void){
         }
         debug("\nadc: done. res[0] = "); debug_flush();
 
-        debug_put_uint16(adc_data[0]);
-        debug_putc('x'); debug_put_hex8(adc_data[0]>>8); debug_put_hex8(adc_data[0]&0xff);
+        debug_put_uint16(adc_data[0]>>4);
+        debug_putc('x'); debug_put_hex8(adc_data[0]>>12); debug_put_hex8((adc_data[0]>>4)&0xff);
 
         debug(", res[1] = "); debug_flush();
 
-        debug_put_uint16(adc_data[1]);
-        debug_putc('x'); debug_put_hex8(adc_data[1]>>8); debug_put_hex8(adc_data[1]&0xff);
+        debug_put_uint16(adc_data[1]>>4);
+        debug_putc('x'); debug_put_hex8(adc_data[1]>>12); debug_put_hex8((adc_data[1]>>4)&0xff);
 
         debug_put_newline();
 

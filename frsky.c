@@ -872,9 +872,6 @@ void frsky_send_telemetry(void){
     static uint8_t debug_test = 0;
     uint8_t i;
 
-    //re arm adc dma etc
-    adc_process();
-
     //Stop RX DMA
     RFST = RFST_SIDLE;
     //abort ch0
@@ -888,6 +885,10 @@ void frsky_send_telemetry(void){
     frsky_packet_buffer[3] = adc_get_scaled(0);
     frsky_packet_buffer[4] = adc_get_scaled(1);
     frsky_packet_buffer[5] = frsky_rssi;
+
+    //re arm adc dma etc
+    //it is important to call this after reading the values...
+    adc_process();
 
     //bytes 6-17 are zero
     for(i=6; i<FRSKY_PACKET_BUFFER_SIZE; i++){
