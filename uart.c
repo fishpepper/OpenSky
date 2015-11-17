@@ -41,22 +41,22 @@ __xdata volatile uint8_t uart_tx_buffer_out;
 __xdata union uart_config_t uart_config;
 
 void uart_init(void){
-	uart_select_port();
-	uart_set_baudrate();
+    uart_select_port();
+    uart_set_baudrate();
 
-	//set up config
-	uart_config.bit.START = 0; //startbit level = low
-	uart_config.bit.STOP  = 1; //stopbit level = high
-	uart_config.bit.SPB   = 0; //1 stopbit
-	uart_config.bit.PARITY = 0; //no parity
-	uart_config.bit.D9     = 0; //8 Bits
-	uart_config.bit.FLOW   = 0; //no hw flow control
-	uart_config.bit.ORDER  = 0; //lsb first
-	uart_set_mode(); 
-	
-	//init tx buffer
-	uart_tx_buffer_in = 0;
-	uart_tx_buffer_out = 0;
+    //set up config
+    uart_config.bit.START = 0; //startbit level = low
+    uart_config.bit.STOP  = 1; //stopbit level = high
+    uart_config.bit.SPB   = 0; //1 stopbit
+    uart_config.bit.PARITY = 0; //no parity
+    uart_config.bit.D9     = 0; //8 Bits
+    uart_config.bit.FLOW   = 0; //no hw flow control
+    uart_config.bit.ORDER  = 0; //lsb first
+    uart_set_mode();
+
+    //init tx buffer
+    uart_tx_buffer_in = 0;
+    uart_tx_buffer_out = 0;
 }
 
 void uart_test(void){
@@ -67,77 +67,6 @@ void uart_test(void){
     }
 }
 
-#if 0
-void uart_putc(uint8_t ch){
-	uint8_t count;
-
-	//add \r to newlines
-	if (ch == '\n') uart_putc('\r');
-
-    // Clear any pending TX interrupt request (set U0CSR.TX_BYTE = 0)
-    U0CSR &= ~(1<<1);
-
-    U0DBUF = ch;
-    while(!(U0CSR & (1<<1))){} // wait for byte to be transmitted
-    U0CSR &= ~(1<<1);
-    return;
-
-}
-#else
-/*void uart_putc(uint8_t ch){
-    uint8_t count;
-    //uint8_t i;
-
-    //add \r to newlines
-    if (ch == '\n') uart_putc('\r');
-
-    cli();
-
-    count = uart_tx_buffer_in;
-    count = (count + 1) & UART_TX_BUFFER_AND_OPERAND;
-
-    uart_tx_buffer[uart_tx_buffer_in] = ch;
-
-    //check if free space in buffer:
-    if (count == uart_tx_buffer_out){
-        //no more space, do not enable int and exit now
-        //this will loose some data. as we use it only debugging we are fine
-        LED_RED_ON();
-        LED_GREEN_OFF();
-        while(1){
-            LED_RED_TOGGLE();
-            LED_GREEN_TOGGLE();
-            delay_ms(200);
-        }
-        return;
-    }
-
-    //check if uart tx int is enabled:
-    if (IEN2 & IEN2_UTX0IE){
-        //int already enabled (=tx active)
-        //update write counter (volatile access!)
-        uart_tx_buffer_in  = count;
-    }else{
-        //clear flags
-        UTX0IF = 0;
-        //U0CSR &= ~U0CSR_TX_BYTE;
-
-        //enable TX int:
-        IEN2 |= (IEN2_UTX0IE);
-
-        uart_tx_buffer_out = uart_tx_buffer_in;
-
-        //send this char
-        U0DBUF = ch;
-
-        //do not change out buffer as we are sendin the first byte already
-        //uart_tx_buffer[uart_tx_buffer_out];
-        //uart_tx_buffer_out = (uart_tx_buffer_out+1) & UART_TX_BUFFER_AND_OPERAND;
-        //uart_tx_buffer_out = uart_tx_buffer_in;
-    }
-
-    sei();
-}*/
 void uart_putc(uint8_t ch){
     //add \r to newlines
     if (ch == '\n') uart_putc('\r');
@@ -151,8 +80,11 @@ void uart_putc(uint8_t ch){
 
         //check if free space in buffer:
         if (uart_tx_buffer_in == uart_tx_buffer_out){
-            //no more space in buffer! this will loose some data
-            LED_RED_ON();
+            //no more space in buffer! this will loose some data!
+            //add LOST data tag (for visual debugging lost data)
+            uart_tx_buffer[(uart_tx_buffer_in-1) & UART_TX_BUFFER_AND_OPERAND] = '$';
+
+            /*LED_RED_ON();
             LED_GREEN_OFF();
             while(1){
                 LED_RED_ON();
@@ -161,7 +93,7 @@ void uart_putc(uint8_t ch){
                 LED_RED_OFF();
                 LED_GREEN_OFF();
                 delay_ms(200);
-            }
+            }*/
             return;
         }
     }else{
@@ -181,7 +113,6 @@ void uart_putc(uint8_t ch){
 
     sei();
 }
-#endif
 
 void uart_flush(void){
     //wait until uart buffer is empty
@@ -190,32 +121,32 @@ void uart_flush(void){
 }
 
 void uart_tx_interrupt(void) __interrupt UTX0_VECTOR{
-	//clear tx int flag
+    //clear tx int flag
     UTX0IF = 0;
 
     //finished with sending?
     if(uart_tx_buffer_in == uart_tx_buffer_out ){
-        	//no data in fifo -> disable tx int:
+            //no data in fifo -> disable tx int:
             IEN2 &= ~(IEN2_UTX0IE);
-	        return;
-	}
-    
+            return;
+    }
+
     //else: data to tx
     U0DBUF = uart_tx_buffer[uart_tx_buffer_out];
 
-	//handle out pointer
+    //handle out pointer
     uart_tx_buffer_out = (uart_tx_buffer_out+1) & UART_TX_BUFFER_AND_OPERAND;
-} 
+}
 
 
 void uart_set_mode(void){ //struct uart_mode_config_t *cfg){
-	//enable uart mode
-	U0CSR |= 0x80;
+    //enable uart mode
+    U0CSR |= 0x80;
 
-	//store config to U0UCR register
+    //store config to U0UCR register
     U0UCR = uart_config.byte & (0x7F);
 
-	//store config to U0GCR: (msb/lsb)
+    //store config to U0GCR: (msb/lsb)
     if (uart_config.bit.ORDER){
         U0GCR |= U0GCR_ORDER;
     }else{
@@ -229,27 +160,27 @@ void uart_set_mode(void){ //struct uart_mode_config_t *cfg){
 
 void uart_set_baudrate(void){
     //this assumes cpu runs from XOSC (26mhz) !
-	//set baudrate
-	U0BAUD = UART_BAUD_M;
-	U0GCR = (U0GCR & ~0x1F) | (UART_BAUD_E);
+    //set baudrate
+    U0BAUD = UART_BAUD_M;
+    U0GCR = (U0GCR & ~0x1F) | (UART_BAUD_E);
 }
 
 void uart_select_port(void){
-	//we will use SERVO_5 as tx output:
-	//therefore we configure 
+    //we will use SERVO_5 as tx output:
+    //therefore we configure
     //USART0 use ALT1 -> Clear flag -> Port P0 = TX
     PERCFG &= ~(PERCFG_U0CFG);
     //USART1 use ALT2
     PERCFG |= PERCFG_U1CFG;
 
-	//configure pin P0_3 (TX) as output:
-	P0SEL |= (1<<3);
+    //configure pin P0_3 (TX) as output:
+    P0SEL |= (1<<3);
 
-	//make sure all P1 pins switch to normal GPIO
-	P1SEL &= ~(0x3C);
+    //make sure all P1 pins switch to normal GPIO
+    P1SEL &= ~(0x3C);
 
-	//make tx pin output:
-	P0DIR |= (1<<3);
+    //make tx pin output:
+    P0DIR |= (1<<3);
 }
 
 void uart_puts(uint8_t *data){
