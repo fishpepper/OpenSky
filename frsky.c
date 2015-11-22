@@ -1010,6 +1010,7 @@ void frsky_increment_channel(int8_t cnt){
 
 
 void frsky_send_telemetry(uint8_t telemetry_id){
+    uint8_t i;
     uint16_t tmp16;
     uint8_t bytes_used = 0;
     static uint8_t which   = 0;
