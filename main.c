@@ -71,10 +71,11 @@ void main(void) {
     debug("main: init done\n");
 
     //run main
+    //frsky_frame_sniffer();
     frsky_main();
 
-	LED_RED_ON();
-	while (1) {
+    LED_RED_ON();
+    while (1) {
         LED_RED_ON();
         delay_ms(200);
         LED_RED_OFF();

@@ -86,6 +86,14 @@ ISP Port connection on vd5m
 
 (pin 1 is on the same side as CH1-5)
 
+The arduino code is rather slow (>30s) whereas the cc-tool flashes in 1s in fast mode!
+
+Notes on using cc-tool on linux:
+make sure to use the patched version from here:
+https://github.com/dashesy/cc-tool
+(this fix is mandatory, otherwise you get a pipe error msg
+-> https://github.com/dashesy/cc-tool/commit/3ebc61763ff5d0dadbdc2f7163e85ca5d002bb0f)
+
 # Notes to Developers
 
 _DO NOT_ use int16/32 in interrupts! mul/div etc for 16bit are not reentrant in SDCC

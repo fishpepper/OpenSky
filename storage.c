@@ -24,13 +24,14 @@
 #include "frsky.h"
 
 //persistant storage in flash
-__code __at (STORAGE_LOCATION) uint8_t storage_on_flash[STORAGE_PAGE_SIZE] = {
+__code __at (STORAGE_LOCATION) uint8_t storage_on_flash[STORAGE_PAGE_SIZE]; //no ini value -> sdcc does not init this!
+/* = {
     //this is a trick to fill the flash data with 0xFF on building (saves some time on flashing)
     //sdcc does not support noinit pragme (?)
     #define STATIC_INIT_VALUE 0xFF
     #define STATIC_INIT_COUNT STORAGE_PAGE_SIZE
     #include "static_init.h"
-};
+};*/
 
 //place in mem from where to run the function (MUST BE BIG ENOUGH!)
 //static uint16_t __xdata storage_run_loc[64];

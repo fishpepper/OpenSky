@@ -1,5 +1,8 @@
 #include "portmacros.h"
 
+//send ADC data as hub telemetry as well:
+#define FRSKY_SEND_HUB_TELEMETRY 0
+
 //pin layout ISP header
 #define ISP_DATA  P2_1
 #define ISP_CLOCK P2_2
@@ -22,6 +25,9 @@
 //30A = 0.0V
 #define ADC1_USE_ACS712 1
 
+//voltage divider on my board is 10 / 3.3 k, scale to 100 / 33 to avoid floating point calc
+#define ADC0_DIVIDER_A 100
+#define ADC0_DIVIDER_B  33
 
 #if 0
 //APA102 SPI CLOCK

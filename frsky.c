@@ -670,8 +670,6 @@ void frsky_calib_pll(void){
     debug_put_newline();
     debug_flush();
 
-    debug("after cal "); debug_put_hex8(RFST);
-
     debug("frsky: calib pll done\n");
 }
 
@@ -695,6 +693,7 @@ void frsky_set_channel(uint8_t hop_index){
 
 void frsky_main(void){
     uint8_t send_telemetry = 0;
+    uint8_t requested_telemetry_id = 0;
     uint8_t missing = 0;
     uint8_t hopcount = 0;
     uint8_t stat_rxcount = 0;
@@ -801,8 +800,11 @@ void frsky_main(void){
 
                 //every 4th frame is a telemetry frame (transmits every 36ms)
                 if ((frsky_packet_buffer[3] % 4) == 2){
+                    //next frame is a telemetry frame
                     send_telemetry = 1;
                 }
+                //always store the last telemtry request id
+                requested_telemetry_id   = frsky_packet_buffer[4];
 
                 //stats
                 stat_rxcount++;
@@ -836,7 +838,7 @@ void frsky_main(void){
             delay_us(900); //1340-500
 
             //build & send packet
-            frsky_send_telemetry();
+            frsky_send_telemetry(requested_telemetry_id);
 
             //mark as done
             send_telemetry = 0;
@@ -850,6 +852,144 @@ void frsky_main(void){
     debug("frsky: main loop ended. THIS SHOULD NEVER HAPPEN!\n");
     while(1);
 }
+
+//useful for debugging/sniffing packets from anothe tx or rx
+//make sure to bind this rx before using this...
+void frsky_frame_sniffer(void){
+    uint8_t send_telemetry = 0;
+    uint8_t missing = 0;
+    uint8_t hopcount = 0;
+    uint8_t stat_rxcount = 0;
+    uint8_t badrx_test = 0;
+    uint8_t conn_lost = 1;
+    uint8_t packet_received = 0;
+    uint8_t i;
+
+    debug("frsky: entering sniffer mode\n");
+
+    //start with any channel:
+    frsky_current_ch_idx = 0;
+    //first set channel uses enter rxmode, this will set up dma etc
+    frsky_enter_rxmode(storage.frsky_hop_table[frsky_current_ch_idx]);
+
+    //wait 500ms on the current ch on powerup
+    timeout_set(500);
+
+    //start with conn lost (allow full sync)
+    conn_lost = 1;
+
+    //reset wdt once in order to have at least one second waiting for a packet:
+    wdt_reset();
+
+    //start main loop
+    while(1){
+        if (timeout_timed_out()){
+            LED_RED_ON();
+
+            //next hop in 9ms
+            if (!conn_lost){
+                timeout_set(9);
+            }else{
+                timeout_set(500);
+            }
+
+            frsky_increment_channel(1);
+
+            //strange delay
+            //_delay_us(1000);
+            delay_us(1000);
+
+            //go back to rx mode
+            frsky_packet_received = 0;
+            DMAARM = DMA_ARM_CH0;
+            RFST = RFST_SRX;
+
+            //check for packets
+            if (!packet_received){
+                if (send_telemetry){
+                    debug("< MISSING\n");
+                    send_telemetry = 0;
+                }else{
+                    debug("> MISSING\n");
+                }
+                send_telemetry = 0;
+                missing++;
+            }
+            packet_received = 0;
+
+            if (hopcount++ >= 100){
+                if (stat_rxcount==0){
+                    conn_lost = 1;
+                    //enter failsafe mode
+                    debug("\nCONN LOST!\n");
+                }
+
+                //statistics
+                hopcount = 1;
+                stat_rxcount = 0;
+            }
+
+            LED_RED_OFF();
+        }
+
+        //handle ovfs
+        frsky_handle_overflows();
+
+        if (frsky_packet_received){
+            if (FRSKY_VALID_PACKET(frsky_packet_buffer)){
+                //ok, valid packet for us
+                LED_GREEN_ON();
+
+                //dump all packets!
+                if (send_telemetry){
+                    debug("< ");
+                    send_telemetry = 0;
+                }else{
+                    debug("> ");
+                }
+
+                for(i=0; i<FRSKY_PACKET_BUFFER_SIZE; i++){
+                    debug_put_hex8(frsky_packet_buffer[i]);
+                    debug_putc(' ');
+                }
+                debug("\n");
+
+                //we hop to the next channel in 0.5ms
+                //afterwards hops are in 9ms grid again
+                //this way we can have up to +/-1ms jitter on our 9ms timebase
+                //without missing packets
+                delay_us(500);
+                timeout_set(0);
+
+                //reset wdt
+                wdt_reset();
+
+                //reset missing packet counter
+                missing = 0;
+
+                //every 4th frame is a telemetry frame (transmits every 36ms)
+                if ((frsky_packet_buffer[3] % 4) == 2){
+                    send_telemetry = 1;
+                }
+
+                //stats
+                stat_rxcount++;
+                packet_received=1;
+                conn_lost = 0;
+
+                //make sure we never read the same packet twice by crc flag
+                frsky_packet_buffer[FRSKY_PACKET_BUFFER_SIZE-1] = 0x00;
+
+                LED_GREEN_OFF();
+            }
+        }
+
+    }
+
+    debug("frsky: sniffer loop ended. THIS SHOULD NEVER HAPPEN!\n");
+    while(1);
+}
+
 
 
 void frsky_increment_channel(int8_t cnt){
@@ -868,9 +1008,11 @@ void frsky_increment_channel(int8_t cnt){
     frsky_set_channel(frsky_current_ch_idx);
 }
 
-void frsky_send_telemetry(void){
-    static uint8_t debug_test = 0;
-    uint8_t i;
+
+void frsky_send_telemetry(uint8_t telemetry_id){
+    uint16_t tmp16;
+    uint8_t bytes_used = 0;
+    static uint8_t which   = 0;
 
     //Stop RX DMA
     RFST = RFST_SIDLE;
@@ -878,22 +1020,51 @@ void frsky_send_telemetry(void){
     DMAARM = DMA_ARM_ABORT | DMA_ARM_CH0;
     frsky_setup_rf_dma(FRSKY_MODE_TX);
 
+    //length of byte (always 0x11 = 17 bytes)
     frsky_packet_buffer[0] = 0x11;
     //txid
     frsky_packet_buffer[1] = storage.frsky_txid[0];
     frsky_packet_buffer[2] = storage.frsky_txid[1];
+    //ADC channels
     frsky_packet_buffer[3] = adc_get_scaled(0);
     frsky_packet_buffer[4] = adc_get_scaled(1);
+    //RSSI
     frsky_packet_buffer[5] = frsky_rssi;
+
+    //send ampere and voltage as hub telemetry data as well
+    #if FRSKY_SEND_HUB_TELEMETRY
+        //use telemetry id to decide which packet to send:
+        if (telemetry_id & 1){
+            //send voltage packet (undocumented sensor 0x39 = volts in 0.1 steps)
+            tmp16 = 123; //12.3V
+            //convert adc to voltage:
+            //float v = (vraw * 3.3/1024.0) * (ADC0_DIVIDER_A + ADC0_DIVIDER_B)) / (ADC0_DIVIDER_B);
+            //continue here
+            bytes_used = frsky_append_hub_data(FRSKY_HUB_TELEMETRY_VOLTAGE, tmp16, &frsky_packet_buffer[8]);
+        }else{
+            //send current
+            tmp16 = 456; //45.6A
+            bytes_used = frsky_append_hub_data(FRSKY_HUB_TELEMETRY_CURRENT, tmp16, &frsky_packet_buffer[8]);
+        }
+
+        //number of valid data bytes:
+        frsky_packet_buffer[6] = bytes_used;
+        //set up frame id
+        frsky_packet_buffer[7] = telemetry_id;
+
+        //do not use rest of frame, use only one hub frame per packet
+        //in order not to have to handle the datastream splitting operation
+    #else
+        //no telemetry -> at least[6]+[7] should be zero
+        //bytes 6-17 are zero
+        for(i=6; i<FRSKY_PACKET_BUFFER_SIZE; i++){
+            frsky_packet_buffer[i] = 0x00;
+        }
+    #endif
 
     //re arm adc dma etc
     //it is important to call this after reading the values...
     adc_process();
-
-    //bytes 6-17 are zero
-    for(i=6; i<FRSKY_PACKET_BUFFER_SIZE; i++){
-        frsky_packet_buffer[i] = 0x00;
-    }
 
     //arm dma channel
     RFST = RFST_STX;
@@ -962,4 +1133,43 @@ void frsky_update_ppm(void){
 
     //copy to ppm module:
     ppm_update(ppm_data);
+}
+
+
+uint8_t frsky_append_hub_data(uint8_t sensor_id, uint16_t value, uint8_t *buf){
+    uint8_t index = 0;
+    uint8_t val8;
+
+    //add header:
+    buf[index++] = FRSKY_HUB_TELEMETRY_HEADER;
+    //add sensor id
+    buf[index++] = sensor_id;
+    //add data, take care of byte stuffing
+    //low byte
+    val8 = LO(value);
+    if (val8 == 0x5E){
+        buf[index++] = 0x5D;
+        buf[index++] = 0x3E;
+    }else if (val8 == 0x5D){
+        buf[index++] = 0x5D;
+        buf[index++] = 0x3D;
+    }else{
+        buf[index++] = val8;
+    }
+    //high byte
+    val8 = HI(value);
+    if (val8 == 0x5E){
+        buf[index++] = 0x5D;
+        buf[index++] = 0x3E;
+    }else if (val8 == 0x5D){
+        buf[index++] = 0x5D;
+        buf[index++] = 0x3D;
+    }else{
+        buf[index++] = val8;
+    }
+    //add footer:
+    buf[index] = FRSKY_HUB_TELEMETRY_HEADER;
+
+    //return index:
+    return index;
 }

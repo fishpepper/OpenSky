@@ -36,3 +36,4 @@ soft_spi.h
 soft_spi.c
 portmacros.h
 README.md
+dump.txt

@@ -82,7 +82,7 @@ void apa102_update_leds(__xdata uint16_t *data, uint8_t link_qual){
 
     //inner leds show throttle
     //throttle is data[2] = (~1500...3000)
-    #define APA102_NEUTRAL_THROTTLE 2100
+    #define APA102_NEUTRAL_THROTTLE 2000
     throttle = data[2];
     if (throttle > APA102_NEUTRAL_THROTTLE){
         //2200-3000 (800) ---> 0-120
