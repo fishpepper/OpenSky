@@ -1013,7 +1013,7 @@ void frsky_send_telemetry(uint8_t telemetry_id){
     uint8_t i;
     uint16_t tmp16;
     uint8_t bytes_used = 0;
-    static uint8_t which   = 0;
+    static uint8_t test = 0;
 
     //Stop RX DMA
     RFST = RFST_SIDLE;
@@ -1037,7 +1037,7 @@ void frsky_send_telemetry(uint8_t telemetry_id){
         //use telemetry id to decide which packet to send:
         if (telemetry_id & 1){
             //send voltage packet (undocumented sensor 0x39 = volts in 0.1 steps)
-            tmp16 = 123; //12.3V
+            tmp16 = test++; //123; //12.3V
             //convert adc to voltage:
             //float v = (vraw * 3.3/1024.0) * (ADC0_DIVIDER_A + ADC0_DIVIDER_B)) / (ADC0_DIVIDER_B);
             //continue here
