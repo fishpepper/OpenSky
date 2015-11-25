@@ -37,3 +37,7 @@ soft_spi.c
 portmacros.h
 README.md
 dump.txt
+sbus.c
+sbus.h
+failsafe.h
+failsafe.c

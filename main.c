@@ -31,6 +31,7 @@
 #include "storage.h"
 #include "ppm.h"
 #include "apa102.h"
+#include "failsafe.h"
 
 void main(void) {
     //leds:
@@ -67,6 +68,9 @@ void main(void) {
 
     //init ppm output
     ppm_init();
+
+    //init failsafe
+    failsafe_init();
 
     debug("main: init done\n");
 

@@ -20,6 +20,7 @@
 #include "config.h"
 #include "debug.h"
 #include "wdt.h"
+#include "failsafe.h"
 
 //ppm signal:
 // s  CH1  s  CH2  s ... s   FILL_UP_TO_20.0ms
@@ -32,8 +33,6 @@
 //invert ppm polarity?
 #define PPM_INVERTED 1
 
-__xdata volatile uint8_t ppm_failsafe_active;
-__xdata volatile uint16_t ppm_nodata_counter;
 __xdata volatile uint8_t ppm_output_index;
 __xdata uint16_t ppm_data_ticks[9];
 
@@ -60,6 +59,9 @@ void ppm_init(void){
     //configure peripheral alternative1 for timer 1:
     //use alt config 1 -> clr flag -> P0_4 = output
     PERCFG &= ~(PERCFG_T1CFG);
+
+    //USART1 use ALT2 in order to free up P0_4 for peripheral func
+    PERCFG |= PERCFG_U1CFG;
 
     //select P0_4 for peripheral function
     //NOTE: make sure to set usart1 to alt2 config!
@@ -91,9 +93,6 @@ void ppm_init(void){
     //enable T1 interrups
     T1IE = 1;
 
-    //start in failsafe mode:
-    ppm_enter_failsafe();
-
     debug("ppm: init done\n"); debug_flush();
 }
 
@@ -102,9 +101,6 @@ void ppm_update(__xdata uint16_t *data){
     uint8_t i=0;
     uint16_t val;
     uint16_t eof_frame_duration = PPM_FRAME_LEN;
-
-    //reset failsafe counter:
-    ppm_nodata_counter = 0;
 
     //convert to ticks for timer
     //input is 0..4095, we should map this to 1000..2000us
@@ -135,16 +131,13 @@ void ppm_update(__xdata uint16_t *data){
     //debug_put_newline(); debug_flush();
 
     //exit failsafe mode
-    if (ppm_failsafe_active){
-        ppm_exit_failsafe();
-    }
-
+    failsafe_exit();
 }
 
 void ppm_exit_failsafe(void){
-    debug("ppm: exit FS\n");
+    //debug("ppm: exit FS\n");
 
-    ppm_failsafe_active = 0;
+    //start from beginning
     ppm_output_index = 0;
 
     //configure p0_4 as peripheral:
@@ -167,9 +160,6 @@ void ppm_enter_failsafe(void){
     //disable T1 interrups
     T1IE = 0;
 
-    //failsafe is active
-    ppm_failsafe_active = 1;
-
     //configure p0_4 as normal i/o:
     P0SEL &= ~(1<<4);
 
@@ -182,7 +172,7 @@ void ppm_enter_failsafe(void){
     P0 &= ~(1<<4);
     #endif
 
-    debug("ppm: entered FS\n");
+    //debug("ppm: entered FS\n");
 }
 
 //timer1 interrupt, this handles the reloading of the
@@ -195,21 +185,13 @@ void ppm_timer1_interrupt(void) __interrupt T1_VECTOR{
 
 
     //failsafe mode?
-    if (ppm_failsafe_active){
-        //ppm_enter_failsafe() will set pin levels
+    if (failsafe_is_active()){
+        //failsafe_enter() will set pin levels
         return;
     }
 
-    //count missing data packets
-    ppm_nodata_counter++;
-
-    //if >1.5s no packets -> enter failsafe!
-    //actually failsafe is also entered from within frsky.c
-    //this is meant as a second failsafe guard
-    if (ppm_nodata_counter >= 50*9*1.5){
-        //go to failsafe mode!
-        ppm_enter_failsafe();
-    }
+    //handle failsafe
+    failsafe_tick();
 
     if (ppm_output_index < 9){
         //load data

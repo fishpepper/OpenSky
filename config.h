@@ -3,6 +3,11 @@
 //send ADC data as hub telemetry as well:
 #define FRSKY_SEND_HUB_TELEMETRY 0
 
+//sbus or ppm out on P0_4:
+//enabling SBUS will DISABLE ppm!
+//******************** WORK IN PROGRESS, NOT READY YET *********************
+//#define SBUS_ENABLED 1
+
 //pin layout ISP header
 #define ISP_DATA  P2_1
 #define ISP_CLOCK P2_2
@@ -11,7 +16,7 @@
 #define SERVO_1 7 //P0_7 = BIND, pull down on startup to enter bind mode
 #define SERVO_2 6 //P0_6 = ADC1 = voltage sensor (max 3.3V on I/O ! -> voltage divider necessary!)
 #define SERVO_3 5 //P0_5 = ADC0 = current sensor (max 3.3V on I/O !)
-#define SERVO_4 4 //P0_4 = PPM OUT
+#define SERVO_4 4 //P0_4 = PPM or SBUS OUT
 #define SERVO_5 3 //P0_3 = debug UART
 
 #define PPM_OUT SERVO_1

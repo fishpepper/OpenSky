@@ -26,7 +26,7 @@
 #include "storage.h"
 #include "ppm.h"
 #include "apa102.h"
-
+#include "failsafe.h"
 
 //this will make binding not very reliable, use for debugging only!
 #define FRSKY_DEBUG_BIND_DATA 0
@@ -697,7 +697,7 @@ void frsky_main(void){
     uint8_t missing = 0;
     uint8_t hopcount = 0;
     uint8_t stat_rxcount = 0;
-    uint8_t badrx_test = 0;
+    //uint8_t badrx_test = 0;
     uint8_t conn_lost = 1;
     uint8_t packet_received = 0;
     //uint8_t i;
@@ -762,7 +762,7 @@ void frsky_main(void){
                 if (stat_rxcount==0){
                     conn_lost = 1;
                     //enter failsafe mode
-                    ppm_enter_failsafe();
+                    failsafe_enter();
                     debug("\nCONN LOST!\n");
                     //no connection led info
                     apa102_show_no_connection();
@@ -920,7 +920,6 @@ void frsky_frame_sniffer(void){
             if (hopcount++ >= 100){
                 if (stat_rxcount==0){
                     conn_lost = 1;
-                    //enter failsafe mode
                     debug("\nCONN LOST!\n");
                 }
 
@@ -1032,6 +1031,22 @@ void frsky_send_telemetry(uint8_t telemetry_id){
     //RSSI
     frsky_packet_buffer[5] = frsky_rssi;
 
+#if 0
+    //number of valid data bytes:
+    frsky_packet_buffer[6] = 0x0a;
+    //set up frame id
+    frsky_packet_buffer[7] = telemetry_id;
+    frsky_packet_buffer[8]=0x5E;// header
+    frsky_packet_buffer[9]=0x10;//packet ID altitude
+    frsky_packet_buffer[10]=test++;
+    frsky_packet_buffer[11]=0;
+    frsky_packet_buffer[12]=0x5E;
+    frsky_packet_buffer[13]=0x5E;
+    frsky_packet_buffer[14]=0x11;//gps speed
+    frsky_packet_buffer[15]=test;
+    frsky_packet_buffer[16]=0;
+    frsky_packet_buffer[17]=0x5E;
+#else
     //send ampere and voltage as hub telemetry data as well
     #if FRSKY_SEND_HUB_TELEMETRY
         //use telemetry id to decide which packet to send:
@@ -1062,6 +1077,7 @@ void frsky_send_telemetry(uint8_t telemetry_id){
             frsky_packet_buffer[i] = 0x00;
         }
     #endif
+#endif
 
     //re arm adc dma etc
     //it is important to call this after reading the values...

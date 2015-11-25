@@ -9,7 +9,7 @@ LDFLAGS_FLASH = \
 ifdef DEBUG
 CFLAGS += --debug
 endif
-SRC = main.c uart.c delay.c clocksource.c frsky.c timeout.c adc.c dma.c wdt.c storage.c flash.c ppm.c apa102.c soft_spi.c
+SRC = main.c uart.c delay.c clocksource.c frsky.c timeout.c adc.c dma.c wdt.c storage.c flash.c ppm.c apa102.c soft_spi.c failsafe.c sbus.c
 ADB=$(SRC:.c=.adb)
 ASM=$(SRC:.c=.asm)
 LNK=$(SRC:.c=.lnk)

@@ -170,8 +170,6 @@ void uart_select_port(void){
     //therefore we configure
     //USART0 use ALT1 -> Clear flag -> Port P0 = TX
     PERCFG &= ~(PERCFG_U0CFG);
-    //USART1 use ALT2
-    PERCFG |= PERCFG_U1CFG;
 
     //configure pin P0_3 (TX) as output:
     P0SEL |= (1<<3);

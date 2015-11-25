@@ -13,9 +13,6 @@ void ppm_update(__xdata uint16_t *data);
 void ppm_exit_failsafe(void);
 void ppm_enter_failsafe(void);
 
-
-extern __xdata volatile uint8_t ppm_failsafe_active;
-extern __xdata volatile uint16_t ppm_nodata_counter;
 extern __xdata volatile uint8_t ppm_output_index;
 extern __xdata uint16_t ppm_data_ticks[9];
 

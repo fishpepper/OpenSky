@@ -28,5 +28,12 @@
 *.x86_64
 *.hex
 
+#misc
+*.asm
+*.lst
+*.sym
+*.rst
+*.rel
+
 # Debug files
 *.dSYM/
