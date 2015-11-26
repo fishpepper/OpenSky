@@ -4,7 +4,7 @@
 #include <stdint.h>
 
 union uart_config_t{
-  uint8_t byte; 
+  uint8_t byte;
   struct{
         uint8_t START : 1; //start bit level
         uint8_t STOP  : 1; //stop bit level
@@ -17,14 +17,9 @@ union uart_config_t{
   } bit;
 };
 
-
-extern __xdata union uart_config_t uart_config;
-
 void uart_init(void);
 void uart_test(void);
-void uart_select_port(void);
-void uart_set_baudrate(void);
-void uart_set_mode(); //struct uart_mode_config_t *cfg);
+void uart_set_mode(__xdata union uart_config_t *cfg);
 void uart_putc(uint8_t ch);
 void uart_flush(void);
 void uart_puts(uint8_t *data);

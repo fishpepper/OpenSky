@@ -19,38 +19,83 @@
 #include "config.h"
 #include "debug.h"
 #include "wdt.h"
+#include "dma.h"
+#include "delay.h"
 #include "sbus.h"
 #include "failsafe.h"
 
-__xdata uint16_t sbus_data[24];
+__xdata uint16_t sbus_data[SBUS_DATA_LEN];
+
 
 void sbus_init(void){
+    __xdata union uart_config_t sbus_uart_config;
+
     debug("sbus: init\n"); debug_flush();
+
+    //we will use SERVO_4 as sbus output:
+    //therefore we configure
+    //USART1 use ALT1 -> Clear flag -> Port P0_4 = TX
+    PERCFG &= ~(PERCFG_U1CFG);
+
+    //configure pin P0_4 (TX) as output:
+    P0SEL |= (1<<4);
+
+    //make tx pin output:
+    P0DIR |= (1<<4);
+
+    //this assumes cpu runs from XOSC (26mhz) !
+    //set baudrate 1mbit -> BAUD_E = 19, BAUD_M = 0
+    U1BAUD = SBUS_BAUD_M;
+    U1GCR = (U0GCR & ~0x1F) | (SBUS_BAUD_E);
+
+    //set up config
+    //8N1, strange, some doc says 8E2??
+    sbus_uart_config.bit.START = 0; //startbit level = low
+    sbus_uart_config.bit.STOP  = 1; //stopbit level = high
+    sbus_uart_config.bit.SPB   = 0; //1 stopbit
+    sbus_uart_config.bit.PARITY = 0; //no parity
+    sbus_uart_config.bit.D9     = 0; //8 Bits
+    sbus_uart_config.bit.FLOW   = 0; //no hw flow control
+    sbus_uart_config.bit.ORDER  = 0; //lsb first
+    uart_set_mode(&sbus_uart_config);
+
+    //use dma channel 3 for transmission:
+    dma_config[3].PRIORITY       = DMA_PRI_LOW;
+    dma_config[3].M8             = DMA_M8_USE_7_BITS;
+    dma_config[3].IRQMASK        = DMA_IRQMASK_DISABLE;
+    dma_config[3].TRIG           = DMA_TRIG_UTX1;
+    dma_config[3].TMODE          = DMA_TMODE_SINGLE;
+    dma_config[3].WORDSIZE       = DMA_WORDSIZE_BYTE;
+
+    //important: src addr start is sbus_data[1] as we
+    //initiate the transfer by manually sending sbus_data[0]!
+    SET_WORD(dma_config[3].SRCADDRH,  dma_config[3].SRCADDRL,  &sbus_data[1]);
+    SET_WORD(dma_config[3].DESTADDRH, dma_config[3].DESTADDRL, &X_U1DBUF);
+    dma_config[3].VLEN           = DMA_VLEN_USE_LEN;
+
+    SET_WORD(dma_config[3].LENH, dma_config[3].LENL, SBUS_DATA_LEN);
+    dma_config[3].SRCINC         = DMA_SRCINC_1;
+    dma_config[3].DESTINC        = DMA_DESTINC_0;
+
+    //set pointer to the DMA configuration struct into DMA-channel 1-4
+    //configuration, should have happened in adc.c already...
+    SET_WORD(DMA1CFGH, DMA1CFGL, &dma_config[1]);
+
+    //arm the relevant DMA channel for UART TX, and apply 45 NOP's
+    //to allow the DMA configuration to load
+    //-> do a sleep instead of those nops...
+    DMAARM |= (1<<DMA_ARM_CH3);
+    delay_us(100);
 
     //start in failsafe mode:
     failsafe_enter();
-
-    /*
-    //set up UART:
-#define BAUD 100000//SBUS 1000000bauds
-    #include <util/setbaud.h>
-    UBRR0H = UBRRH_VALUE;
-    UBRR0L = UBRRL_VALUE;
-    //Set frame format to 8 data bits, no parity, 1 stop bit
-    UCSR0C |= (1<<UCSZ01)|(1<<UCSZ00);
-    while ( UCSR0A & (1 << RXC0) )//flush receive buffer
-        UDR0;
-    //enable reception and RC complete interrupt
-    UCSR0B |= (1<<TXEN0);//tx enable
-
-
-    sbus_nodata_counter = 0;*/
 
     debug("sbus: init done\n"); debug_flush();
 }
 
 void sbus_start_transmission(){
-
+    //send the very first UART byte to trigger a UART TX session:
+    U1DBUF = sbus_data[0];
 }
 
 

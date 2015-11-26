@@ -38,11 +38,28 @@ void putchar(char c){
 __xdata uint8_t uart_tx_buffer[UART_TX_BUFFER_SIZE];
 __xdata volatile uint8_t uart_tx_buffer_in;
 __xdata volatile uint8_t uart_tx_buffer_out;
-__xdata union uart_config_t uart_config;
 
 void uart_init(void){
-    uart_select_port();
-    uart_set_baudrate();
+    __xdata union uart_config_t uart_config;
+
+    //we will use SERVO_5 as tx output:
+    //therefore we configure
+    //USART0 use ALT1 -> Clear flag -> Port P0 = TX
+    PERCFG &= ~(PERCFG_U0CFG);
+
+    //configure pin P0_3 (TX) as output:
+    P0SEL |= (1<<3);
+
+    //make sure all P1 pins switch to normal GPIO
+    P1SEL &= ~(0x3C);
+
+    //make tx pin output:
+    P0DIR |= (1<<3);
+
+    //this assumes cpu runs from XOSC (26mhz) !
+    //set baudrate
+    U0BAUD = UART_BAUD_M;
+    U0GCR = (U0GCR & ~0x1F) | (UART_BAUD_E);
 
     //set up config
     uart_config.bit.START = 0; //startbit level = low
@@ -52,11 +69,20 @@ void uart_init(void){
     uart_config.bit.D9     = 0; //8 Bits
     uart_config.bit.FLOW   = 0; //no hw flow control
     uart_config.bit.ORDER  = 0; //lsb first
-    uart_set_mode();
+    uart_set_mode(&uart_config);
 
     //init tx buffer
     uart_tx_buffer_in = 0;
     uart_tx_buffer_out = 0;
+
+    //enable interrupts:
+    sei();
+
+    //wait some time for uart to become stable
+    delay_us(100);
+    debug_put_newline();
+    debug("### OpenSky -+- (c) by github.com/fishpepper ###\n"); debug_flush();
+    debug("uart: init done\n");
 }
 
 void uart_test(void){
@@ -139,15 +165,15 @@ void uart_tx_interrupt(void) __interrupt UTX0_VECTOR{
 }
 
 
-void uart_set_mode(void){ //struct uart_mode_config_t *cfg){
+void uart_set_mode(__xdata union uart_config_t *cfg){
     //enable uart mode
     U0CSR |= 0x80;
 
     //store config to U0UCR register
-    U0UCR = uart_config.byte & (0x7F);
+    U0UCR = cfg->byte & (0x7F);
 
     //store config to U0GCR: (msb/lsb)
-    if (uart_config.bit.ORDER){
+    if (cfg->bit.ORDER){
         U0GCR |= U0GCR_ORDER;
     }else{
         U0GCR &= ~U0GCR_ORDER;
@@ -158,28 +184,6 @@ void uart_set_mode(void){ //struct uart_mode_config_t *cfg){
     IP1 &= ~(1<<3);
 }
 
-void uart_set_baudrate(void){
-    //this assumes cpu runs from XOSC (26mhz) !
-    //set baudrate
-    U0BAUD = UART_BAUD_M;
-    U0GCR = (U0GCR & ~0x1F) | (UART_BAUD_E);
-}
-
-void uart_select_port(void){
-    //we will use SERVO_5 as tx output:
-    //therefore we configure
-    //USART0 use ALT1 -> Clear flag -> Port P0 = TX
-    PERCFG &= ~(PERCFG_U0CFG);
-
-    //configure pin P0_3 (TX) as output:
-    P0SEL |= (1<<3);
-
-    //make sure all P1 pins switch to normal GPIO
-    P1SEL &= ~(0x3C);
-
-    //make tx pin output:
-    P0DIR |= (1<<3);
-}
 
 void uart_puts(uint8_t *data){
     uint8_t c = *data++;

@@ -43,9 +43,6 @@ void main(void) {
     //init uart
     uart_init();
 
-    //enable interrupts:
-    sei();
-
     //init wdt timer
     wdt_init();
 
@@ -53,7 +50,6 @@ void main(void) {
 
     //init storage
     storage_init();
-
 
     //enable timeout routines
     timeout_init();
@@ -67,7 +63,11 @@ void main(void) {
     adc_init();
 
     //init ppm output
+    #if SBUS_ENABLED
+    sbus_init();
+    #else
     ppm_init();
+    #endif
 
     //init failsafe
     failsafe_init();
