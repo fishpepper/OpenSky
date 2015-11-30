@@ -27,6 +27,7 @@
 #include "ppm.h"
 #include "apa102.h"
 #include "failsafe.h"
+#include "sbus.h"
 
 //this will make binding not very reliable, use for debugging only!
 #define FRSKY_DEBUG_BIND_DATA 0
@@ -719,6 +720,9 @@ void frsky_main(void){
     //reset wdt once in order to have at least one second waiting for a packet:
     wdt_reset();
 
+    //make sure we never read the same packet twice by crc flag
+    frsky_packet_buffer[FRSKY_PACKET_BUFFER_SIZE-1] = 0x00;
+conn_lost = 1;
     //start main loop
     while(1){
         if (timeout_timed_out()){
@@ -733,14 +737,24 @@ void frsky_main(void){
 
             frsky_increment_channel(1);
 
-            //strange delay
-            //_delay_us(1000);
+            //strange delay from spi dumps
             delay_us(1000);
 
             //go back to rx mode
             frsky_packet_received = 0;
             DMAARM = DMA_ARM_CH0;
             RFST = RFST_SRX;
+
+            //if enabled, send a sbus frame in case we lost that frame:
+            #if SBUS_ENABLED
+            if (!packet_received){
+                //frame was lost, so there was no channel value update
+                //and no transmission for the last frame slot.
+                //therefore we will do a transmission now
+                //(frame lost packet flag will be set)
+                sbus_start_transmission(SBUS_FRAME_LOST);
+            }
+            #endif
 
             //check for packets
             if (packet_received){
@@ -817,7 +831,6 @@ void frsky_main(void){
                 //extract channel data:
                 frsky_update_ppm();
 
-                //debug_putc('#');
                 //debug_put_hex8(buffer[3]);
 
                 //make sure we never read the same packet twice by crc flag
@@ -1010,7 +1023,7 @@ void frsky_increment_channel(int8_t cnt){
 
 void frsky_send_telemetry(uint8_t telemetry_id){
     uint8_t i;
-    uint16_t tmp16;
+    //uint16_t tmp16;
     uint8_t bytes_used = 0;
     static uint8_t test = 0;
 
@@ -1125,7 +1138,7 @@ uint8_t frsky_extract_rssi(uint8_t rssi_raw){
 
 void frsky_update_ppm(void){
     //build uint16_t array from data:
-    __xdata uint16_t ppm_data[8];
+    __xdata uint16_t channel_data[8];
 
     /*debug("[");debug_flush();
     for(cnt=0; cnt<FRSKY_PACKET_BUFFER_SIZE; cnt++){
@@ -1137,21 +1150,29 @@ void frsky_update_ppm(void){
     */
 
     //extract channel data from packet:
-    ppm_data[0] = (uint16_t)(((frsky_packet_buffer[10] & 0x0F)<<8 | frsky_packet_buffer[6]));
-    ppm_data[1] = (uint16_t)(((frsky_packet_buffer[10] & 0xF0)<<4 | frsky_packet_buffer[7]));
-    ppm_data[2] = (uint16_t)(((frsky_packet_buffer[11] & 0x0F)<<8 | frsky_packet_buffer[8]));
-    ppm_data[3] = (uint16_t)(((frsky_packet_buffer[11] & 0xF0)<<4 | frsky_packet_buffer[9]));
-    ppm_data[4] = (uint16_t)(((frsky_packet_buffer[16] & 0x0F)<<8 | frsky_packet_buffer[12]));
-    ppm_data[5] = (uint16_t)(((frsky_packet_buffer[16] & 0xF0)<<4 | frsky_packet_buffer[13]));
-    ppm_data[6] = (uint16_t)(((frsky_packet_buffer[17] & 0x0F)<<8 | frsky_packet_buffer[14]));
-    ppm_data[7] = (uint16_t)(((frsky_packet_buffer[17] & 0xF0)<<4 | frsky_packet_buffer[15]));
+    channel_data[0] = (uint16_t)(((frsky_packet_buffer[10] & 0x0F)<<8 | frsky_packet_buffer[6]));
+    channel_data[1] = (uint16_t)(((frsky_packet_buffer[10] & 0xF0)<<4 | frsky_packet_buffer[7]));
+    channel_data[2] = (uint16_t)(((frsky_packet_buffer[11] & 0x0F)<<8 | frsky_packet_buffer[8]));
+    channel_data[3] = (uint16_t)(((frsky_packet_buffer[11] & 0xF0)<<4 | frsky_packet_buffer[9]));
+    channel_data[4] = (uint16_t)(((frsky_packet_buffer[16] & 0x0F)<<8 | frsky_packet_buffer[12]));
+    channel_data[5] = (uint16_t)(((frsky_packet_buffer[16] & 0xF0)<<4 | frsky_packet_buffer[13]));
+    channel_data[6] = (uint16_t)(((frsky_packet_buffer[17] & 0x0F)<<8 | frsky_packet_buffer[14]));
+    channel_data[7] = (uint16_t)(((frsky_packet_buffer[17] & 0xF0)<<4 | frsky_packet_buffer[15]));
 
     //set apa leds:
-    apa102_update_leds(ppm_data, frsky_link_quality);
+    apa102_update_leds(channel_data, frsky_link_quality);
     apa102_start_transmission();
 
-    //copy to ppm module:
-    ppm_update(ppm_data);
+    //exit failsafe mode
+    failsafe_exit();
+
+    //copy to output module:
+    #if SBUS_ENABLED
+    sbus_update(channel_data);
+    sbus_start_transmission(SBUS_FRAME_NOT_LOST);
+    #else
+    ppm_update(channel_data);
+    #endif
 }
 
 

@@ -31,9 +31,6 @@ void putchar(char c){
 }
 #endif*/
 
-//use 155200 baud
-#define UART_BAUD_M CC2510_BAUD_M_115200
-#define UART_BAUD_E CC2510_BAUD_E_115200
 
 __xdata uint8_t uart_tx_buffer[UART_TX_BUFFER_SIZE];
 __xdata volatile uint8_t uart_tx_buffer_in;
@@ -66,6 +63,7 @@ void uart_init(void){
     uart_config.bit.STOP  = 1; //stopbit level = high
     uart_config.bit.SPB   = 0; //1 stopbit
     uart_config.bit.PARITY = 0; //no parity
+    uart_config.bit.BIT9   = 0; //8bit
     uart_config.bit.D9     = 0; //8 Bits
     uart_config.bit.FLOW   = 0; //no hw flow control
     uart_config.bit.ORDER  = 0; //lsb first
@@ -179,9 +177,9 @@ void uart_set_mode(__xdata union uart_config_t *cfg){
         U0GCR &= ~U0GCR_ORDER;
     }
 
-    //interrupt prio to 1 (0..3=highest)
-    IP0 |= (1<<3);
-    IP1 &= ~(1<<3);
+    //interrupt prio to 01 (0..3=highest)
+    IP0 |=  (1<<2);
+    IP1 &= ~(1<<2);
 }
 
 

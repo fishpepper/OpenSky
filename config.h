@@ -5,8 +5,10 @@
 
 //sbus or ppm out on P0_4:
 //enabling SBUS will DISABLE ppm!
-//******************** WORK IN PROGRESS, NOT READY YET *********************
-//#define SBUS_ENABLED 1
+
+#define SBUS_ENABLED  0  //0 = disabled, 1 = enabled
+//invert SBUS output (note: default/futabe is INVERTED=1)
+#define SBUS_INVERTED 0  //0 = not inverted => idle = high, 1 = INVERTED => idle = LOW
 
 //pin layout ISP header
 #define ISP_DATA  P2_1
@@ -56,19 +58,5 @@
 #define LED_GREEN_PIN  4
 #define LED_RED_PORT P2
 #define LED_RED_PIN  3
-
-//use helper macros to do expansion to *DIR etc
-//LEDS
-#define LED_GREEN_DIR PORT2DIR(LED_GREEN_PORT)
-#define LED_RED_DIR   PORT2DIR(LED_RED_PORT)
-#define LED_RED_BIT PORT2BIT(LED_RED_PORT, LED_RED_PIN)
-#define LED_GREEN_BIT PORT2BIT(LED_GREEN_PORT, LED_GREEN_PIN)
-
-//SOFTSPI
-#define SOFT_SPI_CLOCK_DIR PORT2DIR(SOFT_SPI_CLOCK_PORT)
-#define SOFT_SPI_CLOCK_BIT PORT2BIT(SOFT_SPI_CLOCK_PORT, SOFT_SPI_CLOCK_PIN)
-#define SOFT_SPI_MOSI_DIR PORT2DIR(SOFT_SPI_MOSI_PORT)
-#define SOFT_SPI_MOSI_BIT PORT2BIT(SOFT_SPI_MOSI_PORT, SOFT_SPI_MOSI_PIN)
-
 
 

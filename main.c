@@ -44,7 +44,7 @@ void main(void) {
     uart_init();
 
     //init wdt timer
-    wdt_init();
+    //wdt_init();
 
     apa102_init();
 

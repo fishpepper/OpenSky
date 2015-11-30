@@ -22,6 +22,8 @@
 #include "wdt.h"
 #include "failsafe.h"
 
+#if (SBUS_ENABLED == 0)
+
 //ppm signal:
 // s  CH1  s  CH2  s ... s   FILL_UP_TO_20.0ms
 //|`|_____|`|_____|`|_  |`|_____________________
@@ -37,7 +39,13 @@ __xdata volatile uint8_t ppm_output_index;
 __xdata uint16_t ppm_data_ticks[9];
 
 void ppm_init(void){
+    uint8_t i;
     debug("ppm: init\n"); debug_flush();
+
+    //initialise
+    for(i = 0; i<8; i++){
+        ppm_data_ticks[i] = PPM_US_TO_TICKCOUNT(1000);
+    }
 
     //no int on overflow:
     OVFIM = 0;
@@ -104,7 +112,7 @@ void ppm_update(__xdata uint16_t *data){
 
     //convert to ticks for timer
     //input is 0..4095, we should map this to 1000..2000us
-    //-> 1000 + input/4 = 1000 + (input<<2)
+    //frsky seems to send us*1.5 (~1480...3020) -> divide by 1.5 (=*2/3) to get us
     for(i = 0; i<8; i++){
         val = data[i];
         //convert us to ticks:
@@ -129,9 +137,6 @@ void ppm_update(__xdata uint16_t *data){
     //debug(" out ");
     //debug_put_uint16(ppm_data_ticks[0]);
     //debug_put_newline(); debug_flush();
-
-    //exit failsafe mode
-    failsafe_exit();
 }
 
 void ppm_exit_failsafe(void){
@@ -185,7 +190,7 @@ void ppm_timer1_interrupt(void) __interrupt T1_VECTOR{
 
 
     //failsafe mode?
-    if (failsafe_is_active()){
+    if (failsafe_active){
         //failsafe_enter() will set pin levels
         return;
     }
@@ -207,3 +212,6 @@ void ppm_timer1_interrupt(void) __interrupt T1_VECTOR{
     //set overflow cmp value
     SET_WORD_LO_FIRST(T1CC0H, T1CC0L, pulse_len);
 }
+
+#endif
+

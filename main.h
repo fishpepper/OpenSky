@@ -48,6 +48,11 @@
 #define U0GCR_CPOL  (1<<7)
 #define U0CSR_TX_BYTE (1<<1)
 
+#define U1GCR_ORDER (1<<5)
+#define U1GCR_CPHA  (1<<6)
+#define U1GCR_CPOL  (1<<7)
+#define U1CSR_TX_BYTE (1<<1)
+
 #define RFST_SNOP    0x05
 #define RFST_SIDLE   0x04
 #define RFST_STX     0x03

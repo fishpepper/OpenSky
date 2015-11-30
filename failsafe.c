@@ -1,5 +1,6 @@
 #include "failsafe.h"
 #include "debug.h"
+#include "config.h"
 #include "sbus.h"
 #include "ppm.h"
 
@@ -13,19 +14,6 @@ void failsafe_init(void){
 
     //start in failsafe mode
     failsafe_enter();
-}
-
-void failsafe_enter(void){
-    debug("failsafe: enter\n");
-
-    #if SBUS_ENABLED
-    sbus_enter_failsafe();
-    #else
-    ppm_enter_failsafe();
-    #endif
-
-    //failsafe is active
-    failsafe_active = 1;
 }
 
 void failsafe_exit(void){
@@ -42,7 +30,7 @@ void failsafe_exit(void){
         ppm_exit_failsafe();
         #endif
 
-        debug("failsafe: left\n");
+        //debug("failsafe: left\n");
     }
 }
 
@@ -58,10 +46,6 @@ void failsafe_tick(void){
         //go to failsafe mode!
         failsafe_enter();
     }
-}
-
-uint8_t failsafe_is_active(void){
-    return failsafe_active;
 }
 
 

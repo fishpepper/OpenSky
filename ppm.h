@@ -4,7 +4,9 @@
 #include <stdint.h>
 #include <cc2510fx.h>
 #include "main.h"
+#include "config.h"
 
+#if (SBUS_ENABLED == 0)
 void ppm_init(void);
 void ppm_timer1_interrupt(void) __interrupt T1_VECTOR;
 
@@ -29,6 +31,6 @@ extern __xdata uint16_t ppm_data_ticks[9];
 #define PPM_FRAME_LEN PPM_US_TO_TICKCOUNT(20000L)
 #define PPM_SYNC_PULS_LEN_TICKS (PPM_US_TO_TICKCOUNT(PPM_SYNC_DURATION_US))
 
-
+#endif
 
 #endif

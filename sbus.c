@@ -14,7 +14,6 @@
 
    author: fishpepper <AT> gmail.com
 */
-
 #include "main.h"
 #include "config.h"
 #include "debug.h"
@@ -22,10 +21,17 @@
 #include "dma.h"
 #include "delay.h"
 #include "sbus.h"
+#include "ppm.h"
+#include "uart.h"
 #include "failsafe.h"
 
-__xdata uint16_t sbus_data[SBUS_DATA_LEN];
+#if SBUS_ENABLED
 
+__xdata uint8_t sbus_data[SBUS_DATA_LEN];
+
+//SBUS is:
+//100000bps inverted serial stream, 8 bits, even parity, 2 stop bits
+//frame period is 7ms (HS) or 14ms (FS)
 
 void sbus_init(void){
     __xdata union uart_config_t sbus_uart_config;
@@ -44,20 +50,27 @@ void sbus_init(void){
     P0DIR |= (1<<4);
 
     //this assumes cpu runs from XOSC (26mhz) !
-    //set baudrate 1mbit -> BAUD_E = 19, BAUD_M = 0
+    //see sbus.h for calc and defines
     U1BAUD = SBUS_BAUD_M;
-    U1GCR = (U0GCR & ~0x1F) | (SBUS_BAUD_E);
+    U1GCR = (U1GCR & ~0x1F) | (SBUS_BAUD_E);
 
-    //set up config
-    //8N1, strange, some doc says 8E2??
-    sbus_uart_config.bit.START = 0; //startbit level = low
-    sbus_uart_config.bit.STOP  = 1; //stopbit level = high
-    sbus_uart_config.bit.SPB   = 0; //1 stopbit
-    sbus_uart_config.bit.PARITY = 0; //no parity
-    sbus_uart_config.bit.D9     = 0; //8 Bits
+    //set up config for USART -> 8E2
+    #if SBUS_INVERTED
+    sbus_uart_config.bit.START  = 1; //startbit level = low
+    sbus_uart_config.bit.STOP   = 0; //stopbit level = high
+    sbus_uart_config.bit.D9     = 1; //UNEven parity
+    #else
+    sbus_uart_config.bit.START  = 0; //startbit level = low
+    sbus_uart_config.bit.STOP   = 1; //stopbit level = high
+    sbus_uart_config.bit.D9     = 0; //Even parity
+    #endif
+    sbus_uart_config.bit.SPB    = 1; //1 = 2 stopbits
+    sbus_uart_config.bit.PARITY = 1; //1 = parity enabled, D9=0 -> even parity
+    sbus_uart_config.bit.BIT9   = 1; //8bit
+
     sbus_uart_config.bit.FLOW   = 0; //no hw flow control
     sbus_uart_config.bit.ORDER  = 0; //lsb first
-    uart_set_mode(&sbus_uart_config);
+    sbus_uart_set_mode(&sbus_uart_config);
 
     //use dma channel 3 for transmission:
     dma_config[3].PRIORITY       = DMA_PRI_LOW;
@@ -73,7 +86,8 @@ void sbus_init(void){
     SET_WORD(dma_config[3].DESTADDRH, dma_config[3].DESTADDRL, &X_U1DBUF);
     dma_config[3].VLEN           = DMA_VLEN_USE_LEN;
 
-    SET_WORD(dma_config[3].LENH, dma_config[3].LENL, SBUS_DATA_LEN);
+    //transfer SBUS_DATA_LEN-1 bytes (first byte is transmitted on start of transmission)
+    SET_WORD(dma_config[3].LENH, dma_config[3].LENL, SBUS_DATA_LEN-1);
     dma_config[3].SRCINC         = DMA_SRCINC_1;
     dma_config[3].DESTINC        = DMA_DESTINC_0;
 
@@ -84,7 +98,7 @@ void sbus_init(void){
     //arm the relevant DMA channel for UART TX, and apply 45 NOP's
     //to allow the DMA configuration to load
     //-> do a sleep instead of those nops...
-    DMAARM |= (1<<DMA_ARM_CH3);
+    DMAARM |= DMA_ARM_CH3;
     delay_us(100);
 
     //start in failsafe mode:
@@ -93,53 +107,132 @@ void sbus_init(void){
     debug("sbus: init done\n"); debug_flush();
 }
 
-void sbus_start_transmission(){
+void sbus_uart_set_mode(__xdata union uart_config_t *cfg){
+    //enable uart mode
+    U1CSR |= 0x80;
+
+    //store config to U1UCR register
+    U1UCR = cfg->byte & (0x7F);
+
+    //store config to U1GCR: (msb/lsb)
+    if (cfg->bit.ORDER){
+        U1GCR |= U1GCR_ORDER;
+    }else{
+        U1GCR &= ~U1GCR_ORDER;
+    }
+
+    debug("sbus: U1CSR = 0x");
+    debug_put_hex8(U1CSR); debug_flush();
+    debug(" U1UCR = 0x");
+    debug_put_hex8(U1UCR); debug_flush();
+    debug(" U1GCR = 0x");
+    debug_put_hex8(U1GCR); debug_flush();
+    debug_put_newline();
+
+    //interrupt prio to 1 (0..3=highest)
+    IP0 |= (1<<3);
+    IP1 &= ~(1<<3);
+}
+
+void sbus_start_transmission(uint8_t frame_lost){
+    //debug("sbus: TX\n");
+
+    //set up flags:
+    //bit 7 = discrete channel 17
+    //bit 6 = discrete channel 18
+    //bit 5 = frame lost
+    //bit 4 = Failsafe
+    //failsafe + frame lost will be set below,
+    //discrete channels are zero
+    sbus_data[23] = 0x00;
+
+    //failsafe active?
+    if (failsafe_active){
+        //clear failsafe flag:
+        sbus_data[23] |= SBUS_FLAG_FAILSAFE_ACTIVE;
+    }
+
+    //check if this frame was lost
+    if (frame_lost == SBUS_FRAME_LOST){
+        sbus_data[23] |= SBUS_FLAG_FRAME_LOST;
+    }
+
+    //time to send this frame!
+    //re-arm dma:
+    DMAARM |= DMA_ARM_CH3;
+
     //send the very first UART byte to trigger a UART TX session:
     U1DBUF = sbus_data[0];
 }
 
 
 void sbus_update(__xdata uint16_t *data){
-/*
+    uint8_t i;
+    __xdata uint16_t rescaled_data[8];
+    int16_t tmp;
 
-    sbus[0]=SBUS_SYNCBYTE;
-    sbus[1]=lowByte(channel[0]);//
-    sbus[2]=highByte(channel[0]) | lowByte(channel[1])<<3;
-    sbus[3]=(channel[1]>>5)|(channel[2]<<6);//
-    sbus[4]=(channel[2]>>2)& 0xff;
-    sbus[5]=(channel[2]>>10)|lowByte(channel[3])<<1;
-    sbus[6]=(channel[3]>>7)|lowByte(channel[4])<<4;
-    sbus[7]=(channel[4]>>4)|lowByte(channel[5])<<7;
-    sbus[8]=(channel[5]>>1)& 0xff;
-    sbus[9]=(channel[5]>>9)|lowByte(channel[6])<<2;
-    sbus[10]=(channel[6]>>6)|lowByte(channel[7])<<3;
-    sbus[11]=(channel[7]>>3)& 0xff;
-    //
-    sbus[12]=lowByte(channel[8]);
-    sbus[13]=highByte(channel[8]) | lowByte(channel[9])<<3;
-    sbus[14]=(channel[9]>>5)|(channel[10]<<6);
-    sbus[15]=(channel[10]>>2)& 0xff;
-    sbus[16]=(channel[10]>>10)|lowByte(channel[11])<<1;
-    sbus[17]=(channel[11]>>7)|lowByte(channel[12])<<4;
-    sbus[18]=(channel[12]>>4)|lowByte(channel[13])<<7;
-    sbus[19]=(channel[13]>>1)& 0xff;
-    sbus[20]=(channel[13]>>9)|lowByte(channel[14])<<2;
-    sbus[21]=(channel[14]>>6)|lowByte(channel[15])<<3;
-    sbus[22]=(channel[15]>>3)& 0xff;//end
-     //Flags sbus[23]
-     //bit 7=ch17(0x80)
-     //bit 6=ch18(0x40)
-    //bit 5=frame lost(0x20)
-    //bit4=failsafe activated(0x10)
-     //bit3=birt2=bit1=bit0=n/a
-    //sbus[23]=0xC0;// 11000000/FS 11010000
-    sbus[23]=0x10;// 11000000/FS 11010000
-    sbus[24]=SBUS_ENDBYTE;//endbyte
+    //rescale input data:
+    //frsky input is us*1.5 (~1480...3020)
+    //therefore remap ~1480..3020 ---> 0..2047
+    //substract 1430:
+    //sbus data = (input - 1430)
+    //center was at 2250us, is now at 820, remap this to 1024:
+    //1024/820 = 1.25... = 5/4 = 1 1/4
+    //-> sbus data = (input-1430)*(1 1/4) = (input-1430) + (input-1430)/4
+    for(i=0; i<8; i++){
+        tmp = data[i] - 1430;
+        tmp = tmp + (tmp>>2);
+        if (tmp < 0){
+            rescaled_data[i] = 0;
+        }else if(tmp > 2047){
+            rescaled_data[i] = 2047;
+        }else{
+            rescaled_data[i] = tmp;
+        }
+    }
 
+    //sbus transmits up to 16 channels with 11bit each.
+    //build up channel data frame:
+    sbus_data[0] = SBUS_SYNCBYTE;
 
-*/
-    //exit failsafe mode
-    failsafe_exit();
+    //bits ch 0000 0000
+    sbus_data[ 1] = LO(rescaled_data[0]);
+    //bits ch 1111 1000
+    sbus_data[ 2] = (LO(rescaled_data[1])<<3) | HI(rescaled_data[0]);
+    //bits ch 2211 1111
+    sbus_data[ 3] = (rescaled_data[1]>>5) | (rescaled_data[2]<<6);
+    //bits ch 2222 2222
+    sbus_data[ 4] = (rescaled_data[2]>>2) & 0xFF;
+    //bits ch 3333 3332
+    sbus_data[ 5] = (rescaled_data[2]>>10) | (LO(rescaled_data[3])<<1);
+    //bits ch 4444 3333
+    sbus_data[ 6] = (rescaled_data[3]>>7) | (LO(rescaled_data[4])<<4);
+    //bits ch 5444 4444
+    sbus_data[ 7] = (rescaled_data[4]>>4) | (LO(rescaled_data[5])<<7);
+    //bits ch 5555 5555
+    sbus_data[ 8] = (rescaled_data[5]>>1) & 0xFF;
+    //bits ch 6666 6655
+    sbus_data[ 9] = (rescaled_data[5]>>9) | (LO(rescaled_data[6])<<2);
+    //bits ch 7776 6666
+    sbus_data[10] = (rescaled_data[6]>>6) | (LO(rescaled_data[7])<<3);
+    //bits ch 7777 7777
+    sbus_data[11] = (rescaled_data[7]>>3) & 0xFF;
+    //ch8-ch15 = zero
+    for(i=12; i<23; i++){
+        sbus_data[i] = 0x00;
+    }
+    //sbus flags, will be set by start transmission...
+    sbus_data[23] = 0x00;
+
+    //EOF frame:
+    sbus_data[24] = SBUS_ENDBYTE;
+
+    #if SBUS_INVERTED
+    //invert data bits:
+    for(i=0; i<SBUS_DATA_LEN;i++){
+        sbus_data[i] = 0xFF ^ sbus_data[i];
+    }
+    #endif
 }
 
 void sbus_exit_failsafe(void){
@@ -152,7 +245,7 @@ void sbus_enter_failsafe(void){
     debug("sbus: entered FS\n");
 }
 
-
+#endif
 
 
 

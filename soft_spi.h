@@ -18,6 +18,14 @@ void soft_spi_init(void);
 void soft_spi_tx_do(void);
 #define soft_spi_tx(data) {soft_spi_tx_byte=data;  soft_spi_tx_do(); }
 
+
+//SOFTSPI
+#define SOFT_SPI_CLOCK_DIR PORT2DIR(SOFT_SPI_CLOCK_PORT)
+#define SOFT_SPI_CLOCK_BIT PORT2BIT(SOFT_SPI_CLOCK_PORT, SOFT_SPI_CLOCK_PIN)
+#define SOFT_SPI_MOSI_DIR PORT2DIR(SOFT_SPI_MOSI_PORT)
+#define SOFT_SPI_MOSI_BIT PORT2BIT(SOFT_SPI_MOSI_PORT, SOFT_SPI_MOSI_PIN)
+
+
 #define SOFT_SPI_CLOCK_HI()  { SOFT_SPI_CLOCK_BIT = 1; }
 #define SOFT_SPI_CLOCK_LO()  { SOFT_SPI_CLOCK_BIT = 0; }
 #define SOFT_SPI_DATA_TO_MOSI() {if (soft_spi_tx_byte & 0x80){ SOFT_SPI_MOSI_BIT=1; }else{ SOFT_SPI_MOSI_BIT = 0; };}

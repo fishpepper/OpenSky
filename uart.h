@@ -3,6 +3,10 @@
 #include "cc2510fx.h"
 #include <stdint.h>
 
+//use 155200 baud
+#define UART_BAUD_M CC2510_BAUD_M_115200
+#define UART_BAUD_E CC2510_BAUD_E_115200
+
 union uart_config_t{
   uint8_t byte;
   struct{

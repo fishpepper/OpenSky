@@ -15,7 +15,7 @@ a different processor.
 _Features_:
 * completely open source (compiles with the opensource sdcc compiler)
 * fully compatible to frsky 2-way protocol
-* 8 Channel CPPM output
+* 8 Channel CPPM output OR digital SBUS output (configurable INVERTED or non-INVERTED)
 * failsafe (constant, stopped ppm output)
 * 2 analog telemetry channels
 * RSSI telemetry
@@ -47,7 +47,7 @@ see the debug information.
 CH1 = BIND MODE (short to GND on startup to enter bind mode)
 CH2 = ADC0
 CH3 = ADC1
-CH4 = CPPM OUT
+CH4 = CPPM OUT or SBUS (not tested yet)
 CH5 = Debug UART @115200 8N1 (if compiled with debug enabled)
 </pre>
 
