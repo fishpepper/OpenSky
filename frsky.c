@@ -1044,24 +1044,6 @@ void frsky_send_telemetry(uint8_t telemetry_id){
     //RSSI
     frsky_packet_buffer[5] = frsky_rssi;
 
-#if 0
-
-    //011 16 68 FF FF 55 0A 09 5E 10 3C 00 5E 5E 02 EF FF 5E 17 AE
-    //number of valid data bytes:
-    frsky_packet_buffer[6] = 0x0a;
-    //set up frame id
-    frsky_packet_buffer[7] = telemetry_id;
-    frsky_packet_buffer[8]=0x5E;// header
-    frsky_packet_buffer[9]=0x10;//packet ID altitude
-    frsky_packet_buffer[10]=0x3C;
-    frsky_packet_buffer[11]=0;
-    frsky_packet_buffer[12]=0x5E;
-    frsky_packet_buffer[13]=0x5E;
-    frsky_packet_buffer[14]=0x02;//gps speed
-    frsky_packet_buffer[15]=0xEF;
-    frsky_packet_buffer[16]=0xFF;
-    frsky_packet_buffer[17]=0x5E;
-#else
     //send ampere and voltage as hub telemetry data as well
     #if FRSKY_SEND_HUB_TELEMETRY
         //use telemetry id to decide which packet to send:
@@ -1092,7 +1074,6 @@ void frsky_send_telemetry(uint8_t telemetry_id){
             frsky_packet_buffer[i] = 0x00;
         }
     #endif
-#endif
 
     //re arm adc dma etc
     //it is important to call this after reading the values...

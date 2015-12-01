@@ -23,10 +23,10 @@ void sbus_uart_set_mode(__xdata union uart_config_t *cfg);
 #define SBUS_DATA_LEN 25
 extern __xdata uint8_t sbus_data[SBUS_DATA_LEN];
 
-#define SBUS_SYNCBYTE 0xF0
+#define SBUS_SYNCBYTE 0x0F
 #define SBUS_ENDBYTE  0x00
-#define SBUS_FLAG_FRAME_LOST      (1<<5)
-#define SBUS_FLAG_FAILSAFE_ACTIVE (1<<4)
+#define SBUS_FLAG_FRAME_LOST      (1<<2)
+#define SBUS_FLAG_FAILSAFE_ACTIVE (1<<3)
 #define SBUS_FRAME_LOST 1
 #define SBUS_FRAME_NOT_LOST 0
 

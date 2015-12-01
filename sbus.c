@@ -121,14 +121,6 @@ void sbus_uart_set_mode(__xdata union uart_config_t *cfg){
         U1GCR &= ~U1GCR_ORDER;
     }
 
-    debug("sbus: U1CSR = 0x");
-    debug_put_hex8(U1CSR); debug_flush();
-    debug(" U1UCR = 0x");
-    debug_put_hex8(U1UCR); debug_flush();
-    debug(" U1GCR = 0x");
-    debug_put_hex8(U1GCR); debug_flush();
-    debug_put_newline();
-
     //interrupt prio to 1 (0..3=highest)
     IP0 |= (1<<3);
     IP1 &= ~(1<<3);
@@ -156,6 +148,10 @@ void sbus_start_transmission(uint8_t frame_lost){
     if (frame_lost == SBUS_FRAME_LOST){
         sbus_data[23] |= SBUS_FLAG_FRAME_LOST;
     }
+
+    #if SBUS_INVERTED
+    sbus_data[23] = 0xFF ^ sbus_data[23];
+    #endif
 
     //time to send this frame!
     //re-arm dma:

@@ -5,10 +5,11 @@
 
 //sbus or ppm out on P0_4:
 //enabling SBUS will DISABLE ppm!
-
 #define SBUS_ENABLED  0  //0 = disabled, 1 = enabled
-//invert SBUS output (note: default/futabe is INVERTED=1)
-#define SBUS_INVERTED 0  //0 = not inverted => idle = high, 1 = INVERTED => idle = LOW
+//invert SBUS output
+//Note: default/futaba is INVERTED=1
+//for a CC3D running OpenPilot use SBUS_INVERTED=1 !
+#define SBUS_INVERTED 1  //0 = not inverted => idle = high, 1 = INVERTED => idle = LOW
 
 //pin layout ISP header
 #define ISP_DATA  P2_1
