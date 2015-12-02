@@ -56,18 +56,25 @@ void sbus_init(void){
 
     //set up config for USART -> 8E2
     #if SBUS_INVERTED
-    sbus_uart_config.bit.START  = 1; //startbit level = low
-    sbus_uart_config.bit.STOP   = 0; //stopbit level = high
-    sbus_uart_config.bit.D9     = 1; //UNEven parity
+        //this is a really nice feature of the cc2510:
+        //we can invert the idle level of the usart
+        //by setting STOP to zero. by inverting
+        //the parity, the startbit, and the data
+        //by using the SBUS_PREPARE_DATA() macro
+        //we can effectively invert the usart in software :)
+        sbus_uart_config.bit.START  = 1; //startbit level = low
+        sbus_uart_config.bit.STOP   = 0; //stopbit level = high
+        sbus_uart_config.bit.D9     = 1; //UNEven parity
     #else
-    sbus_uart_config.bit.START  = 0; //startbit level = low
-    sbus_uart_config.bit.STOP   = 1; //stopbit level = high
-    sbus_uart_config.bit.D9     = 0; //Even parity
+        //standard usart, non-inverted mode
+        //NOTE: most sbus implementations use inverted mode
+        sbus_uart_config.bit.START  = 0; //startbit level = low
+        sbus_uart_config.bit.STOP   = 1; //stopbit level = high
+        sbus_uart_config.bit.D9     = 0; //Even parity
     #endif
     sbus_uart_config.bit.SPB    = 1; //1 = 2 stopbits
     sbus_uart_config.bit.PARITY = 1; //1 = parity enabled, D9=0 -> even parity
     sbus_uart_config.bit.BIT9   = 1; //8bit
-
     sbus_uart_config.bit.FLOW   = 0; //no hw flow control
     sbus_uart_config.bit.ORDER  = 0; //lsb first
     sbus_uart_set_mode(&sbus_uart_config);
@@ -127,6 +134,7 @@ void sbus_uart_set_mode(__xdata union uart_config_t *cfg){
 }
 
 void sbus_start_transmission(uint8_t frame_lost){
+    uint8_t tmp;
     //debug("sbus: TX\n");
 
     //set up flags:
@@ -136,22 +144,21 @@ void sbus_start_transmission(uint8_t frame_lost){
     //bit 4 = Failsafe
     //failsafe + frame lost will be set below,
     //discrete channels are zero
-    sbus_data[23] = 0x00;
+    tmp = 0x00;
 
     //failsafe active?
     if (failsafe_active){
         //clear failsafe flag:
-        sbus_data[23] |= SBUS_FLAG_FAILSAFE_ACTIVE;
+        tmp |= SBUS_FLAG_FAILSAFE_ACTIVE;
     }
 
     //check if this frame was lost
     if (frame_lost == SBUS_FRAME_LOST){
-        sbus_data[23] |= SBUS_FLAG_FRAME_LOST;
+        tmp |= SBUS_FLAG_FRAME_LOST;
     }
 
-    #if SBUS_INVERTED
-    sbus_data[23] = 0xFF ^ sbus_data[23];
-    #endif
+    //copy flags to buffer
+    sbus_data[23] = SBUS_PREPARE_DATA( tmp );
 
     //time to send this frame!
     //re-arm dma:
@@ -168,16 +175,16 @@ void sbus_update(__xdata uint16_t *data){
     int16_t tmp;
 
     //rescale input data:
-    //frsky input is us*1.5 (~1480...3020)
-    //therefore remap ~1480..3020 ---> 0..2047
-    //substract 1430:
-    //sbus data = (input - 1430)
-    //center was at 2250us, is now at 820, remap this to 1024:
-    //1024/820 = 1.25... = 5/4 = 1 1/4
-    //-> sbus data = (input-1430)*(1 1/4) = (input-1430) + (input-1430)/4
+    //frsky input is us*1.5
+    //under normal conditions this is ~1480...3020
+    //when tx is set to 125% this is  ~1290...3210
+    //remap this to 0...2047 -> first substract 1290
+    //center was at 2250us, is now at 960, remap this to ~1023:
+    //1023/960 = 1,065625.. = approx by 17/16 = 1 1/16
+    //sbus data = (input-1290)*(1 1/16) = (input-1290) + (input-1290)/16
     for(i=0; i<8; i++){
-        tmp = data[i] - 1430;
-        tmp = tmp + (tmp>>2);
+        tmp = data[i] - 1290;
+        tmp = tmp + (tmp>>4);
         if (tmp < 0){
             rescaled_data[i] = 0;
         }else if(tmp > 2047){
@@ -189,46 +196,39 @@ void sbus_update(__xdata uint16_t *data){
 
     //sbus transmits up to 16 channels with 11bit each.
     //build up channel data frame:
-    sbus_data[0] = SBUS_SYNCBYTE;
+    sbus_data[ 0] = SBUS_PREPARE_DATA( SBUS_SYNCBYTE );
 
     //bits ch 0000 0000
-    sbus_data[ 1] = LO(rescaled_data[0]);
+    sbus_data[ 1] = SBUS_PREPARE_DATA( LO(rescaled_data[0]) );
     //bits ch 1111 1000
-    sbus_data[ 2] = (LO(rescaled_data[1])<<3) | HI(rescaled_data[0]);
+    sbus_data[ 2] = SBUS_PREPARE_DATA( (LO(rescaled_data[1])<<3) | HI(rescaled_data[0]) );
     //bits ch 2211 1111
-    sbus_data[ 3] = (rescaled_data[1]>>5) | (rescaled_data[2]<<6);
+    sbus_data[ 3] = SBUS_PREPARE_DATA( (rescaled_data[1]>>5) | (rescaled_data[2]<<6) );
     //bits ch 2222 2222
-    sbus_data[ 4] = (rescaled_data[2]>>2) & 0xFF;
+    sbus_data[ 4] = SBUS_PREPARE_DATA( (rescaled_data[2]>>2) & 0xFF );
     //bits ch 3333 3332
-    sbus_data[ 5] = (rescaled_data[2]>>10) | (LO(rescaled_data[3])<<1);
+    sbus_data[ 5] = SBUS_PREPARE_DATA( (rescaled_data[2]>>10) | (LO(rescaled_data[3])<<1) );
     //bits ch 4444 3333
-    sbus_data[ 6] = (rescaled_data[3]>>7) | (LO(rescaled_data[4])<<4);
+    sbus_data[ 6] = SBUS_PREPARE_DATA( (rescaled_data[3]>>7) | (LO(rescaled_data[4])<<4) );
     //bits ch 5444 4444
-    sbus_data[ 7] = (rescaled_data[4]>>4) | (LO(rescaled_data[5])<<7);
+    sbus_data[ 7] = SBUS_PREPARE_DATA( (rescaled_data[4]>>4) | (LO(rescaled_data[5])<<7) );
     //bits ch 5555 5555
-    sbus_data[ 8] = (rescaled_data[5]>>1) & 0xFF;
+    sbus_data[ 8] = SBUS_PREPARE_DATA( (rescaled_data[5]>>1) & 0xFF );
     //bits ch 6666 6655
-    sbus_data[ 9] = (rescaled_data[5]>>9) | (LO(rescaled_data[6])<<2);
+    sbus_data[ 9] = SBUS_PREPARE_DATA( (rescaled_data[5]>>9) | (LO(rescaled_data[6])<<2) );
     //bits ch 7776 6666
-    sbus_data[10] = (rescaled_data[6]>>6) | (LO(rescaled_data[7])<<5);
+    sbus_data[10] = SBUS_PREPARE_DATA( (rescaled_data[6]>>6) | (LO(rescaled_data[7])<<5) );
     //bits ch 7777 7777
-    sbus_data[11] = (rescaled_data[7]>>3) & 0xFF;
+    sbus_data[11] = SBUS_PREPARE_DATA( (rescaled_data[7]>>3) & 0xFF );
     //ch8-ch15 = zero
     for(i=12; i<23; i++){
-        sbus_data[i] = 0x00;
+        sbus_data[i] = SBUS_PREPARE_DATA( 0x00 );
     }
     //sbus flags, will be set by start transmission...
-    sbus_data[23] = 0x00;
+    sbus_data[23] = SBUS_PREPARE_DATA( 0x00 );
 
     //EOF frame:
-    sbus_data[24] = SBUS_ENDBYTE;
-
-    #if SBUS_INVERTED
-    //invert data bits:
-    for(i=0; i<SBUS_DATA_LEN;i++){
-        sbus_data[i] = 0xFF ^ sbus_data[i];
-    }
-    #endif
+    sbus_data[24] = SBUS_PREPARE_DATA( SBUS_ENDBYTE );
 }
 
 void sbus_exit_failsafe(void){

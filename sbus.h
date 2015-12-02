@@ -8,6 +8,15 @@
 
 #if SBUS_ENABLED
 
+//this helper routine will invert the data
+//stored in buffer in case the sbus is set
+//to inverted
+#if SBUS_INVERTED
+#define SBUS_PREPARE_DATA(a) (0xFF ^ (a))
+#else
+#define SBUS_PREPARE_DATA(a) (a)
+#endif
+
 void sbus_init(void);
 void sbus_update(__xdata uint16_t *data);
 void sbus_start_transmission(uint8_t frame_lost);
