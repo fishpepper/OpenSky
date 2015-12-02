@@ -210,7 +210,7 @@ void sbus_update(__xdata uint16_t *data){
     //bits ch 6666 6655
     sbus_data[ 9] = (rescaled_data[5]>>9) | (LO(rescaled_data[6])<<2);
     //bits ch 7776 6666
-    sbus_data[10] = (rescaled_data[6]>>6) | (LO(rescaled_data[7])<<3);
+    sbus_data[10] = (rescaled_data[6]>>6) | (LO(rescaled_data[7])<<5);
     //bits ch 7777 7777
     sbus_data[11] = (rescaled_data[7]>>3) & 0xFF;
     //ch8-ch15 = zero

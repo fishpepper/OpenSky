@@ -5,7 +5,7 @@
 
 //sbus or ppm out on P0_4:
 //enabling SBUS will DISABLE ppm!
-#define SBUS_ENABLED  0  //0 = disabled, 1 = enabled
+#define SBUS_ENABLED  1  //0 = disabled, 1 = enabled
 //invert SBUS output
 //Note: default/futaba is INVERTED=1
 //for a CC3D running OpenPilot use SBUS_INVERTED=1 !
