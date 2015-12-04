@@ -29,7 +29,13 @@
 #include "adc.h"
 #include "wdt.h"
 #include "storage.h"
+
+#if SBUS_ENABLED
+#include "sbus.h"
+#else
 #include "ppm.h"
+#endif
+
 #include "apa102.h"
 #include "failsafe.h"
 
@@ -62,7 +68,7 @@ void main(void) {
     //init adc
     adc_init();
 
-    //init ppm output
+    //init output
     #if SBUS_ENABLED
     sbus_init();
     #else

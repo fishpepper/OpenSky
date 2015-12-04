@@ -17,7 +17,7 @@
 #include "delay.h"
 
 //busy wait delay loop. not 100% accurate
-static void delay_ms(uint16_t ms) {
+void delay_ms(uint16_t ms) {
     #define DELAY_MS_LOOP_A 86
     #define DELAY_MS_LOOP_B 30
 
@@ -42,7 +42,7 @@ static void delay_ms(uint16_t ms) {
 
 //busy wait delay loop
 //this is more or less accurate
-static void delay_us(uint16_t us) {
+void delay_us(uint16_t us) {
     #define DELAY_US_LOOP 1
 
     while(us--){
