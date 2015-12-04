@@ -29,13 +29,8 @@
 #include "adc.h"
 #include "wdt.h"
 #include "storage.h"
-
-#if SBUS_ENABLED
 #include "sbus.h"
-#else
 #include "ppm.h"
-#endif
-
 #include "apa102.h"
 #include "failsafe.h"
 
