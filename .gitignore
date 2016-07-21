@@ -37,3 +37,6 @@
 
 # Debug files
 *.dSYM/
+
+# misc
+dump*

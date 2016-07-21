@@ -83,7 +83,16 @@ Pinout CC2500:
 17 = RBIAS     = ...
 18 = DGUARD    = ...
 19 = GND       = ...
-20 = SI        = STM32.17 (PA7, SPI1_MISO)
+20 = SI        = STM32.17 (PA7, SPI1_MOSI)
+
+
+TODO:
+LEDs
+BUTTON
+ADCs
+UART
+4 PWM IOs
+SWD
 
 Pinout STM32:
 ...
