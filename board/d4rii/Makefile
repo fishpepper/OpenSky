@@ -3,10 +3,14 @@ CFLAGS  = -O1 -g
 ASFLAGS = -g
 
 # object files
-OBJS=  $(STARTUP) $(DRIVER) main.o assert.o hal_led.o
+DRIVER = stm32f10x_rcc.o stm32f10x_gpio.o stm32f10x_usart.o misc.o
+OBJS=  $(STARTUP) $(DRIVER) main.o assert.o uart.o hal_led.o hal_uart.o 
 
 # name of executable
-RESULT ?= opensky_$(notdir $(CURDIR)).elf
+RESULT ?= opensky_$(notdir $(CURDIR))
+
+#crystal frequency
+CRYSTAL_FREQ = 12000000
 
 # Tool path
 ifeq ($(TOOLROOT),)
@@ -47,7 +51,6 @@ vpath %.c $(TEMPLATEROOT)/Library
 PTYPE = STM32F10X_MD_VL 
 LDSCRIPT = $(LINK)/stm32f103c8.ld
 STARTUP = startup_stm32f10x.o system_stm32f10x.o 
-DRIVER = stm32f10x_rcc.o stm32f10x_gpio.o
 
 # Compilation Flags
 
@@ -55,6 +58,7 @@ FULLASSERT = -DUSE_FULL_ASSERT
 
 LDFLAGS+= -T$(LDSCRIPT) -mthumb -mcpu=cortex-m3 
 CFLAGS+= -mcpu=cortex-m3 -mthumb 
+CFLAGS+= -DHSE_VALUE=$(CRYSTAL_FREQ)
 CFLAGS+= -I$(DEVICE) -I$(CORE) -I$(PERIPH)/inc -I.
 CFLAGS+= -D$(PTYPE) -DUSE_STDPERIPH_DRIVER $(FULLASSERT)
 #CFLAGS+= -I$(TEMPLATEROOT)/Library/ff9/src -I$(TEMPLATEROOT)/Library
@@ -80,7 +84,10 @@ clean:
 	rm -f $(OBJS) $(OBJS:.o=.d) $(RESULT).* $(CLEANOTHER)
 
 debug: $(RESULT).elf
-	arm-none-eabi-gdb $(RESULT).elf
+	openocd -f /usr/share/openocd/scripts/interface/stlink-v2.cfg -f /usr/share/openocd/scripts/target/stm32f1x.cfg & echo $$! > /tmp/openocd.PID
+	sleep 1
+	arm-none-eabi-gdb --eval-command="target remote localhost:3333" $(RESULT).elf
+	kill `cat /tmp/openocd.PID`
 
 flash : $(RESULT).bin
 	st-flash write $(RESULT).bin 0x8000000

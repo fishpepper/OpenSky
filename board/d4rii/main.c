@@ -1,6 +1,7 @@
 #include "stm32f10x.h"
-#include "hal_led.h"
-
+#include "led.h"
+#include "uart.h"
+#include "debug.h"
 
 int i = 0;
 int off = 5;
@@ -13,17 +14,20 @@ void inc(void){
 
 int main(void){
 	uint32_t i=0;
-	hal_led_red_init();
-	hal_led_green_init();
-	
-	
+	led_init();
+	uart_init();
 	
 	while (1) {
 		for(i=0; i<0x00FFFFF; i++) {}
-		hal_led_green_on();
-		hal_led_red_off();
+		led_green_on();
+		led_red_on();
 		for(i=0; i<0x00FFFFF; i++) {}
-		hal_led_green_off();
-		hal_led_red_on();
+		led_green_off();
+		led_red_off();
+		
+		for(i=0; i<0x00FFFFF; i++) {}
+		for(i=0; i<0x00FFFFF; i++) {}
+		debug_putc('#');
+		debug("MAIN");
 	}
 }
