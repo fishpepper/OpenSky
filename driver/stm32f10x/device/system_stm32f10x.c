@@ -522,31 +522,18 @@ static void SetSysClockTo24(void)
   RCC->CR |= ((uint32_t)RCC_CR_HSEON);
  
   /* Wait till HSE is ready and if Time out is reached exit */
-  do
-  {
+  do{
     HSEStatus = RCC->CR & RCC_CR_HSERDY;
     StartUpCounter++;  
   } while((HSEStatus == 0) && (StartUpCounter != HSE_STARTUP_TIMEOUT));
 
-  if ((RCC->CR & RCC_CR_HSERDY) != RESET)
-  {
+  if ((RCC->CR & RCC_CR_HSERDY) != RESET){
     HSEStatus = (uint32_t)0x01;
-  }
-  else
-  {
+  } else {
     HSEStatus = (uint32_t)0x00;
   }  
 
-  if (HSEStatus == (uint32_t)0x01)
-  {
-#if !defined STM32F10X_LD_VL && !defined STM32F10X_MD_VL && !defined STM32F10X_HD_VL 
-    /* Enable Prefetch Buffer */
-    FLASH->ACR |= FLASH_ACR_PRFTBE;
-
-    /* Flash 0 wait state */
-    FLASH->ACR &= (uint32_t)((uint32_t)~FLASH_ACR_LATENCY);
-    FLASH->ACR |= (uint32_t)FLASH_ACR_LATENCY_0;    
-#endif
+  if (HSEStatus == (uint32_t)0x01) {
  
     /* HCLK = SYSCLK */
     RCC->CFGR |= (uint32_t)RCC_CFGR_HPRE_DIV1;
@@ -557,43 +544,16 @@ static void SetSysClockTo24(void)
     /* PCLK1 = HCLK */
     RCC->CFGR |= (uint32_t)RCC_CFGR_PPRE1_DIV1;
     
-#ifdef STM32F10X_CL
-    /* Configure PLLs ------------------------------------------------------*/
-    /* PLL configuration: PLLCLK = PREDIV1 * 6 = 24 MHz */ 
-    RCC->CFGR &= (uint32_t)~(RCC_CFGR_PLLXTPRE | RCC_CFGR_PLLSRC | RCC_CFGR_PLLMULL);
-    RCC->CFGR |= (uint32_t)(RCC_CFGR_PLLXTPRE_PREDIV1 | RCC_CFGR_PLLSRC_PREDIV1 | 
-                            RCC_CFGR_PLLMULL6); 
-
-    /* PLL2 configuration: PLL2CLK = (HSE / 5) * 8 = 40 MHz */
-    /* PREDIV1 configuration: PREDIV1CLK = PLL2 / 10 = 4 MHz */       
-    RCC->CFGR2 &= (uint32_t)~(RCC_CFGR2_PREDIV2 | RCC_CFGR2_PLL2MUL |
-                              RCC_CFGR2_PREDIV1 | RCC_CFGR2_PREDIV1SRC);
-    RCC->CFGR2 |= (uint32_t)(RCC_CFGR2_PREDIV2_DIV5 | RCC_CFGR2_PLL2MUL8 |
-                             RCC_CFGR2_PREDIV1SRC_PLL2 | RCC_CFGR2_PREDIV1_DIV10);
-  
-    /* Enable PLL2 */
-    RCC->CR |= RCC_CR_PLL2ON;
-    /* Wait till PLL2 is ready */
-    while((RCC->CR & RCC_CR_PLL2RDY) == 0)
-    {
-    }   
-#elif defined (STM32F10X_LD_VL) || defined (STM32F10X_MD_VL) || defined (STM32F10X_HD_VL)
-    /*  PLL configuration:  = (HSE / 2) * 6 = 24 MHz */
+    /*  PLL configuration:  = (HSE / 1) * 2 = 24 MHz */
     RCC->CFGR &= (uint32_t)((uint32_t)~(RCC_CFGR_PLLSRC | RCC_CFGR_PLLXTPRE | RCC_CFGR_PLLMULL));
-    RCC->CFGR |= (uint32_t)(RCC_CFGR_PLLSRC_PREDIV1 | RCC_CFGR_PLLXTPRE_PREDIV1_Div2 | RCC_CFGR_PLLMULL6);
-#else    
-    /*  PLL configuration:  = (HSE / 2) * 6 = 24 MHz */
-    RCC->CFGR &= (uint32_t)((uint32_t)~(RCC_CFGR_PLLSRC | RCC_CFGR_PLLXTPRE | RCC_CFGR_PLLMULL));
-    RCC->CFGR |= (uint32_t)(RCC_CFGR_PLLSRC_HSE | RCC_CFGR_PLLXTPRE_HSE_Div2 | RCC_CFGR_PLLMULL6);
-#endif /* STM32F10X_CL */
+    //RCC->CFGR |= (uint32_t)(RCC_CFGR_PLLSRC_PREDIV1 | RCC_CFGR_PLLXTPRE_PREDIV1_Div2 | RCC_CFGR_PLLMULL6);
+    RCC->CFGR |= (uint32_t)(RCC_CFGR_PLLSRC_PREDIV1 | RCC_CFGR_PLLMULL2);
 
     /* Enable PLL */
     RCC->CR |= RCC_CR_PLLON;
 
     /* Wait till PLL is ready */
-    while((RCC->CR & RCC_CR_PLLRDY) == 0)
-    {
-    }
+    while((RCC->CR & RCC_CR_PLLRDY) == 0) { }
 
     /* Select PLL as system clock source */
     RCC->CFGR &= (uint32_t)((uint32_t)~(RCC_CFGR_SW));

@@ -5,7 +5,7 @@ static __IO uint32_t hal_timeout_ms;
 
 void hal_timeout_init(void) {
 	//configure 1ms sys tick:
-	if (!SysTick_Config(SystemCoreClock / 1000)){
+	if (SysTick_Config(SystemCoreClock / 1000)){
 		debug("hal_timeout: failed to set systick timeout\n");
 	}
 	

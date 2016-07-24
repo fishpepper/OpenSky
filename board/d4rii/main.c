@@ -37,10 +37,10 @@ int main(void){
 
 	while(1){
 		led_red_on();
-		timeout_set(2*1000);
+		timeout_set(1000);
 		while(!timeout_timed_out()){}
 		led_red_off();
-		timeout_set(2*1000);
+		timeout_set(1000);
 		while(!timeout_timed_out()){}
 	}
 	

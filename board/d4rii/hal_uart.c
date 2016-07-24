@@ -61,7 +61,7 @@ void _hal_uart_init_mode(void) {
 	//USART configuration:
 	// 115200 baud, 8N1
 	// no hw flow control
-	uart_init.USART_BaudRate = 115200*2; //FIXME clockspeed!
+	uart_init.USART_BaudRate = 115200;
 	uart_init.USART_WordLength = USART_WordLength_8b;
 	uart_init.USART_StopBits = USART_StopBits_1;
 	uart_init.USART_Parity = USART_Parity_No;
