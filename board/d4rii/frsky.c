@@ -14,6 +14,7 @@
 
    author: fishpepper <AT> gmail.com
 */
+#include "main.h"
 #include "frsky.h"
 #include <string.h>
 #include "debug.h"
@@ -22,45 +23,45 @@
 #include "delay.h"
 #include "dma.h"
 #include "wdt.h"
-#include "adc.h"
-#include "storage.h"
-#include "ppm.h"
-#include "apa102.h"
-#include "failsafe.h"
-#include "sbus.h"
+#include "cc25xx.h"
+//ADDME//#include "adc.h"
+//ADDME//#include "storage.h"
+//ADDME//#include "ppm.h"
+//ADDME//#include "apa102.h"
+//ADDME//#include "failsafe.h"
+//ADDME//#include "sbus.h"
 
 //this will make binding not very reliable, use for debugging only!
 #define FRSKY_DEBUG_BIND_DATA 0
 #define FRSKY_DEBUG_HOPTABLE 1
 
 //hop data & config
-//__xdata uint8_t storage.frsky_txid[2] = {0x16, 0x68};
-//__xdata uint8_t storage.frsky_hop_table[FRSKY_HOPTABLE_SIZE] = {0x01, 0x42, 0x83, 0xC4, 0x1A, 0x5B, 0x9C, 0xDD, 0x33, 0x74, 0xB5, 0x0B, 0x4C, 0x8D, 0xCE, 0x24, 0x65, 0xA6, 0xE7, 0x3D, 0x7E, 0xBF, 0x15, 0x56, 0x97, 0xD8, 0x2E, 0x6F, 0xB0, 0x06, 0x47, 0x88, 0xC9, 0x1F, 0x60, 0xA1, 0xE2, 0x38, 0x79, 0xBA, 0x10, 0x51, 0x92, 0xD3, 0x29, 0x6A, 0xAB};
-//__xdata int8_t storage.frsky_freq_offset;
-__xdata uint8_t frsky_current_ch_idx;
+//EXTERNAL_MEMORY uint8_t storage.frsky_txid[2] = {0x16, 0x68};
+//EXTERNAL_MEMORY uint8_t storage.frsky_hop_table[FRSKY_HOPTABLE_SIZE] = {0x01, 0x42, 0x83, 0xC4, 0x1A, 0x5B, 0x9C, 0xDD, 0x33, 0x74, 0xB5, 0x0B, 0x4C, 0x8D, 0xCE, 0x24, 0x65, 0xA6, 0xE7, 0x3D, 0x7E, 0xBF, 0x15, 0x56, 0x97, 0xD8, 0x2E, 0x6F, 0xB0, 0x06, 0x47, 0x88, 0xC9, 0x1F, 0x60, 0xA1, 0xE2, 0x38, 0x79, 0xBA, 0x10, 0x51, 0x92, 0xD3, 0x29, 0x6A, 0xAB};
+//EXTERNAL_MEMORY int8_t storage.frsky_freq_offset;
+EXTERNAL_MEMORY uint8_t frsky_current_ch_idx;
 
 //rssi
-__xdata uint8_t frsky_rssi;
-__xdata uint8_t frsky_link_quality;
+EXTERNAL_MEMORY uint8_t frsky_rssi;
+EXTERNAL_MEMORY uint8_t frsky_link_quality;
 
 //pll calibration
-__xdata uint8_t frsky_calib_fscal1_table[FRSKY_HOPTABLE_SIZE];
-__xdata uint8_t frsky_calib_fscal2;
-__xdata uint8_t frsky_calib_fscal3;
-//__xdata int16_t storage.frsky_freq_offset_acc;
+EXTERNAL_MEMORY uint8_t frsky_calib_fscal1_table[FRSKY_HOPTABLE_SIZE];
+EXTERNAL_MEMORY uint8_t frsky_calib_fscal2;
+EXTERNAL_MEMORY uint8_t frsky_calib_fscal3;
+//EXTERNAL_MEMORY int16_t storage.frsky_freq_offset_acc;
 
 //rf rxtx buffer
-__xdata volatile uint8_t frsky_packet_buffer[FRSKY_PACKET_BUFFER_SIZE];
-__xdata volatile uint8_t frsky_packet_received;
-__xdata volatile uint8_t frsky_packet_sent;
-__xdata volatile uint8_t frsky_mode;
-
-//dma config
-__xdata DMA_DESC frsky_dma_config;
+EXTERNAL_MEMORY volatile uint8_t frsky_packet_buffer[FRSKY_PACKET_BUFFER_SIZE];
+EXTERNAL_MEMORY volatile uint8_t frsky_packet_received;
+EXTERNAL_MEMORY volatile uint8_t frsky_packet_sent;
+EXTERNAL_MEMORY volatile uint8_t frsky_mode;
 
 void frsky_init(void){
     //uint8_t i;
     debug("frsky: init\n"); debug_flush();
+    
+    cc25xx_init();
 
     frsky_link_quality = 0;
 
@@ -71,7 +72,7 @@ void frsky_init(void){
 
     //init frsky registersttings for cc2500
     frsky_configure();
-
+/*
     if (frsky_bind_jumper_set()){
         //do binding
         frsky_do_bind();
@@ -91,57 +92,57 @@ void frsky_init(void){
     frsky_calib_pll();
 
     debug("frsky: init done\n");debug_flush();
+    */
 }
-
 
 void frsky_configure(void){
-    debug("frsky: configure\n"); debug_flush();
+	debug("frsky: configure\n"); debug_flush();
 
-    //start idle
-    RFST = RFST_SIDLE;
+	//start idle
+	cc25xx_strobe(RFST_SIDLE);
+    
+	//not necessary here IOCFG0 = 0x01
+	//not necessary here IOCFG2 = 0x0E
+	cc25xx_set_register(MCSM1    ,0x0F); //go back to rx after transmission completed //0x0C;
+	cc25xx_set_register(MCSM0    ,0x18);
+	cc25xx_set_register(PKTLEN   ,FRSKY_PACKET_LENGTH); //on 251x this has to be exactly our size
+	cc25xx_set_register(PKTCTRL0 ,0x05);
+	cc25xx_set_register(PA_TABLE0,0xFF);
+	cc25xx_set_register(FSCTRL1  ,0x08);
+	cc25xx_set_register(FSCTRL0  ,0x00);
+	//set base freq 2404 mhz
+	cc25xx_set_register(FREQ2    ,0x5C);
+	cc25xx_set_register(FREQ1    ,0x76);
+	cc25xx_set_register(FREQ0    ,0x27);
+	cc25xx_set_register(MDMCFG4  ,0xAA);
+	cc25xx_set_register(MDMCFG3  ,0x39);
+	cc25xx_set_register(MDMCFG2  ,0x11);
+	cc25xx_set_register(MDMCFG1  ,0x23);
+	cc25xx_set_register(MDMCFG0  ,0x7A);
+	cc25xx_set_register(DEVIATN  ,0x42);
+	cc25xx_set_register(FOCCFG   ,0x16);
+	cc25xx_set_register(BSCFG    ,0x6C);
+	cc25xx_set_register(AGCCTRL2 ,0x03);
+	cc25xx_set_register(AGCCTRL1 ,0x40);
+	cc25xx_set_register(AGCCTRL0 ,0x91);
+	cc25xx_set_register(FREND1   ,0x56);
+	cc25xx_set_register(FREND0   ,0x10);
+	cc25xx_set_register(FSCAL3   ,0xA9);
+	cc25xx_set_register(FSCAL2   ,0x05);
+	cc25xx_set_register(FSCAL1   ,0x00);
+	cc25xx_set_register(FSCAL0   ,0x11);
+	//???FSTEST   , 0x59);
+	cc25xx_set_register(TEST2    ,0x88);
+	cc25xx_set_register(TEST1    ,0x31);
+	cc25xx_set_register(TEST0    ,0x0B);
+	//???FIFOTHR  = 0x07);
+	cc25xx_set_register(ADDR     ,0x00);
 
-    //not necessary here IOCFG0 = 0x01
-    //not necessary here IOCFG2 = 0x0E
-    MCSM1    = 0x0F; //go back to rx after transmission completed //0x0C;
-    MCSM0    = 0x18;
-    PKTLEN   = FRSKY_PACKET_LENGTH; //on 251x this has to be exactly our size
-    PKTCTRL0 = 0x05;
-    PA_TABLE0  = 0xFF;
-    FSCTRL1  = 0x08;
-    FSCTRL0  = 0x00;
-    //set base freq 2404 mhz
-    FREQ2    = 0x5C;
-    FREQ1    = 0x76;
-    FREQ0    = 0x27;
-    MDMCFG4  = 0xAA;
-    MDMCFG3  = 0x39;
-    MDMCFG2  = 0x11;
-    MDMCFG1  = 0x23;
-    MDMCFG0  = 0x7A;
-    DEVIATN  = 0x42;
-    FOCCFG   = 0x16;
-    BSCFG    = 0x6C;
-    AGCCTRL2 = 0x03;
-    AGCCTRL1 = 0x40;
-    AGCCTRL0 = 0x91;
-    FREND1   = 0x56;
-    FREND0   = 0x10;
-    FSCAL3   = 0xA9;
-    FSCAL2   = 0x05;
-    FSCAL1   = 0x00;
-    FSCAL0   = 0x11;
-    //???FSTEST   = 0x59;
-    TEST2    = 0x88;
-    TEST1    = 0x31;
-    TEST0    = 0x0B;
-    //???FIFOTHR  = 0x07;
-    ADDR     = 0x00;
-
-    //for now just append status
-    PKTCTRL1 = CC2500_PKTCTRL1_APPEND_STATUS;
-
-    debug("frsky: configure done\n"); debug_flush();
+	//for now just append status
+	cc25xx_set_register(PKTCTRL1, CC2500_PKTCTRL1_APPEND_STATUS);
+	debug("frsky: configure done\n"); debug_flush();
 }
+#if 0
 
 
 void frsky_configure_address(void){
@@ -1119,7 +1120,7 @@ uint8_t frsky_extract_rssi(uint8_t rssi_raw){
 
 void frsky_update_ppm(void){
     //build uint16_t array from data:
-    __xdata uint16_t channel_data[8];
+    EXTERNAL_MEMORY uint16_t channel_data[8];
 
     /*debug("[");debug_flush();
     for(cnt=0; cnt<FRSKY_PACKET_BUFFER_SIZE; cnt++){
@@ -1194,3 +1195,4 @@ uint8_t frsky_append_hub_data(uint8_t sensor_id, uint16_t value, uint8_t *buf){
     //return index:
     return index;
 }
+#endif

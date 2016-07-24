@@ -6,6 +6,7 @@
 #include "timeout.h"
 #include "delay.h"
 #include "wdt.h"
+#include "frsky.h"
 
 int i = 0;
 int off = 5;
@@ -49,10 +50,10 @@ int main(void){
 	
 	
 	//apa102_init();
-/*
+
 	//init frsky core
 	frsky_init();
-
+/*
 	//init adc
 	adc_init();
 

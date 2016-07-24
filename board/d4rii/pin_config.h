@@ -17,4 +17,13 @@
 #define DEBUG_USART_IRQHANDLER   USART1_IRQHandler
 #define DEBUG_USART_IRQn         USART1_IRQn
 
+
+#define CC25XX_SPI_GPIO     GPIOA
+#define CC25XX_SPI_SCK_PIN  GPIO_Pin_5
+#define CC25XX_SPI_MOSI_PIN GPIO_Pin_7
+#define CC25XX_SPI_MISO_PIN GPIO_Pin_6
+#define CC25XX_SPI_CSN_PIN  GPIO_Pin_4
+#define CC25XX_SPI_GDO2_PIN GPIO_Pin_3
+#define CC25XX_SPI          SPI1
+
 #endif //__PIN_CONFIG_H__

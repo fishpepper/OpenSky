@@ -19,9 +19,9 @@
 #include "uart.h"
 #include "debug.h"
 
-__xdata uint8_t uart_tx_buffer[UART_TX_BUFFER_SIZE];
-__xdata volatile uint8_t uart_tx_buffer_in;
-__xdata volatile uint8_t uart_tx_buffer_out;
+EXTERNAL_MEMORY uint8_t uart_tx_buffer[UART_TX_BUFFER_SIZE];
+EXTERNAL_MEMORY volatile uint8_t uart_tx_buffer_in;
+EXTERNAL_MEMORY volatile uint8_t uart_tx_buffer_out;
 
 #define delay_us(n) {uint64_t i; for(i=0; i<n*0x00FFFF; i++) {}}
 #define delay_ms(n) {uint64_t i; for(i=0; i<n; i++) { delay_us(1000); }}

@@ -1,34 +1,36 @@
 #ifndef __FRSKY_H__
 #define __FRSKY_H__
 
+#include <stdint.h>
 #include "main.h"
-#include "cc2510fx.h"
+#include "hal_cc25xx.h"
 #include "dma.h"
 
 #define FRSKY_HOPTABLE_SIZE 47
 //
-//extern __xdata uint8_t frsky_txid[2];
-//extern __xdata uint8_t frsky_hop_table[FRSKY_HOPTABLE_SIZE];
-//extern __xdata int8_t frsky_freq_offset;
-extern __xdata uint8_t frsky_current_ch_idx;
+//extern EXTERNAL_MEMORY uint8_t frsky_txid[2];
+//extern EXTERNAL_MEMORY uint8_t frsky_hop_table[FRSKY_HOPTABLE_SIZE];
+//extern EXTERNAL_MEMORY int8_t frsky_freq_offset;
+extern EXTERNAL_MEMORY uint8_t frsky_current_ch_idx;
 //rssi
-extern __xdata uint8_t frsky_rssi;
-extern __xdata uint8_t frsky_link_quality;
+extern EXTERNAL_MEMORY uint8_t frsky_rssi;
+extern EXTERNAL_MEMORY uint8_t frsky_link_quality;
 //pll calibration
-extern __xdata uint8_t frsky_calib_fscal1_table[FRSKY_HOPTABLE_SIZE];
-extern __xdata uint8_t frsky_calib_fscal2;
-extern __xdata uint8_t frsky_calib_fscal3;
-//extern __xdata int16_t frsky_freq_offset_acc;
+extern EXTERNAL_MEMORY uint8_t frsky_calib_fscal1_table[FRSKY_HOPTABLE_SIZE];
+extern EXTERNAL_MEMORY uint8_t frsky_calib_fscal2;
+extern EXTERNAL_MEMORY uint8_t frsky_calib_fscal3;
+//extern EXTERNAL_MEMORY int16_t frsky_freq_offset_acc;
 
 #define FRSKY_PACKET_LENGTH 17
 #define FRSKY_PACKET_BUFFER_SIZE (FRSKY_PACKET_LENGTH+3)
-extern __xdata volatile uint8_t frsky_packet_buffer[FRSKY_PACKET_BUFFER_SIZE];
-extern __xdata volatile uint8_t frsky_packet_received;
-extern __xdata volatile uint8_t frsky_packet_sent;
-extern __xdata volatile uint8_t frsky_mode;
+extern EXTERNAL_MEMORY volatile uint8_t frsky_packet_buffer[FRSKY_PACKET_BUFFER_SIZE];
+extern EXTERNAL_MEMORY volatile uint8_t frsky_packet_received;
+extern EXTERNAL_MEMORY volatile uint8_t frsky_packet_sent;
+extern EXTERNAL_MEMORY volatile uint8_t frsky_mode;
 
 void frsky_init(void);
 void frsky_configure(void);
+#if 0
 void frsky_fetch_txid_and_hoptable(void);
 void frsky_configure_address(void);
 void frsky_calib_pll(void);
@@ -49,6 +51,7 @@ uint8_t frsky_bind_jumper_set(void);
 void frsky_do_bind(void);
 void frsky_store_config(void);
 void frsky_send_telemetry(uint8_t telemetry_id);
+#endif
 
 #define FRSKY_MODE_RX 0
 #define FRSKY_MODE_TX 1

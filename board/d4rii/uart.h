@@ -1,8 +1,7 @@
 #ifndef __UART_H__
 #define __UART_H__
+#include "main.h"
 #include <stdint.h>
-
-#define __xdata 
 
 void uart_init(void);
 void uart_test(void);
@@ -23,8 +22,8 @@ void uart_put_newline(void);
     //FAIL!
     #warn "ALWAYS USE POWER OF TWO FOR BUFFER SIZE!"
 #endif
-extern __xdata uint8_t uart_tx_buffer[UART_TX_BUFFER_SIZE];
-extern volatile __xdata uint8_t uart_tx_buffer_in;
-extern volatile __xdata uint8_t uart_tx_buffer_out;
+extern EXTERNAL_MEMORY uint8_t uart_tx_buffer[UART_TX_BUFFER_SIZE];
+extern volatile EXTERNAL_MEMORY uint8_t uart_tx_buffer_in;
+extern volatile EXTERNAL_MEMORY uint8_t uart_tx_buffer_out;
 
 #endif
