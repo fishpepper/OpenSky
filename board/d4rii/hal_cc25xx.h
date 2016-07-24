@@ -7,6 +7,7 @@
 
 void hal_cc25xx_init(void);
 void hal_cc25xx_set_register(uint8_t reg, uint8_t val);
+uint8_t hal_cc25xx_get_register(uint8_t address);
 void hal_cc25xx_strobe(uint8_t val);
 
 //adress checks
@@ -24,6 +25,24 @@ void hal_cc25xx_strobe(uint8_t val);
 #define WRITE_FLAG   0b00000000
 #define READ_FLAG    0b10000000
 
+//Definitions for burst/single access to registers
+#define CC2500_WRITE_SINGLE     0x00
+#define CC2500_WRITE_BURST      0x40
+#define CC2500_READ_SINGLE      0x80
+#define CC2500_READ_BURST       0xC0
+
+#define CC2500_STATUS_STATE_IDLE   (0<<4)
+#define CC2500_STATUS_STATE_RX     (1<<4)
+#define CC2500_STATUS_STATE_TX     (2<<4)
+#define CC2500_STATUS_STATE_FSTXON (3<<4)
+#define CC2500_STATUS_STATE_CALIBRATE  (4<<4)
+#define CC2500_STATUS_STATE_SETTLING   (5<<4)
+#define CC2500_STATUS_STATE_RXFIFO_OVF (6<<4)
+#define CC2500_STATUS_STATE_TXFIFO_OVF (7<<4)
+
+#define hal_cc25xx_get_register_burst(x)  hal_cc25xx_get_register(x | READ_FLAG | BURST_FLAG)
+
+
 // strobes
 #define RFST_SRES     0x30
 #define RFST_SFSTXON  0x31
@@ -40,6 +59,7 @@ void hal_cc25xx_strobe(uint8_t val);
 #define RFST_SNOP     0x3D
 
 // Status registers
+#define PARTNUM        0x30|BURST_FLAG
 #define VERSION        0x31|BURST_FLAG
 #define FREQEST        0x32|BURST_FLAG
 #define LQI            0x33|BURST_FLAG

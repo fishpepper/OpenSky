@@ -56,3 +56,11 @@ void hal_spi_tx(uint8_t address){
 	// send SPI data
 	SPI_I2S_SendData(CC25XX_SPI, address);
 }
+
+uint8_t hal_spi_rx(void) {
+	hal_spi_tx(0xFF);
+	
+	// read data
+	uint8_t result = SPI_I2S_ReceiveData(CC25XX_SPI);
+	return result;
+}

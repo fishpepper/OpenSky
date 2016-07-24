@@ -29,6 +29,7 @@ extern EXTERNAL_MEMORY volatile uint8_t frsky_packet_sent;
 extern EXTERNAL_MEMORY volatile uint8_t frsky_mode;
 
 void frsky_init(void);
+void frsky_show_partinfo(void);
 void frsky_configure(void);
 #if 0
 void frsky_fetch_txid_and_hoptable(void);

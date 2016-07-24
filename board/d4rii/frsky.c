@@ -70,6 +70,8 @@ void frsky_init(void){
 
     frsky_rssi = 100;
 
+    frsky_show_partinfo();
+    
     //init frsky registersttings for cc2500
     frsky_configure();
 /*
@@ -93,6 +95,21 @@ void frsky_init(void){
 
     debug("frsky: init done\n");debug_flush();
     */
+}
+
+
+void frsky_show_partinfo(void) {
+	
+    //check version:
+    debug("frsky: cc25xx partnum 0x");
+    uint8_t partnum = hal_cc25xx_get_register_burst(PARTNUM);
+    debug_put_hex8(partnum);
+    debug_put_newline();
+    
+    debug("frsky: cc25xx version 0x");
+    uint8_t version = hal_cc25xx_get_register_burst(VERSION);
+    debug_put_hex8(version);
+    debug_put_newline();
 }
 
 void frsky_configure(void){
