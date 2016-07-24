@@ -2,6 +2,8 @@
 #include "led.h"
 #include "uart.h"
 #include "debug.h"
+#include "clocksource.h"
+#include "timeout.h"
 
 int i = 0;
 int off = 5;
@@ -13,10 +15,70 @@ void inc(void){
 
 
 int main(void){
-	uint32_t i=0;
+	//leds:
 	led_init();
+
+	//init clock sources:
+	clocksource_init();
+
+	//init uart
 	uart_init();
+
+	//init wdt timer
+//	wdt_init();
+
+//	apa102_init();
+
+	//init storage
+//	storage_init();
+
+	//enable timeout routines
+	timeout_init();
+
+	while(1){
+		led_red_on();
+		timeout_set(2*1000);
+		while(!timeout_timed_out()){}
+		led_red_off();
+		timeout_set(2*1000);
+		while(!timeout_timed_out()){}
+	}
 	
+	
+	//apa102_init();
+/*
+	//init frsky core
+	frsky_init();
+
+	//init adc
+	adc_init();
+
+	//init output
+	#if SBUS_ENABLED
+	sbus_init();
+	#else
+	ppm_init();
+	#endif
+
+	//init failsafe
+	failsafe_init();
+
+	debug("main: init done\n");
+
+	//run main
+	//frsky_frame_sniffer();
+	frsky_main();
+*/
+	/*LED_RED_ON();
+	while (1) {
+		LED_RED_ON();
+		delay_ms(200);
+		LED_RED_OFF();
+		delay_ms(200);
+	}
+	*/
+	
+	uint32_t i=0;
 	while (1) {
 		for(i=0; i<0x00FFFFF; i++) {}
 		led_green_on();

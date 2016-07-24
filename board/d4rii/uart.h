@@ -15,10 +15,6 @@ void uart_put_int8(int8_t c);
 void uart_put_uint16(uint16_t c);
 void uart_put_newline(void);
 
-#if DEBUG
-void putchar(char c);
-#endif
-
 #define UART_TX_BUFFER_SIZE 128
 #if ((UART_TX_BUFFER_SIZE==128) || (UART_TX_BUFFER_SIZE==64) || (UART_TX_BUFFER_SIZE==32))
     //ALWAYS use 2^n for buffer size! -> faster code and no int16 in interrupts (see Readme.md)
