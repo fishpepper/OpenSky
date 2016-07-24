@@ -1,7 +1,9 @@
 #include "hal_timeout.h"
 #include "debug.h"
+#include "wdt.h"
 
 static __IO uint32_t hal_timeout_ms;
+static __IO int32_t hal_tick;
 
 void hal_timeout_init(void) {
 	//configure 1ms sys tick:
@@ -10,6 +12,7 @@ void hal_timeout_init(void) {
 	}
 	
 	hal_timeout_ms = 0;
+	hal_tick = 0;
 }
 
 void hal_timeout_set(__IO uint32_t ms){ 
@@ -21,8 +24,19 @@ uint8_t hal_timeout_timed_out(void) {
 	return (hal_timeout_ms == 0);
 }
 
+// seperate ms delay function
+void hal_timeout_delay_ms(uint32_t timeout){
+	int32_t hal_tick_copy;
+	hal_tick_copy = hal_tick;
+	
+	while((hal_tick - hal_tick_copy) <= timeout) {
+		wdt_reset();
+	}
+}
+
 void SysTick_Handler(void){
 	if (hal_timeout_ms != 0){
 		hal_timeout_ms--;
 	}
+	hal_tick++;
 }

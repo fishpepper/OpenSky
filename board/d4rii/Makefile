@@ -3,8 +3,9 @@ CFLAGS  = -O1 -g
 ASFLAGS = -g
 
 # object files
-DRIVER = stm32f10x_rcc.o stm32f10x_gpio.o stm32f10x_usart.o misc.o
-OBJS=  $(STARTUP) $(DRIVER) main.o assert.o uart.o clocksource.o timeout.o hal_led.o hal_uart.o hal_clocksource.o hal_timeout.o
+DRIVER   = stm32f10x_rcc.o stm32f10x_gpio.o stm32f10x_usart.o misc.o stm32f10x_wwdg.o
+HAL_OBJS = hal_led.o hal_uart.o hal_clocksource.o hal_timeout.o hal_wdt.o hal_delay.o
+OBJS     =  $(STARTUP) $(DRIVER) $(HAL_OBJS) main.o assert.o uart.o clocksource.o timeout.o wdt.o delay.o
 
 # name of executable
 RESULT ?= opensky_$(notdir $(CURDIR))
@@ -63,6 +64,8 @@ CFLAGS+= -I$(DEVICE) -I$(CORE) -I$(PERIPH)/inc -I.
 CFLAGS+= -D$(PTYPE) -DUSE_STDPERIPH_DRIVER $(FULLASSERT)
 #CFLAGS+= -I$(TEMPLATEROOT)/Library/ff9/src -I$(TEMPLATEROOT)/Library
 
+OPENOCD_PIDFILE = /tmp/openocd_opensky.pid
+
 # Build executable 
 
 $(RESULT).elf : $(OBJS)
@@ -84,12 +87,13 @@ clean:
 	rm -f $(OBJS) $(OBJS:.o=.d) $(RESULT).* $(CLEANOTHER)
 
 debug: $(RESULT).elf
-	openocd -f /usr/share/openocd/scripts/interface/stlink-v2.cfg -f /usr/share/openocd/scripts/target/stm32f1x.cfg & echo $$! > /tmp/openocd.PID
+	openocd -f /usr/share/openocd/scripts/interface/stlink-v2.cfg -f /usr/share/openocd/scripts/target/stm32f1x.cfg & echo $$! > $(OPENOCD_PIDFILE)
 	sleep 1
 	arm-none-eabi-gdb --eval-command="target remote localhost:3333" $(RESULT).elf
-	kill `cat /tmp/openocd.PID`
+	if [ -a $(OPENOCD_PIDFILE) ]; then kill `cat $(OPENOCD_PIDFILE)`; fi;
 
 flash : $(RESULT).bin
+	if [ -a $(OPENOCD_PIDFILE) ]; then kill `cat $(OPENOCD_PIDFILE)`; fi;
 	st-flash write $(RESULT).bin 0x8000000
 
 # pull in dependencies
