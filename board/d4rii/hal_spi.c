@@ -1,11 +1,25 @@
 #include "hal_spi.h"
+#include "debug.h"
 #include "pin_config.h"
 #include "stm32f10x_gpio.h"
 #include "stm32f10x_spi.h"
+#include "stm32f10x_rcc.h"
 
 void hal_spi_init(void) {
+	_hal_spi_rcc_init();
 	_hal_spi_gpio_init();
 	_hal_spi_mode_init();
+	_hal_spi_enable();
+}
+
+void _hal_spi_rcc_init(void) {
+	// enable clocks
+	RCC_APB2PeriphClockCmd(CC25XX_SPI_GPIO_CLK | RCC_APB2Periph_AFIO, ENABLE);
+	RCC_APB2PeriphClockCmd(RCC_APB2Periph_SPI1, ENABLE);
+}
+
+void _hal_spi_enable(void) {
+	SPI_Cmd(CC25XX_SPI, ENABLE);
 }
 
 void _hal_spi_mode_init(void) {
@@ -51,7 +65,7 @@ void _hal_spi_gpio_init(void) {
 }
 
 void hal_spi_tx(uint8_t address){
-	 // wait for SPI Tx buffer empty
+	// wait for SPI Tx buffer empty
 	while (SPI_I2S_GetFlagStatus(CC25XX_SPI, SPI_I2S_FLAG_TXE) == RESET);
 	// send SPI data
 	SPI_I2S_SendData(CC25XX_SPI, address);
