@@ -57,11 +57,6 @@ void _hal_spi_gpio_init(void) {
 	gpio_init.GPIO_Pin  = CC25XX_SPI_MISO_PIN;
 	gpio_init.GPIO_Mode = GPIO_Mode_IN_FLOATING;
 	GPIO_Init(CC25XX_SPI_GPIO, &gpio_init);
-	
-	// configure GDO2 pin as Input floating
-	gpio_init.GPIO_Pin  = CC25XX_SPI_GDO2_PIN;
-	gpio_init.GPIO_Mode = GPIO_Mode_IN_FLOATING;
-	GPIO_Init(CC25XX_SPI_GPIO, &gpio_init);
 }
 
 uint8_t hal_spi_tx(uint8_t address){

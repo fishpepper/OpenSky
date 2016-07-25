@@ -12,7 +12,11 @@ void hal_cc25xx_strobe(uint8_t val);
 
 void hal_cc25xx_enable_receive(void);
 void hal_cc25xx_enter_rxmode(void);
+void hal_cc25xx_enter_txmode(void);
 
+void _hal_cc25xx_gpio_init(void);
+void hal_cc25xx_set_antenna(uint8_t id);
+void hal_cc25xx_set_gdo_mode(void);
 //adress checks
 #define CC2500_PKTCTRL1_FLAG_ADR_CHECK_00 ((0<<1) | (0<<0))
 #define CC2500_PKTCTRL1_FLAG_ADR_CHECK_01 ((0<<1) | (1<<0))

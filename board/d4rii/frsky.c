@@ -128,9 +128,61 @@ void frsky_configure(void){
 
 	//start idle
 	cc25xx_strobe(RFST_SIDLE);
+/*
+02 = 06
+00 = 06
+17 = 0C
+18 = 18
+06 = 19
+07 = 04
+08 = 05
+3E = FF
+0B = 68
+0C = 00
+0D = 5C
+0E = 76
+0F = 27
+10 = AA
+11 = 39
+12 = 11
+13 = 23
+14 = 7A
+15 = 42
+19 = 16
+1A = 6C
+1B = 03
+1C = 46
+1D = 91
+21 = 56
+22 = 10
+23 = A9
+24 = 0A
+25 = 00
+26 = 11
+29 = 59
+2C = 88
+2D = 31
+2E = 0B
+03 = 07
+04 = 00
+02 = 06
+
+pause
+
+09 = 03
+0A = 00
+07 = 05 , 34
+
+GDO2 HI->LO
+FB DB
+FB DB
+36 3A 34
+*/
     
-	//not necessary here IOCFG0 = 0x01
-	//not necessary here IOCFG2 = 0x0E
+	// IOCFG0,1,2 is set in hal code (it is specific to the board used)
+	cc25xx_set_gdo_mode();
+	
+	//normal config
 	cc25xx_set_register(MCSM1    ,0x0F); //go back to rx after transmission completed //0x0C;
 	cc25xx_set_register(MCSM0    ,0x18);
 	cc25xx_set_register(PKTLEN   ,FRSKY_PACKET_LENGTH); //on 251x this has to be exactly our size
@@ -347,6 +399,11 @@ void frsky_autotune(void){
                 debug("]\n"); debug_flush();*/
             }
         }
+        if (GPIO_ReadInputDataBit(CC25XX_GDO2_GPIO, GPIO_Pin_3)){
+		debug("HIGH\n");
+	}else{
+		debug("LOW\n");
+	}
         if (!done){
             debug_putc('-');
         }

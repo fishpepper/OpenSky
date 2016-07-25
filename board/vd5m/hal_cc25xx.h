@@ -10,6 +10,10 @@
 
 #define CC25XX_FIFO FIFO
 
+void hal_cc25xx_set_gdo_mode(void) {
+	//not necessary here IOCFG0 = 0x01
+	//not necessary here IOCFG2 = 0x0E
+}
 
    
 void hal_enter_rxmode(void) {

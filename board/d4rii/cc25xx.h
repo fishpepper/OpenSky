@@ -10,5 +10,9 @@ void cc25xx_init(void);
 #define cc25xx_enable_receive() hal_cc25xx_enable_receive()
 #define cc25xx_enter_rxmode() hal_cc25xx_enter_rxmode()
 #define cc25xx_get_register_burst(address) hal_cc25xx_get_register_burst(address)
+#define cc25xx_set_gdo_mode() hal_cc25xx_set_gdo_mode()
+
+
+void cc25xx_switch_antenna(void);
 
 #endif // __CC25XX_H__
