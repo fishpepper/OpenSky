@@ -30,9 +30,9 @@ void _hal_spi_mode_init(void) {
 	spi_init.SPI_Mode      = SPI_Mode_Master;
 	spi_init.SPI_DataSize  = SPI_DataSize_8b;
 	spi_init.SPI_CPOL      = SPI_CPOL_Low;
-	spi_init.SPI_CPHA      = SPI_CPHA_2Edge;
+	spi_init.SPI_CPHA      = SPI_CPHA_1Edge;
 	spi_init.SPI_NSS       = SPI_NSS_Soft;
-	spi_init.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_8;
+	spi_init.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_16;
 	spi_init.SPI_FirstBit  = SPI_FirstBit_MSB;
 	spi_init.SPI_CRCPolynomial = 7;
 	SPI_Init(CC25XX_SPI, &spi_init);
@@ -64,17 +64,18 @@ void _hal_spi_gpio_init(void) {
 	GPIO_Init(CC25XX_SPI_GPIO, &gpio_init);
 }
 
-void hal_spi_tx(uint8_t address){
+uint8_t hal_spi_tx(uint8_t address){
 	// wait for SPI Tx buffer empty
 	while (SPI_I2S_GetFlagStatus(CC25XX_SPI, SPI_I2S_FLAG_TXE) == RESET);
 	// send SPI data
 	SPI_I2S_SendData(CC25XX_SPI, address);
+	
+	// read response
+	while (SPI_I2S_GetFlagStatus(CC25XX_SPI, SPI_I2S_FLAG_RXNE) == RESET);
+	uint8_t result = SPI_I2S_ReceiveData(CC25XX_SPI);
+	return result;
 }
 
 uint8_t hal_spi_rx(void) {
-	hal_spi_tx(0xFF);
-	
-	// read data
-	uint8_t result = SPI_I2S_ReceiveData(CC25XX_SPI);
-	return result;
+	return hal_spi_tx(0xff);
 }

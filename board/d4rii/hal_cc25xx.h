@@ -10,6 +10,9 @@ void hal_cc25xx_set_register(uint8_t reg, uint8_t val);
 uint8_t hal_cc25xx_get_register(uint8_t address);
 void hal_cc25xx_strobe(uint8_t val);
 
+void hal_cc25xx_enable_receive(void);
+void hal_cc25xx_enter_rxmode(void);
+
 //adress checks
 #define CC2500_PKTCTRL1_FLAG_ADR_CHECK_00 ((0<<1) | (0<<0))
 #define CC2500_PKTCTRL1_FLAG_ADR_CHECK_01 ((0<<1) | (1<<0))

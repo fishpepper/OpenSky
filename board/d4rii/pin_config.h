@@ -27,4 +27,10 @@
 #define CC25XX_SPI_CLK      RCC_APB2Periph_SPI1
 #define CC25XX_SPI_GPIO_CLK RCC_APB2Periph_GPIOA
 
+
+
+#define BIND_JUMPER_GPIO      GPIOA
+#define BIND_JUMPER_PIN       GPIO_Pin_8
+#define BIND_JUMPER_GPIO_CLK  RCC_APB2Periph_GPIOA
+
 #endif //__PIN_CONFIG_H__

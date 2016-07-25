@@ -4,8 +4,8 @@ ASFLAGS = -g
 
 # object files
 DRIVER   = stm32f10x_rcc.o stm32f10x_gpio.o stm32f10x_usart.o misc.o stm32f10x_wwdg.o  stm32f10x_spi.o
-HAL_OBJS = hal_led.o hal_uart.o hal_clocksource.o hal_timeout.o hal_wdt.o hal_delay.o hal_dma.o hal_spi.o hal_cc25xx.o
-OBJS     =  $(STARTUP) $(DRIVER) $(HAL_OBJS) main.o assert.o uart.o clocksource.o timeout.o wdt.o delay.o dma.o frsky.o spi.o cc25xx.o
+HAL_OBJS = hal_led.o hal_uart.o hal_clocksource.o hal_timeout.o hal_wdt.o hal_delay.o hal_dma.o hal_spi.o hal_cc25xx.o hal_io.o
+OBJS     =  $(STARTUP) $(DRIVER) $(HAL_OBJS) main.o assert.o uart.o clocksource.o timeout.o wdt.o delay.o dma.o frsky.o spi.o cc25xx.o io.o storage.o
 
 # name of executable
 RESULT ?= opensky_$(notdir $(CURDIR))

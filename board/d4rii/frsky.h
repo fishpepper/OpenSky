@@ -31,6 +31,14 @@ extern EXTERNAL_MEMORY volatile uint8_t frsky_mode;
 void frsky_init(void);
 void frsky_show_partinfo(void);
 void frsky_configure(void);
+uint8_t frsky_bind_jumper_set(void);
+void frsky_do_bind(void);
+void frsky_configure_address(void);
+void frsky_autotune(void);
+void frsky_enter_rxmode(uint8_t channel);
+void frsky_tune_channel(uint8_t ch);
+void frsky_handle_overflows(void);
+
 #if 0
 void frsky_fetch_txid_and_hoptable(void);
 void frsky_configure_address(void);
