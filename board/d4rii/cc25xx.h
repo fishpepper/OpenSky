@@ -12,6 +12,8 @@ void cc25xx_init(void);
 #define cc25xx_get_register_burst(address) hal_cc25xx_get_register_burst(address)
 #define cc25xx_set_gdo_mode() hal_cc25xx_set_gdo_mode()
 
+#define cc25xx_process_packets(ptr1, ptr2, len) hal_cc25xx_process_packets(ptr1, ptr2, len)
+#define cc25xx_disable_rf_interrupt() hal_cc25xx_disable_rf_interrupt()
 
 void cc25xx_switch_antenna(void);
 

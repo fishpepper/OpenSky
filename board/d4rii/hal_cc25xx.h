@@ -17,6 +17,13 @@ void hal_cc25xx_enter_txmode(void);
 void _hal_cc25xx_gpio_init(void);
 void hal_cc25xx_set_antenna(uint8_t id);
 void hal_cc25xx_set_gdo_mode(void);
+uint8_t hal_cc25xx_get_gdo_status(void);
+void hal_cc25xx_process_packets(volatile uint8_t *packet_received, volatile uint8_t *buffer, uint8_t maxlen);
+
+void hal_cc25xx_read_fifo(uint8_t *buf, uint8_t len);
+void hal_cc25xx_register_read_multi(uint8_t address, uint8_t *buf, uint8_t len);
+void hal_cc25xx_disable_rf_interrupt(void);
+
 //adress checks
 #define CC2500_PKTCTRL1_FLAG_ADR_CHECK_00 ((0<<1) | (0<<0))
 #define CC2500_PKTCTRL1_FLAG_ADR_CHECK_01 ((0<<1) | (1<<0))

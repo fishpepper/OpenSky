@@ -15,6 +15,14 @@ void hal_cc25xx_set_gdo_mode(void) {
 	//not necessary here IOCFG2 = 0x0E
 }
 
+void cc25xx_process_packets(uint8_t *frsky_packet_received){
+	//nothing to do, for vd5m we set the flag in the rf interrupt
+}
+
+void hal_cc25xx_disable_rf_interrupt(void) {
+    IEN2 &= ~(IEN2_RFIE);
+    RFIM = 0;
+}
    
 void hal_enter_rxmode(void) {
     //set up dma for radio--->buffer

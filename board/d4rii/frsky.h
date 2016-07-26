@@ -38,6 +38,10 @@ void frsky_autotune(void);
 void frsky_enter_rxmode(uint8_t channel);
 void frsky_tune_channel(uint8_t ch);
 void frsky_handle_overflows(void);
+void frsky_fetch_txid_and_hoptable(void);
+void frsky_calib_pll(void);
+void frsky_main(void);
+uint8_t frsky_extract_rssi(uint8_t rssi_raw);
 
 #if 0
 void frsky_fetch_txid_and_hoptable(void);
@@ -45,7 +49,6 @@ void frsky_configure_address(void);
 void frsky_calib_pll(void);
 void frsky_rf_interrupt(void) __interrupt RF_VECTOR;
 void frsky_handle_overflows(void);
-void frsky_main(void);
 void frsky_set_channel(uint8_t hop_index);
 void frsky_update_ppm(void);
 void frsky_increment_channel(int8_t cnt);

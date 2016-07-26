@@ -34,7 +34,7 @@ int main(void){
 //	apa102_init();
 
 	//init storage
-//	storage_init();
+	storage_init();
 
 	//enable timeout routines
 	timeout_init();
@@ -49,29 +49,30 @@ int main(void){
 	}*/
 	
 	
-	//apa102_init();
+	//FIXME//apa102_init();
 
 	//init frsky core
 	frsky_init();
-/*
+	
 	//init adc
-	adc_init();
+	//FIXME//adc_init();
 
 	//init output
 	#if SBUS_ENABLED
-	sbus_init();
+	//FIXME//sbus_init();
 	#else
-	ppm_init();
+	//FIXME//ppm_init();
 	#endif
 
 	//init failsafe
-	failsafe_init();
+	///FIXME//failsafe_init();
 
 	debug("main: init done\n");
 
 	//run main
 	//frsky_frame_sniffer();
 	frsky_main();
+/*
 */
 	/*LED_RED_ON();
 	while (1) {
