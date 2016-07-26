@@ -74,6 +74,10 @@ void hal_cc25xx_disable_rf_interrupt(void) {
 	//nothing to do here
 }
 
+void hal_cc25xx_setup_rf_dma(uint8_t mode) {
+	//nothign to do
+}
+
 inline void hal_cc25xx_set_gdo_mode(void) {
 	cc25xx_set_register(IOCFG0, 0x06);
 	//cc25xx_set_register(IOCFG1, ???);
@@ -133,6 +137,10 @@ inline void hal_cc25xx_enable_receive(void){
 	//this is called after freq tuning before activating SRX
 }
 
+void hal_cc25xx_enable_transmit(void) {
+	//FIXME
+}
+
 inline uint8_t hal_cc25xx_get_gdo_status(void) {
 	if (GPIO_ReadInputDataBit(CC25XX_GDO2_GPIO, GPIO_Pin_3)){
 		return 1;
@@ -164,7 +172,24 @@ inline void hal_cc25xx_register_read_multi(uint8_t address, uint8_t *buf, uint8_
     hal_spi_csn_hi();
 }
 
-inline void hal_cc25xx_process_packets(volatile uint8_t *packet_received, volatile uint8_t *buffer, uint8_t maxlen){
+inline void hal_cc25xx_register_write_multi(uint8_t address, uint8_t *buf, uint8_t len){
+    //select device:
+    hal_spi_csn_lo();
+
+    //wait for RDY signal:
+    //while(CC2500_SPI_MISO_PIN & (1<<CC2500_SPI_MISO_PN)){}
+    
+    //request address (write request)
+    hal_spi_tx(address | READ_FLAG | BURST_FLAG);
+    while(len--){
+        hal_spi_tx(*buf);
+        buf++;
+    }
+    //deselect device
+    hal_spi_csn_lo();
+}
+
+inline void hal_cc25xx_process_packet(volatile uint8_t *packet_received, volatile uint8_t *buffer, uint8_t maxlen){
 	 if(hal_cc25xx_get_gdo_status() == 0){
 		//data received, fetch data
 		uint8_t len = hal_cc25xx_get_register_burst(RXBYTES);
@@ -184,4 +209,17 @@ inline void hal_cc25xx_process_packets(volatile uint8_t *packet_received, volati
 			*packet_received = 1;
 		}
 	 }
+}
+
+void hal_cc25xx_transmit_packet(volatile uint8_t *buffer, uint8_t len) {
+	//flush rx fifo
+	hal_cc25xx_strobe(RFST_SFRX);
+	//why that delay?!
+	delay_us(25);
+	//flush tx fifo
+	hal_cc25xx_strobe(RFST_SFTX);
+	//copy to fifo
+	hal_cc25xx_register_write_multi(CC25XX_FIFO, (uint8_t *)buffer, buffer[0]+1);
+	//and send!
+	hal_cc25xx_strobe(RFST_STX);
 }

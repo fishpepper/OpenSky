@@ -11,14 +11,18 @@ uint8_t hal_cc25xx_get_register(uint8_t address);
 void hal_cc25xx_strobe(uint8_t val);
 
 void hal_cc25xx_enable_receive(void);
+void hal_cc25xx_enable_transmit(void);
 void hal_cc25xx_enter_rxmode(void);
 void hal_cc25xx_enter_txmode(void);
+
+void hal_cc25xx_setup_rf_dma(uint8_t mode);
 
 void _hal_cc25xx_gpio_init(void);
 void hal_cc25xx_set_antenna(uint8_t id);
 void hal_cc25xx_set_gdo_mode(void);
 uint8_t hal_cc25xx_get_gdo_status(void);
-void hal_cc25xx_process_packets(volatile uint8_t *packet_received, volatile uint8_t *buffer, uint8_t maxlen);
+void hal_cc25xx_process_packet(volatile uint8_t *packet_received, volatile uint8_t *buffer, uint8_t maxlen);
+void hal_cc25xx_transmit_packet(volatile uint8_t *buffer, uint8_t len);
 
 void hal_cc25xx_read_fifo(uint8_t *buf, uint8_t len);
 void hal_cc25xx_register_read_multi(uint8_t address, uint8_t *buf, uint8_t len);

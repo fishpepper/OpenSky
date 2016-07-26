@@ -42,6 +42,9 @@ void frsky_fetch_txid_and_hoptable(void);
 void frsky_calib_pll(void);
 void frsky_main(void);
 uint8_t frsky_extract_rssi(uint8_t rssi_raw);
+void frsky_increment_channel(int8_t cnt);
+void frsky_set_channel(uint8_t hop_index);
+void frsky_send_telemetry(uint8_t telemetry_id);
 
 #if 0
 void frsky_fetch_txid_and_hoptable(void);
@@ -49,9 +52,7 @@ void frsky_configure_address(void);
 void frsky_calib_pll(void);
 void frsky_rf_interrupt(void) __interrupt RF_VECTOR;
 void frsky_handle_overflows(void);
-void frsky_set_channel(uint8_t hop_index);
 void frsky_update_ppm(void);
-void frsky_increment_channel(int8_t cnt);
 void frsky_setup_rf_dma(uint8_t);
 uint8_t frsky_extract_rssi(uint8_t rssi_raw);
 void frsky_enter_rxmode(uint8_t ch);
@@ -62,7 +63,6 @@ uint8_t frsky_append_hub_data(uint8_t sensor_id, uint16_t value, uint8_t *buf);
 uint8_t frsky_bind_jumper_set(void);
 void frsky_do_bind(void);
 void frsky_store_config(void);
-void frsky_send_telemetry(uint8_t telemetry_id);
 #endif
 
 #define FRSKY_MODE_RX 0

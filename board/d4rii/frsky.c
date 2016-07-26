@@ -312,7 +312,7 @@ void frsky_autotune(void){
             //handle any ovf conditions
             frsky_handle_overflows();
 
-	    cc25xx_process_packets(&frsky_packet_received, &frsky_packet_buffer, FRSKY_PACKET_BUFFER_SIZE);
+	    cc25xx_process_packet(&frsky_packet_received, &frsky_packet_buffer, FRSKY_PACKET_BUFFER_SIZE);
 	    
 	    
             if (frsky_packet_received){
@@ -424,7 +424,7 @@ void frsky_tune_channel(uint8_t ch){
 
     //set channel number
     cc25xx_set_register(CHANNR, ch);
-
+    
     //start Self calib:
     cc25xx_strobe(RFST_SCAL);
 
@@ -492,7 +492,7 @@ void frsky_fetch_txid_and_hoptable(void){
         }
         
         //process incoming data
-        cc25xx_process_packets(&frsky_packet_received, &frsky_packet_buffer, FRSKY_PACKET_BUFFER_SIZE);
+        cc25xx_process_packet(&frsky_packet_received, &frsky_packet_buffer, FRSKY_PACKET_BUFFER_SIZE);
 
         if (frsky_packet_received){
             debug_putc('p');
@@ -643,6 +643,7 @@ void frsky_main(void){
 
     //start with any channel:
     frsky_current_ch_idx = 0;
+    
     //first set channel uses enter rxmode, this will set up dma etc
     frsky_enter_rxmode(storage.frsky_hop_table[frsky_current_ch_idx]);
 
@@ -675,7 +676,7 @@ void frsky_main(void){
             frsky_increment_channel(1);
 
             //strange delay from spi dumps
-            delay_us(1000);
+            delay_ms(1); //delay_us(1000);
 
             //go back to rx mode
             frsky_packet_received = 0;
@@ -731,7 +732,7 @@ void frsky_main(void){
         frsky_handle_overflows();
 	
 	//process incoming data
-        cc25xx_process_packets(&frsky_packet_received, &frsky_packet_buffer, FRSKY_PACKET_BUFFER_SIZE);
+        cc25xx_process_packet(&frsky_packet_received, &frsky_packet_buffer, FRSKY_PACKET_BUFFER_SIZE);
 	
 
         if (frsky_packet_received){
@@ -792,7 +793,7 @@ void frsky_main(void){
             delay_us(900); //1340-500
 
             //build & send packet
-            //FIXME//frsky_send_telemetry(requested_telemetry_id);
+            frsky_send_telemetry(requested_telemetry_id);
 
             //mark as done
             send_telemetry = 0;
@@ -810,6 +811,7 @@ void frsky_main(void){
 
 
 void frsky_set_channel(uint8_t hop_index){
+	hop index doesnt work?!
     uint8_t ch = storage.frsky_hop_table[hop_index];
     //debug_putc('S'); debug_put_hex8(ch);
 
@@ -897,6 +899,77 @@ void frsky_update_ppm(void){
 }
 
 
+
+
+void frsky_send_telemetry(uint8_t telemetry_id){
+    uint8_t i;
+    //uint16_t tmp16;
+    uint8_t bytes_used = 0;
+    static uint8_t test = 0;
+
+    //Stop RX DMA
+    cc25xx_strobe(RFST_SIDLE);
+    
+    //enable tx
+    cc25xx_enter_txmode();
+
+    //length of byte (always 0x11 = 17 bytes)
+    frsky_packet_buffer[0] = 0x11;
+    //txid
+    frsky_packet_buffer[1] = storage.frsky_txid[0];
+    frsky_packet_buffer[2] = storage.frsky_txid[1];
+    //ADC channels
+    frsky_packet_buffer[3] = 123; //FIXME//adc_get_scaled(0);
+    frsky_packet_buffer[4] = 123; //FIXME//adc_get_scaled(1);
+    //RSSI
+    frsky_packet_buffer[5] = frsky_rssi;
+
+    //send ampere and voltage as hub telemetry data as well
+    #if FRSKY_SEND_HUB_TELEMETRY
+        //use telemetry id to decide which packet to send:
+        if (telemetry_id & 1){
+            //send voltage packet (undocumented sensor 0x39 = volts in 0.1 steps)
+            tmp16 = test++; //123; //12.3V
+            //convert adc to voltage:
+            //float v = (vraw * 3.3/1024.0) * (ADC0_DIVIDER_A + ADC0_DIVIDER_B)) / (ADC0_DIVIDER_B);
+            //continue here
+            bytes_used = frsky_append_hub_data(FRSKY_HUB_TELEMETRY_VOLTAGE, tmp16, &frsky_packet_buffer[8]);
+        }else{
+            //send current
+            tmp16 = 456; //45.6A
+            bytes_used = frsky_append_hub_data(FRSKY_HUB_TELEMETRY_CURRENT, tmp16, &frsky_packet_buffer[8]);
+        }
+
+        //number of valid data bytes:
+        frsky_packet_buffer[6] = bytes_used;
+        //set up frame id
+        frsky_packet_buffer[7] = telemetry_id;
+
+        //do not use rest of frame, use only one hub frame per packet
+        //in order not to have to handle the datastream splitting operation
+    #else
+        //no telemetry -> at least[6]+[7] should be zero
+        //bytes 6-17 are zero
+        for(i=6; i<FRSKY_PACKET_BUFFER_SIZE; i++){
+            frsky_packet_buffer[i] = 0x00;
+        }
+    #endif
+
+    //re arm adc dma etc
+    //it is important to call this after reading the values...
+    //FIXME//adc_process();
+
+	//arm dma channel
+	cc25xx_strobe(RFST_STX);
+	cc25xx_enable_transmit();
+	cc25xx_transmit_packet(frsky_packet_buffer, FRSKY_PACKET_BUFFER_SIZE);
+
+	cc25xx_setup_rf_dma(FRSKY_MODE_RX);
+	cc25xx_enable_receive();
+	cc25xx_strobe(RFST_SRX);
+}
+
+
 #if 0
 
 void frsky_rf_interrupt(void) __interrupt RF_VECTOR{
@@ -917,60 +990,7 @@ void frsky_rf_interrupt(void) __interrupt RF_VECTOR{
     }
 }
 
-void frsky_setup_rf_dma(uint8_t mode){
-    // CPU has priority over DMA
-    // Use 8 bits for transfer count
-    // No DMA interrupt when done
-    // DMA triggers on radio
-    // Single transfer per trigger.
-    // One byte is transferred each time.
 
-    dma_config[0].PRIORITY       = DMA_PRI_HIGH;
-    dma_config[0].M8             = DMA_M8_USE_8_BITS;
-    dma_config[0].IRQMASK        = DMA_IRQMASK_DISABLE;
-    dma_config[0].TRIG           = DMA_TRIG_RADIO;
-    dma_config[0].TMODE          = DMA_TMODE_SINGLE;
-    dma_config[0].WORDSIZE       = DMA_WORDSIZE_BYTE;
-
-    //store mode
-    frsky_mode = mode;
-
-    if (frsky_mode == FRSKY_MODE_TX) {
-        // Transmitter specific DMA settings
-        // Source: radioPktBuffer
-        // Destination: RFD register
-        // Use the first byte read + 1
-        // Sets the maximum transfer count allowed (length byte + data)
-        // Data source address is incremented by 1 byte
-        // Destination address is constant
-        SET_WORD(dma_config[0].SRCADDRH, dma_config[0].SRCADDRL, frsky_packet_buffer);
-        SET_WORD(dma_config[0].DESTADDRH, dma_config[0].DESTADDRL, &X_RFD);
-        dma_config[0].VLEN           = DMA_VLEN_FIRST_BYTE_P_1;
-        SET_WORD(dma_config[0].LENH, dma_config[0].LENL, (FRSKY_PACKET_LENGTH+1));
-        dma_config[0].SRCINC         = DMA_SRCINC_1;
-        dma_config[0].DESTINC        = DMA_DESTINC_0;
-    }else{
-        // Receiver specific DMA settings:
-        // Source: RFD register
-        // Destination: radioPktBuffer
-        // Use the first byte read + 3 (incl. 2 status bytes)
-        // Sets maximum transfer count allowed (length byte + data + 2 status bytes)
-        // Data source address is constant
-        // Destination address is incremented by 1 byte for each write
-        SET_WORD(dma_config[0].SRCADDRH, dma_config[0].SRCADDRL, &X_RFD);
-        SET_WORD(dma_config[0].DESTADDRH, dma_config[0].DESTADDRL, &frsky_packet_buffer[0]);
-        dma_config[0].VLEN           = DMA_VLEN_FIRST_BYTE_P_3;
-        SET_WORD(dma_config[0].LENH, dma_config[0].LENL, (FRSKY_PACKET_LENGTH+3));
-        dma_config[0].SRCINC         = DMA_SRCINC_0;
-        dma_config[0].DESTINC        = DMA_DESTINC_1;
-    }
-
-    // Save pointer to the DMA configuration struct into DMA-channel 0
-    // configuration registers
-    SET_WORD(DMA0CFGH, DMA0CFGL, &dma_config[0]);
-
-    frsky_packet_received = 0;
-}
 
 
 
@@ -1115,92 +1135,6 @@ void frsky_frame_sniffer(void){
     while(1);
 }
 
-
-
-void frsky_send_telemetry(uint8_t telemetry_id){
-    uint8_t i;
-    //uint16_t tmp16;
-    uint8_t bytes_used = 0;
-    static uint8_t test = 0;
-
-    //Stop RX DMA
-    RFST = RFST_SIDLE;
-    //abort ch0
-    DMAARM = DMA_ARM_ABORT | DMA_ARM_CH0;
-    frsky_setup_rf_dma(FRSKY_MODE_TX);
-
-    //length of byte (always 0x11 = 17 bytes)
-    frsky_packet_buffer[0] = 0x11;
-    //txid
-    frsky_packet_buffer[1] = storage.frsky_txid[0];
-    frsky_packet_buffer[2] = storage.frsky_txid[1];
-    //ADC channels
-    frsky_packet_buffer[3] = adc_get_scaled(0);
-    frsky_packet_buffer[4] = adc_get_scaled(1);
-    //RSSI
-    frsky_packet_buffer[5] = frsky_rssi;
-
-    //send ampere and voltage as hub telemetry data as well
-    #if FRSKY_SEND_HUB_TELEMETRY
-        //use telemetry id to decide which packet to send:
-        if (telemetry_id & 1){
-            //send voltage packet (undocumented sensor 0x39 = volts in 0.1 steps)
-            tmp16 = test++; //123; //12.3V
-            //convert adc to voltage:
-            //float v = (vraw * 3.3/1024.0) * (ADC0_DIVIDER_A + ADC0_DIVIDER_B)) / (ADC0_DIVIDER_B);
-            //continue here
-            bytes_used = frsky_append_hub_data(FRSKY_HUB_TELEMETRY_VOLTAGE, tmp16, &frsky_packet_buffer[8]);
-        }else{
-            //send current
-            tmp16 = 456; //45.6A
-            bytes_used = frsky_append_hub_data(FRSKY_HUB_TELEMETRY_CURRENT, tmp16, &frsky_packet_buffer[8]);
-        }
-
-        //number of valid data bytes:
-        frsky_packet_buffer[6] = bytes_used;
-        //set up frame id
-        frsky_packet_buffer[7] = telemetry_id;
-
-        //do not use rest of frame, use only one hub frame per packet
-        //in order not to have to handle the datastream splitting operation
-    #else
-        //no telemetry -> at least[6]+[7] should be zero
-        //bytes 6-17 are zero
-        for(i=6; i<FRSKY_PACKET_BUFFER_SIZE; i++){
-            frsky_packet_buffer[i] = 0x00;
-        }
-    #endif
-
-    //re arm adc dma etc
-    //it is important to call this after reading the values...
-    adc_process();
-
-    //arm dma channel
-    RFST = RFST_STX;
-    cc25xx_enable_receive();
-
-    //tricky: this will force an int request and
-    //        initiate the actual transmission
-    S1CON |= 0x03;
-
-    //wait some time here. packet should be sent within our 9ms
-    //frame (actually within 5-6ms). if not print an error...
-    frsky_packet_sent = 0;
-    while(!frsky_packet_sent){
-        if (timeout_timed_out()){
-            break;
-        }
-    }
-    if (timeout_timed_out()){
-        debug("\nfrsky: ERROR tx timed out\n");
-    }
-
-    frsky_packet_sent = 0;
-
-    frsky_setup_rf_dma(FRSKY_MODE_RX);
-    cc25xx_enable_receive();
-    RFST = RFST_SRX;
-}
 
 
 uint8_t frsky_append_hub_data(uint8_t sensor_id, uint16_t value, uint8_t *buf){

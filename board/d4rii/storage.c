@@ -36,6 +36,15 @@ void storage_init(void){
     //reload data from flash
     storage_read_from_flash();
 
+    debug("storage: loaded hoptable[] = ");
+    uint8_t i;
+    for(i=0; i<FRSKY_HOPTABLE_SIZE; i++){
+	    debug_put_hex8(storage.frsky_hop_table[i]);
+	    debug_putc(' ');
+	    debug_flush();
+    }
+    debug_put_newline();
+    
     /*frsky_enter_rxmode(0);
     IEN2 &= ~(IEN2_RFIE);
     RFIM = 0;
