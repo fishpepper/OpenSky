@@ -439,13 +439,14 @@ void frsky_tune_channel(uint8_t ch){
 void frsky_handle_overflows(void) {
     if ((cc25xx_get_register(MARCSTATE) & 0x1F) == 0x11){
         debug("frsky: RXOVF\n");
+	//flush rx buf
         cc25xx_strobe(RFST_SFRX);
     }else if ((cc25xx_get_register(MARCSTATE) & 0x1F) == 0x16){
         debug("frsky: TXOVF\n");
+	//flush tx buf
         cc25xx_strobe(RFST_SFTX);
     }
 }
-
 
 
 void frsky_fetch_txid_and_hoptable(void){
@@ -965,10 +966,10 @@ void frsky_send_telemetry(uint8_t telemetry_id){
 	cc25xx_strobe(RFST_STX);
 	cc25xx_enable_transmit();
 	cc25xx_transmit_packet(frsky_packet_buffer, FRSKY_PACKET_BUFFER_SIZE);
-wait for tx completion?!
-	cc25xx_setup_rf_dma(FRSKY_MODE_RX);
-	cc25xx_enable_receive();
-	cc25xx_strobe(RFST_SRX);
+
+// 	cc25xx_setup_rf_dma(FRSKY_MODE_RX);
+// 	cc25xx_enable_receive();
+// 	cc25xx_strobe(RFST_SRX);
 }
 
 

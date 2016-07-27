@@ -31,6 +31,10 @@ void hal_timeout_init(void) {
 	hal_timeout_100us_delay = 0;
 }
 
+void hal_timeout_set_100us(__IO uint32_t hus) {
+	hal_timeout_100us = hus;
+}
+
 void hal_timeout_set(__IO uint32_t ms){ 
 	hal_timeout_100us = 10*ms;
 }

@@ -4,6 +4,7 @@
 #include "stm32f10x_gpio.h"
 #include "stm32f10x_rcc.h"
 #include "debug.h"
+#include "timeout.h"
 
 void hal_cc25xx_init(void){
 	hal_spi_init();
@@ -123,21 +124,21 @@ inline void hal_cc25xx_strobe(uint8_t address){
 inline void hal_cc25xx_enter_rxmode(void) {
 	//add pa/lna config bit setting here
 	CC25XX_LNA_SW_CRX_GPIO->BSRR = (CC25XX_LNA_SW_CRX_PIN); //1
+	delay_us(20);
 	CC25XX_LNA_SW_CTX_GPIO->BRR  = (CC25XX_ANT_SW_CTX_PIN); //0
 }
 
 inline void hal_cc25xx_enter_txmode(void) {
 	//add pa/lna config bit setting here
 	CC25XX_LNA_SW_CRX_GPIO->BRR  = (CC25XX_LNA_SW_CRX_PIN); //0
+	delay_us(20);
 	CC25XX_LNA_SW_CTX_GPIO->BSRR = (CC25XX_ANT_SW_CTX_PIN); //1
 }
 
 
 inline void hal_cc25xx_enable_receive(void){
 	//this is called after freq tuning before activating SRX
-	//strange delay from spi dumps
-        delay_us(300);
-	do spi dumps and compare!
+	delay_us(300);
 }
 
 void hal_cc25xx_enable_transmit(void) {
@@ -195,6 +196,9 @@ inline void hal_cc25xx_register_write_multi(uint8_t address, uint8_t *buf, uint8
 inline void hal_cc25xx_process_packet(volatile uint8_t *packet_received, volatile uint8_t *buffer, uint8_t maxlen){
 	 if(hal_cc25xx_get_gdo_status() == 0){
 		//data received, fetch data
+		//timeout_set_100us(5);
+		 
+		 
 		 //there is a bug in the cc2500
 		//see p3 http://www.ti.com/lit/er/swrz002e/swrz002e.pdf
 		//workaround: read len register very quickly twice:
