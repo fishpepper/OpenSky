@@ -911,7 +911,7 @@ void frsky_send_telemetry(uint8_t telemetry_id){
     static uint8_t test = 0;
 
     //Stop RX DMA
-    cc25xx_strobe(RFST_SIDLE);
+    cc25xx_strobe(RFST_SFTX);
     
     //enable tx
     cc25xx_enter_txmode();
