@@ -70,3 +70,7 @@ void SysTick_Handler(void){
 		hal_timeout_100us_delay--;
 	}
 }
+
+uint32_t hal_timeout_time_remaining(void) {
+	return hal_timeout_100us/10;
+}

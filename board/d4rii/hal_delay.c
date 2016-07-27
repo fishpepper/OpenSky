@@ -17,4 +17,18 @@
 
 #include "hal_delay.h"
 
-//nothing to do here...
+inline void hal_delay_us(uint32_t us) {
+	//based on https://github.com/leaflabs/libmaple
+    us *= 8;
+
+    //fudge for function call overhead 
+    us--;
+    us--;
+    us--;
+    asm volatile("   mov r0, %[us]          \n\t"
+                 "1: subs r0, #1            \n\t"
+                 "   bhi 1b                 \n\t"
+                 :
+                 : [us] "r" (us)
+                 : "r0");
+}
