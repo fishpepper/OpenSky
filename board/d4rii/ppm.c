@@ -45,7 +45,7 @@ void ppm_init(void){
     for(i = 0; i<8; i++){
         ppm_data_ticks[i] = PPM_US_TO_TICKCOUNT(1000);
     }
-/*
+    /*
     //no int on overflow:
     OVFIM = 0;
 
@@ -108,7 +108,7 @@ void ppm_update(EXTERNAL_MEMORY uint16_t *data){
     uint8_t i=0;
     uint16_t val;
     uint16_t eof_frame_duration = PPM_FRAME_LEN;
-/*
+    /*
     //convert to ticks for timer
     //input is 0..4095, we should map this to 1000..2000us
     //frsky seems to send us*1.5 (~1480...3020) -> divide by 1.5 (=*2/3) to get us
@@ -143,7 +143,7 @@ void ppm_exit_failsafe(void){
 
     //start from beginning
     ppm_output_index = 0;
-/*
+    /*
     //configure p0_4 as peripheral:
     P0SEL |= (1<<4);
 
@@ -159,8 +159,8 @@ void ppm_exit_failsafe(void){
 }
 
 void ppm_enter_failsafe(void){
-/*
-	//disable interrupts
+    /*
+    //disable interrupts
     OVFIM = 0;
 
     //disable T1 interrups

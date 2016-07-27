@@ -28,7 +28,7 @@ EXTERNAL_MEMORY volatile uint8_t uart_tx_buffer_out;
 
 void uart_init(void){
     hal_uart_init();
-    
+
     uart_tx_buffer_in = 0;
     uart_tx_buffer_out = 0;
 
@@ -83,7 +83,7 @@ void uart_putc(uint8_t ch){
 
         hal_uart_start_transmission(ch);
     }
-    
+
     //re enable interrupts
     hal_uart_int_enable(1);
 }
@@ -109,15 +109,15 @@ void uart_put_hex8(uint8_t val){
     uint8_t lo = val&0x0F;
     uint8_t hi = val>>4;
     if (hi<0x0A){
-            hi = '0' + hi;
+        hi = '0' + hi;
     }else{
-            hi = 'A' - 0x0A + hi;
+        hi = 'A' - 0x0A + hi;
     }
 
     if (lo<0x0A){
-            lo = '0' + lo;
+        lo = '0' + lo;
     }else{
-            lo = 'A' - 0x0A + lo;
+        lo = 'A' - 0x0A + lo;
     }
     uart_putc(hi);
     uart_putc(lo);
@@ -181,10 +181,10 @@ void uart_put_uint8(uint8_t c){
 //FIXME: this routine is somewhat buggy when used with the ISR fifo uart_putc
 //       it is still unclear why this is causing problems?!
 void uart_put_uint16(uint16_t c){
-        uint8_t tmp;
-        uint8_t l=0;
-        //loop unrolling is better (no int16 arithmetic)
-        /*for(mul=10000; mul>0; mul = mul/10){
+    uint8_t tmp;
+    uint8_t l=0;
+    //loop unrolling is better (no int16 arithmetic)
+    /*for(mul=10000; mul>0; mul = mul/10){
         uint16_t mul;
 
         l=0;
@@ -200,39 +200,39 @@ void uart_put_uint16(uint16_t c){
                         uart_putc(tmp);
                 }
         }*/
-        tmp = 0;
-        while(c>=10000L){
-            c-=10000L;
-            tmp++;
-            l=1;
-        }
-        if (tmp != 0) uart_putc('0' + tmp);
+    tmp = 0;
+    while(c>=10000L){
+        c-=10000L;
+        tmp++;
+        l=1;
+    }
+    if (tmp != 0) uart_putc('0' + tmp);
 
-        tmp = 0;
-        while(c>=1000L){
-            c-=1000L;
-            tmp++;
-            l=1;
-        }
-        if (l || (tmp != 0)) uart_putc('0' + tmp);
+    tmp = 0;
+    while(c>=1000L){
+        c-=1000L;
+        tmp++;
+        l=1;
+    }
+    if (l || (tmp != 0)) uart_putc('0' + tmp);
 
-        tmp = 0;
-        while(c>=100){
-            c-=100;
-            tmp++;
-            l=1;
-        }
-        if (l || (tmp != 0)) uart_putc('0' + tmp);
+    tmp = 0;
+    while(c>=100){
+        c-=100;
+        tmp++;
+        l=1;
+    }
+    if (l || (tmp != 0)) uart_putc('0' + tmp);
 
-        tmp = 0;
-        while(c>=10){
-            c-=10;
-            tmp++;
-            l=1;
-        }
-        if (l || (tmp != 0)) uart_putc('0' + tmp);
+    tmp = 0;
+    while(c>=10){
+        c-=10;
+        tmp++;
+        l=1;
+    }
+    if (l || (tmp != 0)) uart_putc('0' + tmp);
 
-        uart_putc('0' + (uint8_t)c);
+    uart_putc('0' + (uint8_t)c);
 }
 
 void uart_put_newline(void){

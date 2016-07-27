@@ -22,13 +22,13 @@
 void timeout_init(void) {
     debug("timeout: init\n"); debug_flush();
     hal_timeout_init();
-    
+
 #if 0
     //measure delay_us(x) accuracy
     timeout_set(2000);
     uint32_t c;
     for(c=0; c<1000; c++){
-	delay_us(1000); //1ms
+        delay_us(1000); //1ms
     }
     uint32_t remaining = timeout_time_remaining();
     uint32_t duration  = 2000-remaining;

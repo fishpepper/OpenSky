@@ -22,55 +22,55 @@ volatile static __IO uint32_t hal_timeout_100us;
 volatile static __IO uint32_t hal_timeout_100us_delay;
 
 void hal_timeout_init(void) {
-	//configure 1ms sys tick:
-	if (SysTick_Config(SystemCoreClock / 10000)){
-		debug("hal_timeout: failed to set systick timeout\n");
-	}
-	
-	hal_timeout_100us = 0;
-	hal_timeout_100us_delay = 0;
+    //configure 1ms sys tick:
+    if (SysTick_Config(SystemCoreClock / 10000)){
+        debug("hal_timeout: failed to set systick timeout\n");
+    }
+
+    hal_timeout_100us = 0;
+    hal_timeout_100us_delay = 0;
 }
 
 void hal_timeout_set_100us(__IO uint32_t hus) {
-	hal_timeout_100us = hus;
+    hal_timeout_100us = hus;
 }
 
-void hal_timeout_set(__IO uint32_t ms){ 
-	hal_timeout_100us = 10*ms;
+void hal_timeout_set(__IO uint32_t ms){
+    hal_timeout_100us = 10*ms;
 }
 
 uint8_t hal_timeout_timed_out(void) {
-	//debug_put_uint16(hal_timeout_ms); debug("\n"); debug_flush();
-	return (hal_timeout_100us == 0);
+    //debug_put_uint16(hal_timeout_ms); debug("\n"); debug_flush();
+    return (hal_timeout_100us == 0);
 }
 
 // seperate ms delay function
 void hal_timeout_delay_ms(uint32_t timeout){
-	hal_timeout_100us_delay = 10*timeout;
-	
-	while(hal_timeout_100us_delay > 0){
-		wdt_reset();
-	}
+    hal_timeout_100us_delay = 10*timeout;
+
+    while(hal_timeout_100us_delay > 0){
+        wdt_reset();
+    }
 }
 
 // seperate ms delay function
 void hal_timeout_delay_100us(uint32_t timeout){
-	hal_timeout_100us_delay = timeout;
-	
-	while(hal_timeout_100us_delay > 0){
-		wdt_reset();
-	}
+    hal_timeout_100us_delay = timeout;
+
+    while(hal_timeout_100us_delay > 0){
+        wdt_reset();
+    }
 }
 
 void SysTick_Handler(void){
-	if (hal_timeout_100us != 0){
-		hal_timeout_100us--;
-	}
-	if (hal_timeout_100us_delay != 0){
-		hal_timeout_100us_delay--;
-	}
+    if (hal_timeout_100us != 0){
+        hal_timeout_100us--;
+    }
+    if (hal_timeout_100us_delay != 0){
+        hal_timeout_100us_delay--;
+    }
 }
 
 uint32_t hal_timeout_time_remaining(void) {
-	return hal_timeout_100us/10;
+    return hal_timeout_100us/10;
 }

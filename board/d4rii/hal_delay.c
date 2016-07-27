@@ -18,10 +18,10 @@
 #include "hal_delay.h"
 
 inline void hal_delay_us(uint32_t us) {
-	//based on https://github.com/leaflabs/libmaple
+    //based on https://github.com/leaflabs/libmaple
     us *= 8;
 
-    //fudge for function call overhead 
+    //fudge for function call overhead
     us--;
     us--;
     us--;

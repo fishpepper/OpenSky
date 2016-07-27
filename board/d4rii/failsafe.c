@@ -22,11 +22,11 @@ void failsafe_exit(void){
         //reset failsafe counter:
         failsafe_active = 0;
 
-        #if SBUS_ENABLED
+#if SBUS_ENABLED
         sbus_exit_failsafe();
-        #else
+#else
         ppm_exit_failsafe();
-        #endif
+#endif
 
         //debug("failsafe: left\n");
     }

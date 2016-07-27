@@ -12,105 +12,105 @@ int i = 0;
 int off = 5;
 
 void inc(void){
-  i += off;
+    i += off;
 }
 
 
 
 int main(void){
-	//leds:
-	led_init();
+    //leds:
+    led_init();
 
-	//init clock sources:
-	clocksource_init();
+    //init clock sources:
+    clocksource_init();
 
-	//init uart
-	uart_init();
+    //init uart
+    uart_init();
 
-	//init wdt timer
-	//FIXME FIXME FIXME
-	//wdt_init();
+    //init wdt timer
+    //FIXME FIXME FIXME
+    //wdt_init();
 
-//	apa102_init();
+    //	apa102_init();
 
-	//init storage
-	storage_init();
+    //init storage
+    storage_init();
 
-	//enable timeout routines
-	timeout_init();
+    //enable timeout routines
+    timeout_init();
 
-// 	uint16_t seconds=0;
-// 	timeout_set(1000);
-// 	while(1){
-// 		while(!timeout_timed_out()){}
-// 		timeout_set(1000);
-// 		seconds++;
-// 		debug_put_uint16(seconds);
-// 		debug_put_newline();
-// 	}
-// 	
-	
-	//FIXME//apa102_init();
+    // 	uint16_t seconds=0;
+    // 	timeout_set(1000);
+    // 	while(1){
+    // 		while(!timeout_timed_out()){}
+    // 		timeout_set(1000);
+    // 		seconds++;
+    // 		debug_put_uint16(seconds);
+    // 		debug_put_newline();
+    // 	}
+    //
 
-	//init frsky core
-	frsky_init();
-	
-	//init adc
-	//FIXME//adc_init();
+    //FIXME//apa102_init();
 
-	//init output
-	#if SBUS_ENABLED
-	//FIXME//sbus_init();
-	#else
-	//FIXME//ppm_init();
-	#endif
+    //init frsky core
+    frsky_init();
 
-	//init failsafe
-	///FIXME//failsafe_init();
+    //init adc
+    //FIXME//adc_init();
 
-	debug("main: init done\n");
+    //init output
+#if SBUS_ENABLED
+    //FIXME//sbus_init();
+#else
+    //FIXME//ppm_init();
+#endif
 
-	//run main
-	//frsky_frame_sniffer();
-	frsky_main();
-/*
+    //init failsafe
+    ///FIXME//failsafe_init();
+
+    debug("main: init done\n");
+
+    //run main
+    //frsky_frame_sniffer();
+    frsky_main();
+    /*
 */
-	/*LED_RED_ON();
-	while (1) {
-		LED_RED_ON();
-		delay_ms(200);
-		LED_RED_OFF();
-		delay_ms(200);
-	}
-	*/
-	
-	uint32_t i=0;
-	uint8_t t=0;
-	while (1) {
-		uint16_t y;
-		led_green_on();
-		for(y=0; y<100; y++){
-			uint16_t x;
-			for(x=0; x<100; x++){
-				delay_us(100);
-			}
-			//10ms
-			wdt_reset();
-		}
-		led_green_off();
-		debug_put_uint8(t++); debug_put_newline();
-		//delay_ms(200);
-	}
-	while (1) {
-		for(i=0; i<10; i++) { delay_ms(10); wdt_reset();}
-		led_green_on();
-		led_red_on();
-		for(i=0; i<10; i++) { delay_ms(10); wdt_reset();}
-		led_green_off();
-		led_red_off();
-		
-		for(i=0; i<20; i++) { delay_ms(10); wdt_reset();}
-		debug_putc('#');
-		debug("MAIN");
-	}
+    /*LED_RED_ON();
+    while (1) {
+        LED_RED_ON();
+        delay_ms(200);
+        LED_RED_OFF();
+        delay_ms(200);
+    }
+    */
+
+    uint32_t i=0;
+    uint8_t t=0;
+    while (1) {
+        uint16_t y;
+        led_green_on();
+        for(y=0; y<100; y++){
+            uint16_t x;
+            for(x=0; x<100; x++){
+                delay_us(100);
+            }
+            //10ms
+            wdt_reset();
+        }
+        led_green_off();
+        debug_put_uint8(t++); debug_put_newline();
+        //delay_ms(200);
+    }
+    while (1) {
+        for(i=0; i<10; i++) { delay_ms(10); wdt_reset();}
+        led_green_on();
+        led_red_on();
+        for(i=0; i<10; i++) { delay_ms(10); wdt_reset();}
+        led_green_off();
+        led_red_off();
+
+        for(i=0; i<20; i++) { delay_ms(10); wdt_reset();}
+        debug_putc('#');
+        debug("MAIN");
+    }
 }
