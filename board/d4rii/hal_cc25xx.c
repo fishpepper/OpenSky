@@ -141,9 +141,6 @@ inline void hal_cc25xx_enable_receive(void){
 	delay_us(300);
 }
 
-void hal_cc25xx_enable_transmit(void) {
-	//FIXME
-}
 
 inline uint8_t hal_cc25xx_get_gdo_status(void) {
 	if (GPIO_ReadInputDataBit(CC25XX_GDO2_GPIO, GPIO_Pin_3)){
@@ -237,10 +234,6 @@ inline void hal_cc25xx_process_packet(volatile uint8_t *packet_received, volatil
 }
 
 void hal_cc25xx_transmit_packet(volatile uint8_t *buffer, uint8_t len) {
-	//flush rx fifo
-	hal_cc25xx_strobe(RFST_SFRX);
-	//why that delay?!
-	delay_us(25);
 	//flush tx fifo
 	hal_cc25xx_strobe(RFST_SFTX);
 	//copy to fifo

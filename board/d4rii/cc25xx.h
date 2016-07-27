@@ -8,7 +8,6 @@ void cc25xx_init(void);
 #define cc25xx_strobe(val) hal_cc25xx_strobe(val);
 #define cc25xx_get_register(address) hal_cc25xx_get_register(address)
 #define cc25xx_enable_receive() hal_cc25xx_enable_receive()
-#define cc25xx_enable_transmit() hal_cc25xx_enable_transmit()
 #define cc25xx_enter_rxmode() hal_cc25xx_enter_rxmode()
 #define cc25xx_enter_txmode() hal_cc25xx_enter_txmode()
 #define cc25xx_get_register_burst(address) hal_cc25xx_get_register_burst(address)

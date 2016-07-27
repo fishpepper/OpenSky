@@ -745,6 +745,7 @@ void frsky_main(void){
                 //this way we can have up to +/-1ms jitter on our 9ms timebase
                 //without missing packets
                 delay_us(500);
+		//hal_timeout_delay_100us(5);
                 timeout_set(0);
 
                 //reset wdt
@@ -792,9 +793,10 @@ void frsky_main(void){
 
             //DO NOT go to SRX here
             delay_us(900); //1340-500
+	    //hal_timeout_delay_100us(9);
 
             //build & send packet
-            frsky_send_telemetry(requested_telemetry_id);
+            //frsky_send_telemetry(requested_telemetry_id);
 
             //mark as done
             send_telemetry = 0;
@@ -911,7 +913,7 @@ void frsky_send_telemetry(uint8_t telemetry_id){
     static uint8_t test = 0;
 
     //Stop RX DMA
-    cc25xx_strobe(RFST_SFTX);
+    cc25xx_strobe(RFST_SFRX);
     
     //enable tx
     cc25xx_enter_txmode();
@@ -963,10 +965,8 @@ void frsky_send_telemetry(uint8_t telemetry_id){
     //FIXME//adc_process();
 
 	//arm dma channel
-	cc25xx_strobe(RFST_STX);
-	cc25xx_enable_transmit();
 	cc25xx_transmit_packet(frsky_packet_buffer, FRSKY_PACKET_BUFFER_SIZE);
-
+	
 // 	cc25xx_setup_rf_dma(FRSKY_MODE_RX);
 // 	cc25xx_enable_receive();
 // 	cc25xx_strobe(RFST_SRX);

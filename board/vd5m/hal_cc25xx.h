@@ -113,7 +113,7 @@ void hal_cc25xx_enable_receive(void) {
 }
 
 
-void hal_cc25xx_enable_transmit(void) {
+void hal_cc25xx_transmit_packet(volatile uint8_t *buffer, uint8_t len) {
 	//start transmitting on dma channel 0
 	DMAARM = DMA_ARM_CH0;
 	
