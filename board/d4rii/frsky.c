@@ -132,7 +132,7 @@ void frsky_configure(void){
     cc25xx_set_gdo_mode();
 
     //normal config
-    cc25xx_set_register(MCSM1    ,0x0F); //go back to rx after transmission completed //0x0C;
+    cc25xx_set_register(MCSM1    ,0x0F); //go back to rx after transmission completed //0x0C = stay idle;
     cc25xx_set_register(MCSM0    ,0x18);
     cc25xx_set_register(PKTLEN   ,FRSKY_PACKET_LENGTH); //on 251x this has to be exactly our size
     cc25xx_set_register(PKTCTRL0 ,0x05);
@@ -437,11 +437,12 @@ void frsky_tune_channel(uint8_t ch){
 }
 
 void frsky_handle_overflows(void) {
-    if ((cc25xx_get_register(MARCSTATE) & 0x1F) == 0x11){
+    uint8_t marc_state = cc25xx_get_register(MARCSTATE) & 0x1F;
+    if (marc_state == 0x11){
         debug("frsky: RXOVF\n");
         //flush rx buf
         cc25xx_strobe(RFST_SFRX);
-    }else if ((cc25xx_get_register(MARCSTATE) & 0x1F) == 0x16){
+    }else if (marc_state == 0x16){
         debug("frsky: TXOVF\n");
         //flush tx buf
         cc25xx_strobe(RFST_SFTX);
@@ -779,8 +780,6 @@ void frsky_main(void){
                 frsky_packet_buffer[FRSKY_PACKET_BUFFER_SIZE-1] = 0x00;
 
                 led_green_off();
-            }else{
-                hal_cc25xx_strobe(RFST_SRX);
             }
         }
 
@@ -796,7 +795,7 @@ void frsky_main(void){
             //hal_timeout_delay_100us(9);
 
             //build & send packet
-            //frsky_send_telemetry(requested_telemetry_id);
+            frsky_send_telemetry(requested_telemetry_id);
 
             //mark as done
             send_telemetry = 0;
@@ -924,8 +923,8 @@ void frsky_send_telemetry(uint8_t telemetry_id){
     frsky_packet_buffer[1] = storage.frsky_txid[0];
     frsky_packet_buffer[2] = storage.frsky_txid[1];
     //ADC channels
-    frsky_packet_buffer[3] = 123; //FIXME//adc_get_scaled(0);
-    frsky_packet_buffer[4] = 123; //FIXME//adc_get_scaled(1);
+    frsky_packet_buffer[3] = 22; //FIXME//adc_get_scaled(0);
+    frsky_packet_buffer[4] = 33; //FIXME//adc_get_scaled(1);
     //RSSI
     frsky_packet_buffer[5] = frsky_rssi;
 
@@ -966,7 +965,6 @@ void frsky_send_telemetry(uint8_t telemetry_id){
 
     //arm dma channel
     cc25xx_transmit_packet(frsky_packet_buffer, FRSKY_PACKET_BUFFER_SIZE);
-
     // 	cc25xx_setup_rf_dma(FRSKY_MODE_RX);
     // 	cc25xx_enable_receive();
     // 	cc25xx_strobe(RFST_SRX);

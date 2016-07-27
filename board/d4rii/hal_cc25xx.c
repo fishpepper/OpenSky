@@ -117,7 +117,7 @@ inline uint8_t hal_cc25xx_get_register(uint8_t address){
 inline void hal_cc25xx_strobe(uint8_t address){
     hal_spi_csn_lo();
     uint8_t status = hal_spi_tx(address);
-    //debug("stobe = 0x"); debug_put_hex8(status); debug_put_newline();
+    //debug("s"); debug_put_hex8(status); debug_put_newline();
     hal_spi_csn_hi();
 }
 
@@ -126,6 +126,7 @@ inline void hal_cc25xx_enter_rxmode(void) {
     CC25XX_LNA_SW_CRX_GPIO->BSRR = (CC25XX_LNA_SW_CRX_PIN); //1
     delay_us(20);
     CC25XX_LNA_SW_CTX_GPIO->BRR  = (CC25XX_ANT_SW_CTX_PIN); //0
+    delay_us(5);
 }
 
 inline void hal_cc25xx_enter_txmode(void) {
@@ -133,12 +134,13 @@ inline void hal_cc25xx_enter_txmode(void) {
     CC25XX_LNA_SW_CRX_GPIO->BRR  = (CC25XX_LNA_SW_CRX_PIN); //0
     delay_us(20);
     CC25XX_LNA_SW_CTX_GPIO->BSRR = (CC25XX_ANT_SW_CTX_PIN); //1
+    delay_us(5);
 }
 
 
 inline void hal_cc25xx_enable_receive(void){
     //this is called after freq tuning before activating SRX
-    delay_us(300);
+    delay_us(1352);
 }
 
 
@@ -181,7 +183,7 @@ inline void hal_cc25xx_register_write_multi(uint8_t address, uint8_t *buf, uint8
     //while(CC2500_SPI_MISO_PIN & (1<<CC2500_SPI_MISO_PN)){}
 
     //request address (write request)
-    hal_spi_tx(address | READ_FLAG | BURST_FLAG);
+    hal_spi_tx(address | BURST_FLAG);
     while(len--){
         hal_spi_tx(*buf);
         buf++;
@@ -195,6 +197,7 @@ inline void hal_cc25xx_process_packet(volatile uint8_t *packet_received, volatil
         //data received, fetch data
         //timeout_set_100us(5);
 
+        *packet_received = 0;
 
         //there is a bug in the cc2500
         //see p3 http://www.ti.com/lit/er/swrz002e/swrz002e.pdf
