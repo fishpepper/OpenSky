@@ -79,9 +79,9 @@ void hal_cc25xx_setup_rf_dma(uint8_t mode) {
 }
 
 inline void hal_cc25xx_set_gdo_mode(void) {
-	cc25xx_set_register(IOCFG0, 0x06);
+	cc25xx_set_register(IOCFG0, 0x06); //6);
 	//cc25xx_set_register(IOCFG1, ???);
-	cc25xx_set_register(IOCFG2, 0x06);
+	cc25xx_set_register(IOCFG2, 0x06); //6);
 }
 
 inline void hal_cc25xx_set_register(uint8_t address, uint8_t data){
@@ -135,6 +135,9 @@ inline void hal_cc25xx_enter_txmode(void) {
 
 inline void hal_cc25xx_enable_receive(void){
 	//this is called after freq tuning before activating SRX
+	//strange delay from spi dumps
+        delay_us(300);
+	do spi dumps and compare!
 }
 
 void hal_cc25xx_enable_transmit(void) {
@@ -192,13 +195,31 @@ inline void hal_cc25xx_register_write_multi(uint8_t address, uint8_t *buf, uint8
 inline void hal_cc25xx_process_packet(volatile uint8_t *packet_received, volatile uint8_t *buffer, uint8_t maxlen){
 	 if(hal_cc25xx_get_gdo_status() == 0){
 		//data received, fetch data
-		uint8_t len = hal_cc25xx_get_register_burst(RXBYTES);
-		
+		 //there is a bug in the cc2500
+		//see p3 http://www.ti.com/lit/er/swrz002e/swrz002e.pdf
+		//workaround: read len register very quickly twice:
+		uint8_t len1, len2, len, i;
+            
+		//try this 10 times befor giving up:
+		for (i=0; i<10; i++){
+			len1 = hal_cc25xx_get_register_burst(RXBYTES) & 0x7F;
+			len2 = hal_cc25xx_get_register_burst(RXBYTES) & 0x7F;
+			if (len1==len2) break;
+		}
+            
+		//valid len found?
+		if (len1==len2){
+			len = len1;
+		}else{
+			//no, ignore this
+			len = 0;
+		}
+            
                 //packet received, grab data
                 uint8_t tmp_buffer[len];
                 hal_cc25xx_read_fifo(tmp_buffer, len);
 		
-		if (len != 0) debug_put_hex8(len);
+		//if (len != 0) debug_put_hex8(len);
 		
 		//only accept valid packet lenbghts:
 		if (len == maxlen){

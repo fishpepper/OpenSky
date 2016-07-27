@@ -32,7 +32,7 @@ void _hal_spi_mode_init(void) {
 	spi_init.SPI_CPOL      = SPI_CPOL_Low;
 	spi_init.SPI_CPHA      = SPI_CPHA_1Edge;
 	spi_init.SPI_NSS       = SPI_NSS_Soft;
-	spi_init.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_16;
+	spi_init.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_2;
 	spi_init.SPI_FirstBit  = SPI_FirstBit_MSB;
 	spi_init.SPI_CRCPolynomial = 7;
 	SPI_Init(CC25XX_SPI, &spi_init);

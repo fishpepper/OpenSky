@@ -4,6 +4,8 @@
 
 #define hal_delay_ms(ms) hal_timeout_delay_ms(ms)
 //FIXME!
-#define hal_delay_us(us) { uint32_t i; for(i=0; i<700; i++){ }; } 
+#define hal_delay_us(us) { uint32_t i; for(i=0; i<700; i++){ }; }
+//#define hal_delay_us(us) { if (us < 100) { uint32_t i; for(i=0; i<600; i++){ }; } else { hal_timeout_delay_100us(us/100); }}
+
 
 #endif // __HAL_DELAY_H__

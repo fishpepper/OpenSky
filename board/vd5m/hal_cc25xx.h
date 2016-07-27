@@ -103,7 +103,11 @@ void hal_cc25xx_setup_rf_dma(uint8_t mode){
 }
 
 
+
 void hal_cc25xx_enable_receive(void) {
+	//strange delay from spi dumps
+        delay_us(1000); //d4r uses 300?!
+	
 	//start receiving on dma channel 0
 	DMAARM = DMA_ARM_CH0;
 }

@@ -18,42 +18,51 @@
 #include "debug.h"
 #include "wdt.h"
 
-static __IO uint32_t hal_timeout_ms;
-static __IO uint32_t hal_timeout_ms_delay;
+volatile static __IO uint32_t hal_timeout_100us;
+volatile static __IO uint32_t hal_timeout_100us_delay;
 
 void hal_timeout_init(void) {
 	//configure 1ms sys tick:
-	if (SysTick_Config(SystemCoreClock / 1000)){
+	if (SysTick_Config(SystemCoreClock / 10000)){
 		debug("hal_timeout: failed to set systick timeout\n");
 	}
 	
-	hal_timeout_ms = 0;
-	hal_timeout_ms_delay = 0;
+	hal_timeout_100us = 0;
+	hal_timeout_100us_delay = 0;
 }
 
 void hal_timeout_set(__IO uint32_t ms){ 
-	hal_timeout_ms = ms;
+	hal_timeout_100us = 10*ms;
 }
 
 uint8_t hal_timeout_timed_out(void) {
 	//debug_put_uint16(hal_timeout_ms); debug("\n"); debug_flush();
-	return (hal_timeout_ms == 0);
+	return (hal_timeout_100us == 0);
 }
 
 // seperate ms delay function
 void hal_timeout_delay_ms(uint32_t timeout){
-	hal_timeout_ms_delay = timeout;
+	hal_timeout_100us_delay = 10*timeout;
 	
-	while(hal_timeout_ms_delay > 0){
+	while(hal_timeout_100us_delay > 0){
+		wdt_reset();
+	}
+}
+
+// seperate ms delay function
+void hal_timeout_delay_100us(uint32_t timeout){
+	hal_timeout_100us_delay = timeout;
+	
+	while(hal_timeout_100us_delay > 0){
 		wdt_reset();
 	}
 }
 
 void SysTick_Handler(void){
-	if (hal_timeout_ms != 0){
-		hal_timeout_ms--;
+	if (hal_timeout_100us != 0){
+		hal_timeout_100us--;
 	}
-	if (hal_timeout_ms_delay != 0){
-		hal_timeout_ms_delay--;
+	if (hal_timeout_100us_delay != 0){
+		hal_timeout_100us_delay--;
 	}
 }

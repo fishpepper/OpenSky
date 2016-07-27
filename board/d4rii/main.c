@@ -39,15 +39,16 @@ int main(void){
 	//enable timeout routines
 	timeout_init();
 
-	/*while(1){
-		led_red_on();
-		timeout_set(1000);
-		while(!timeout_timed_out()){}
-		led_red_off();
-		timeout_set(1000);
-		while(!timeout_timed_out()){}
-	}*/
-	
+// 	uint16_t seconds=0;
+// 	timeout_set(1000);
+// 	while(1){
+// 		while(!timeout_timed_out()){}
+// 		timeout_set(1000);
+// 		seconds++;
+// 		debug_put_uint16(seconds);
+// 		debug_put_newline();
+// 	}
+// 	
 	
 	//FIXME//apa102_init();
 

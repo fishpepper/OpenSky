@@ -79,10 +79,11 @@ void frsky_init(void){
     
     if (frsky_bind_jumper_set()){
         //do binding
-	frsky_do_bind();
         //binding will never return/continue
+	frsky_do_bind();
     }
 
+    
     //show info:
     debug("frsky: using txid 0x"); debug_flush();
     debug_put_hex8(storage.frsky_txid[0]);
@@ -136,7 +137,7 @@ void frsky_configure(void){
 	cc25xx_set_register(PKTLEN   ,FRSKY_PACKET_LENGTH); //on 251x this has to be exactly our size
 	cc25xx_set_register(PKTCTRL0 ,0x05);
 	cc25xx_set_register(PA_TABLE0,0xFF);
-	cc25xx_set_register(FSCTRL1  ,0x08);
+	cc25xx_set_register(FSCTRL1  ,0x08); //D4R-II seems to set 0x68 here ?! instead of 0x08
 	cc25xx_set_register(FSCTRL0  ,0x00);
 	//set base freq 2404 mhz
 	cc25xx_set_register(FREQ2    ,0x5C);
@@ -151,7 +152,7 @@ void frsky_configure(void){
 	cc25xx_set_register(FOCCFG   ,0x16);
 	cc25xx_set_register(BSCFG    ,0x6C);
 	cc25xx_set_register(AGCCTRL2 ,0x03);
-	cc25xx_set_register(AGCCTRL1 ,0x40);
+	cc25xx_set_register(AGCCTRL1 ,0x40); //D4R uses 46 instead of 0x40);
 	cc25xx_set_register(AGCCTRL0 ,0x91);
 	cc25xx_set_register(FREND1   ,0x56);
 	cc25xx_set_register(FREND0   ,0x10);
@@ -438,10 +439,10 @@ void frsky_tune_channel(uint8_t ch){
 void frsky_handle_overflows(void) {
     if ((cc25xx_get_register(MARCSTATE) & 0x1F) == 0x11){
         debug("frsky: RXOVF\n");
-        cc25xx_strobe(RFST_SIDLE);
+        cc25xx_strobe(RFST_SFRX);
     }else if ((cc25xx_get_register(MARCSTATE) & 0x1F) == 0x16){
         debug("frsky: TXOVF\n");
-        cc25xx_strobe(RFST_SIDLE);
+        cc25xx_strobe(RFST_SFTX);
     }
 }
 
@@ -646,7 +647,8 @@ void frsky_main(void){
     
     //first set channel uses enter rxmode, this will set up dma etc
     frsky_enter_rxmode(storage.frsky_hop_table[frsky_current_ch_idx]);
-
+    cc25xx_strobe(RFST_SRX); //D4R-II addition!
+    
     //wait 500ms on the current ch on powerup
     timeout_set(500);
 
@@ -674,9 +676,6 @@ void frsky_main(void){
             }
 
             frsky_increment_channel(1);
-
-            //strange delay from spi dumps
-            delay_ms(1); //delay_us(1000);
 
             //go back to rx mode
             frsky_packet_received = 0;
@@ -733,7 +732,6 @@ void frsky_main(void){
 	
 	//process incoming data
         cc25xx_process_packet(&frsky_packet_received, &frsky_packet_buffer, FRSKY_PACKET_BUFFER_SIZE);
-	
 
         if (frsky_packet_received){
             //valid packet?
@@ -779,7 +777,9 @@ void frsky_main(void){
                 frsky_packet_buffer[FRSKY_PACKET_BUFFER_SIZE-1] = 0x00;
 
                 led_green_off();
-            }
+            }else{  
+		hal_cc25xx_strobe(RFST_SRX);
+           }
         }
 
         if (send_telemetry){
@@ -811,8 +811,8 @@ void frsky_main(void){
 
 
 void frsky_set_channel(uint8_t hop_index){
-	hop index doesnt work?!
-    uint8_t ch = storage.frsky_hop_table[hop_index];
+	uint8_t ch = storage.frsky_hop_table[hop_index];
+    
     //debug_putc('S'); debug_put_hex8(ch);
 
     //go to idle
@@ -822,7 +822,9 @@ void frsky_set_channel(uint8_t hop_index){
     cc25xx_set_register(FSCAL3, frsky_calib_fscal3);
     cc25xx_set_register(FSCAL2, frsky_calib_fscal2);
     cc25xx_set_register(FSCAL1, frsky_calib_fscal1_table[hop_index]);
+    
 
+//     debug("SET 0x"); debug_put_hex8(ch); debug_put_newline();
     //set channel
     cc25xx_set_register(CHANNR, ch);
 }
@@ -963,7 +965,7 @@ void frsky_send_telemetry(uint8_t telemetry_id){
 	cc25xx_strobe(RFST_STX);
 	cc25xx_enable_transmit();
 	cc25xx_transmit_packet(frsky_packet_buffer, FRSKY_PACKET_BUFFER_SIZE);
-
+wait for tx completion?!
 	cc25xx_setup_rf_dma(FRSKY_MODE_RX);
 	cc25xx_enable_receive();
 	cc25xx_strobe(RFST_SRX);
