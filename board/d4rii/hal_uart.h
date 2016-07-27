@@ -8,11 +8,11 @@ uint8_t hal_uart_start_transmission(uint8_t ch);
 void hal_uart_int_enable(uint8_t enable) ;
 uint8_t hal_uart_int_enabled(void);
 
-void _hal_uart_nvic_init(uint8_t enable);
-void _hal_uart_init_rcc(void);
-void _hal_uart_init_gpio(void);
-void _hal_uart_enable(void);
-void _hal_uart_init_mode(void);
+static void hal_uart_nvic_init(uint8_t enable);
+static void hal_uart_init_rcc(void);
+static void hal_uart_init_gpio(void);
+static void hal_uart_enable(void);
+static void hal_uart_init_mode(void);
 void DEBUG_USART_IRQHANDLER(void);
 
 #endif // __HAL_UART__H_

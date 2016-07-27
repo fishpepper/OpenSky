@@ -6,23 +6,23 @@
 #include "stm32f10x_rcc.h"
 
 void hal_spi_init(void) {
-	_hal_spi_rcc_init();
-	_hal_spi_gpio_init();
-	_hal_spi_mode_init();
-	_hal_spi_enable();
+	hal_spi_rcc_init();
+	hal_spi_gpio_init();
+	hal_spi_mode_init();
+	hal_spi_enable();
 }
 
-void _hal_spi_rcc_init(void) {
+static void hal_spi_rcc_init(void) {
 	// enable clocks
 	RCC_APB2PeriphClockCmd(CC25XX_SPI_GPIO_CLK | RCC_APB2Periph_AFIO, ENABLE);
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_SPI1, ENABLE);
 }
 
-void _hal_spi_enable(void) {
+static void hal_spi_enable(void) {
 	SPI_Cmd(CC25XX_SPI, ENABLE);
 }
 
-void _hal_spi_mode_init(void) {
+static void hal_spi_mode_init(void) {
 	SPI_InitTypeDef spi_init;
 	
 	// mode config
@@ -38,7 +38,7 @@ void _hal_spi_mode_init(void) {
 	SPI_Init(CC25XX_SPI, &spi_init);
 }
 
-void _hal_spi_gpio_init(void) {
+static void hal_spi_gpio_init(void) {
 	GPIO_InitTypeDef gpio_init;
 
 	// configure SCK and MOSI pins as Alternate Function Push-Pull

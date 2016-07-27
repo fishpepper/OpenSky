@@ -17,7 +17,7 @@ void hal_cc25xx_enter_txmode(void);
 
 void hal_cc25xx_setup_rf_dma(uint8_t mode);
 
-void _hal_cc25xx_gpio_init(void);
+static void hal_cc25xx_gpio_init(void);
 void hal_cc25xx_set_antenna(uint8_t id);
 void hal_cc25xx_set_gdo_mode(void);
 uint8_t hal_cc25xx_get_gdo_status(void);

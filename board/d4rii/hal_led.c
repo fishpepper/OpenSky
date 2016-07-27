@@ -17,7 +17,7 @@
 #include "hal_led.h"
 #include  "stm32f10x_rcc.h"
 
-void _hal_led_init(uint16_t pin) {
+void hal_led_init(uint16_t pin) {
 	GPIO_InitTypeDef gpio_init;
 	
 	//periph clock enable for port

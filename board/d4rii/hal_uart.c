@@ -26,14 +26,14 @@ volatile uint8_t hal_usart_txe_is_on;
 void hal_uart_init(void) {
 	hal_usart_txe_is_on = 0;
 	
-	_hal_uart_nvic_init(0);
-	_hal_uart_init_rcc();
-	_hal_uart_init_gpio();
-	_hal_uart_init_mode();
- 	_hal_uart_enable();
+	hal_uart_nvic_init(0);
+	hal_uart_init_rcc();
+	hal_uart_init_gpio();
+	hal_uart_init_mode();
+ 	hal_uart_enable();
 }
 
-void _hal_uart_nvic_init(uint8_t enable) {
+static void hal_uart_nvic_init(uint8_t enable) {
 	// enable interrupts
 	NVIC_InitTypeDef nvic_init;
 
@@ -48,7 +48,6 @@ void _hal_uart_nvic_init(uint8_t enable) {
 	nvic_init.NVIC_IRQChannelCmd = enable ? ENABLE : DISABLE;
 	NVIC_Init(&nvic_init);
 }
-
 
 void DEBUG_USART_IRQHANDLER(void){
 	led_red_off();
@@ -71,7 +70,7 @@ void DEBUG_USART_IRQHANDLER(void){
 	}
 }
 
-void _hal_uart_init_mode(void) {
+static void hal_uart_init_mode(void) {
 	USART_InitTypeDef uart_init;
 	
 	//USART configuration:
@@ -86,13 +85,13 @@ void _hal_uart_init_mode(void) {
 	USART_Init(DEBUG_USART, &uart_init);
 }
 
-void _hal_uart_enable(void) {
+static void hal_uart_enable(void) {
 	//enable uart
 	USART_Cmd(DEBUG_USART, ENABLE);
 }
 
 void hal_uart_int_enable(uint8_t enable) {
-	_hal_uart_nvic_init(enable);
+	hal_uart_nvic_init(enable);
 }
 
 uint8_t hal_uart_start_transmission(uint8_t ch) {
@@ -110,7 +109,7 @@ uint8_t hal_uart_int_enabled(void) {
 }
 
 
-void _hal_uart_init_gpio(void){
+static void hal_uart_init_gpio(void){
 	GPIO_InitTypeDef gpio_init;
 
 	//Configure USART TX as alternate function push-pull
@@ -125,7 +124,7 @@ void _hal_uart_init_gpio(void){
 	GPIO_Init(DEBUG_USART_GPIO, &gpio_init);
 }
 
-void _hal_uart_init_rcc(void){
+static void hal_uart_init_rcc(void){
 	// configure clocks for uart:
 	// enable GPIO clock
 	RCC_APB2PeriphClockCmd(DEBUG_USART_GPIO_CLK | RCC_APB2Periph_AFIO, ENABLE);
