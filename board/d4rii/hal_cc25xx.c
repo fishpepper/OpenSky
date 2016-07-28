@@ -50,9 +50,14 @@ static void hal_cc25xx_gpio_init(void) {
     GPIO_Init(CC25XX_LNA_SW_CRX_GPIO, &gpio_init);
     hal_cc25xx_enter_rxmode();
 
+    //JTAG IS ON LNA pins! -> DISABLE JTAG!
+    RCC_APB2PeriphClockCmd(RCC_APB2Periph_AFIO, ENABLE);
+    GPIO_PinRemapConfig(GPIO_Remap_SWJ_JTAGDisable, ENABLE);
+
     //GDO2
     // periph clock enable for port
     RCC_APB2PeriphClockCmd(CC25XX_GDO2_GPIO_CLK, ENABLE);
+
     // configure GDO2 pin as Input floating
     gpio_init.GPIO_Pin  = CC25XX_GDO2_PIN;
     gpio_init.GPIO_Mode = GPIO_Mode_IN_FLOATING;
@@ -127,6 +132,7 @@ inline void hal_cc25xx_enter_rxmode(void) {
     delay_us(20);
     CC25XX_LNA_SW_CTX_GPIO->BRR  = (CC25XX_ANT_SW_CTX_PIN); //0
     delay_us(5);
+
 }
 
 inline void hal_cc25xx_enter_txmode(void) {
