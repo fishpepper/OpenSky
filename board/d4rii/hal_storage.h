@@ -11,6 +11,7 @@ void hal_storage_read(uint8_t *storage_ptr, uint16_t len);
 static void hal_storage_i2c_init(void);
 static void hal_storage_i2c_mode_init(void);
 static void hal_storage_i2c_gpio_init(void);
+static void hal_storage_i2c_rcc_init(void);
 static uint32_t hal_storage_check_len(uint16_t len);
 static uint32_t hal_storage_i2c_read_buffer(uint16_t address, uint8_t *buffer, uint8_t len);
 static uint32_t hal_storage_i2c_write_buffer(uint8_t address, uint8_t *buffer, uint8_t len);

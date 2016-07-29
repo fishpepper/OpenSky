@@ -42,11 +42,12 @@ int main(void){
 
     //	apa102_init();
 
+    //enable timeout routines
+    timeout_init();
+
     //init storage
     storage_init();
 
-    //enable timeout routines
-    timeout_init();
 
     // 	uint16_t seconds=0;
     // 	timeout_set(1000);

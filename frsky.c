@@ -79,8 +79,8 @@ void frsky_init(void){
 
     if (frsky_bind_jumper_set()){
         //do binding
-        //binding will never return/continue
         frsky_do_bind();
+        //binding will never return/continue
     }
 
 

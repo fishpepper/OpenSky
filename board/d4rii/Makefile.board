@@ -79,11 +79,7 @@ POSTCOMPILE = mv -f $(BUILD_DIR)/$*.Td $(BUILD_DIR)/$*.d
 
 board : $(RESULT).elf 
 
-$(RESULT).elf : $(BOARD_SRCS:%.c=%.o)
-	echo  $(LINK_OBJS)
-	echo ""
-	echo  $(LDLIBS)
-	echo
+$(RESULT).elf : $(BOARD_SRCS:%.c=%.d)
 	$(LD) $(LDFLAGS) -o $@ $(LINK_OBJS) $(LDLIBS)
 
 %.bin: %.elf

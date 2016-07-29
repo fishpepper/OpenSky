@@ -64,6 +64,7 @@
 
 
 #define EEPROM_GPIO                GPIOB
+#define EEPROM_GPIO_CLK            RCC_APB2Periph_GPIOB
 #define EEPROM_I2C                 I2C1
 #define EEPROM_I2C_CLK             RCC_APB1Periph_I2C1
 #define EEPROM_I2C_SDA_PIN         GPIO_Pin_7
