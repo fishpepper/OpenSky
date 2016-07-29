@@ -437,6 +437,7 @@ void frsky_tune_channel(uint8_t ch){
 }
 
 void frsky_handle_overflows(void) {
+    return ;
     uint8_t marc_state = cc25xx_get_register(MARCSTATE) & 0x1F;
     if (marc_state == 0x11){
         debug("frsky: RXOVF\n");
@@ -774,7 +775,7 @@ void frsky_main(void){
                 //extract channel data:
                 frsky_update_ppm();
 
-                //debug_put_hex8(buffer[3]);
+                //debug_put_hex8(frsky_packet_buffer[3]);
 
                 //make sure we never read the same packet twice by crc flag
                 frsky_packet_buffer[FRSKY_PACKET_BUFFER_SIZE-1] = 0x00;
@@ -795,7 +796,7 @@ void frsky_main(void){
             //hal_timeout_delay_100us(9);
 
             //build & send packet
-            //frsky_send_telemetry(requested_telemetry_id);
+            frsky_send_telemetry(requested_telemetry_id);
 
             //mark as done
             send_telemetry = 0;

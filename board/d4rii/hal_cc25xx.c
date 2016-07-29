@@ -194,7 +194,7 @@ inline void hal_cc25xx_register_read_multi(uint8_t address, uint8_t *buffer, uin
     // wait for ready signal
     while(GPIO_ReadInputDataBit(CC25XX_SPI_GPIO, CC25XX_SPI_MISO_PIN) == 1){}
 
-    debug("read "); debug_put_uint8(len); debug_flush();
+    //debug("read "); debug_put_uint8(len); debug_flush();
     // request address (read request)
     uint8_t status = hal_spi_tx(address);
 
