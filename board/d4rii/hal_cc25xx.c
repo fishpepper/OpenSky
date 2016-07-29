@@ -85,15 +85,22 @@ void hal_cc25xx_setup_rf_dma(uint8_t mode) {
 }
 
 inline void hal_cc25xx_set_gdo_mode(void) {
-    cc25xx_set_register(IOCFG0, 0x06); //6);
+    cc25xx_set_register(IOCFG0, 0x01); //6);
     //cc25xx_set_register(IOCFG1, ???);
-    cc25xx_set_register(IOCFG2, 0x06); //6);
+    cc25xx_set_register(IOCFG2, 0x01); //6);
 }
 
 inline void hal_cc25xx_set_register(uint8_t address, uint8_t data){
+    //select device
     hal_spi_csn_lo();
+
+    //wait for ready signal
+    while(GPIO_ReadInputDataBit(CC25XX_SPI_GPIO, CC25XX_SPI_MISO_PIN) == 1){}
+
     hal_spi_tx(address);
     hal_spi_tx(data);
+
+    //deslect
     hal_spi_csn_hi();
 }
 
@@ -102,8 +109,9 @@ inline uint8_t hal_cc25xx_get_register(uint8_t address){
 
     //select device:
     hal_spi_csn_lo();
+
     //wait for RDY signal:
-    //while(CC2500_SPI_MISO_PIN & (1<<CC2500_SPI_MISO_PN)){}
+    while(GPIO_ReadInputDataBit(CC25XX_SPI_GPIO, CC25XX_SPI_MISO_PIN) == 1){}
 
     //request address (read request has bit7 set)
     uint8_t status = hal_spi_tx(address | 0x80);
@@ -166,16 +174,19 @@ inline void hal_cc25xx_register_read_multi(uint8_t address, uint8_t *buf, uint8_
     //select device:
     hal_spi_csn_lo();
 
-    //wait for RDY signal:
-    //while(CC2500_SPI_MISO_PIN & (1<<CC2500_SPI_MISO_PN)){}
+    //wait for ready signal
+    while(GPIO_ReadInputDataBit(CC25XX_SPI_GPIO, CC25XX_SPI_MISO_PIN) == 1){}
 
+    debug("read "); debug_put_uint8(len); debug_flush();
     //request address (read request)
-    uint8_t result = hal_spi_tx(address);
+    uint8_t status = hal_spi_tx(address);
 
+    hal_spi_tx_buffer_dma(buf, len);
+    /*
     while(len--){
         *buf = hal_spi_rx();
         buf++;
-    }
+    }*/
 
     //deselect device
     hal_spi_csn_hi();
@@ -186,20 +197,22 @@ inline void hal_cc25xx_register_write_multi(uint8_t address, uint8_t *buf, uint8
     hal_spi_csn_lo();
 
     //wait for RDY signal:
-    //while(CC2500_SPI_MISO_PIN & (1<<CC2500_SPI_MISO_PN)){}
+    while(GPIO_ReadInputDataBit(CC25XX_SPI_GPIO, CC25XX_SPI_MISO_PIN) == 1){}
 
     //request address (write request)
     hal_spi_tx(address | BURST_FLAG);
-    while(len--){
+
+    hal_spi_tx_buffer_dma(buf, len);
+    /*while(len--){
         hal_spi_tx(*buf);
         buf++;
-    }
+    }*/
     //deselect device
     hal_spi_csn_lo();
 }
 
 inline void hal_cc25xx_process_packet(volatile uint8_t *packet_received, volatile uint8_t *buffer, uint8_t maxlen){
-    if(hal_cc25xx_get_gdo_status() == 0){
+    if(hal_cc25xx_get_gdo_status() == 1){
         //data received, fetch data
         //timeout_set_100us(5);
 
@@ -220,24 +233,22 @@ inline void hal_cc25xx_process_packet(volatile uint8_t *packet_received, volatil
         //valid len found?
         if (len1==len2){
             len = len1;
+
+            //packet received, grab data
+            uint8_t tmp_buffer[len];
+            hal_cc25xx_read_fifo(tmp_buffer, len);
+
+            //only accept valid packet lenbghts:
+            if (len == maxlen){
+                uint8_t i;
+                for(i=0; i<maxlen; i++){
+                    buffer[i] = tmp_buffer[i];
+                }
+                *packet_received = 1;
+            }
         }else{
             //no, ignore this
             len = 0;
-        }
-
-        //packet received, grab data
-        uint8_t tmp_buffer[len];
-        hal_cc25xx_read_fifo(tmp_buffer, len);
-
-        //if (len != 0) debug_put_hex8(len);
-
-        //only accept valid packet lenbghts:
-        if (len == maxlen){
-            uint8_t i;
-            for(i=0; i<maxlen; i++){
-                buffer[i] = tmp_buffer[i];
-            }
-            *packet_received = 1;
         }
     }
 }

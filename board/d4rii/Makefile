@@ -3,9 +3,9 @@ CFLAGS  = -O1 -g
 ASFLAGS = -g
 
 # object files
-DRIVER   = stm32f10x_rcc.o stm32f10x_gpio.o stm32f10x_usart.o misc.o stm32f10x_wwdg.o  stm32f10x_spi.o
+DRIVER   = stm32f10x_rcc.o stm32f10x_gpio.o stm32f10x_usart.o misc.o stm32f10x_wwdg.o  stm32f10x_spi.o stm32f10x_dma.o
 HAL_OBJS = hal_led.o hal_uart.o hal_clocksource.o hal_timeout.o hal_wdt.o hal_delay.o hal_dma.o hal_spi.o hal_cc25xx.o hal_io.o
-OBJS     =  $(STARTUP) $(DRIVER) $(HAL_OBJS) main.o assert.o uart.o clocksource.o timeout.o wdt.o delay.o dma.o frsky.o spi.o cc25xx.o io.o storage.o failsafe.o ppm.o 
+OBJS     =  $(STARTUP) $(DRIVER) $(HAL_OBJS) main.o assert.o uart.o clocksource.o timeout.o wdt.o delay.o dma.o frsky.o spi.o cc25xx.o io.o storage.o failsafe.o ppm.o
 
 # name of executable
 RESULT ?= opensky_$(notdir $(CURDIR))
@@ -49,16 +49,16 @@ vpath %.c $(TEMPLATEROOT)/Library/ff9/src/option
 vpath %.c $(TEMPLATEROOT)/Library
 
 #  Processor specific
-PTYPE = STM32F10X_MD_VL 
+PTYPE = STM32F10X_MD_VL
 LDSCRIPT = $(LINK)/stm32f103c8.ld
-STARTUP = startup_stm32f10x.o system_stm32f10x.o 
+STARTUP = startup_stm32f10x.o system_stm32f10x.o
 
 # Compilation Flags
 
-FULLASSERT = -DUSE_FULL_ASSERT 
+FULLASSERT = -DUSE_FULL_ASSERT
 
-LDFLAGS+= -T$(LDSCRIPT) -mthumb -mcpu=cortex-m3 
-CFLAGS+= -mcpu=cortex-m3 -mthumb 
+LDFLAGS+= -T$(LDSCRIPT) -mthumb -mcpu=cortex-m3
+CFLAGS+= -mcpu=cortex-m3 -mthumb
 CFLAGS+= -DHSE_VALUE=$(CRYSTAL_FREQ)
 CFLAGS+= -I$(DEVICE) -I$(CORE) -I$(PERIPH)/inc -I.
 CFLAGS+= -D$(PTYPE) -DUSE_STDPERIPH_DRIVER $(FULLASSERT)
@@ -66,11 +66,11 @@ CFLAGS+= -D$(PTYPE) -DUSE_STDPERIPH_DRIVER $(FULLASSERT)
 
 OPENOCD_PIDFILE = /tmp/openocd_opensky.pid
 
-# Build executable 
+# Build executable
 
 $(RESULT).elf : $(OBJS)
 	$(LD) $(LDFLAGS) -o $@ $(OBJS) $(LDLIBS)
-	
+
 %.bin: %.elf
 	$(OBJ) -O binary $< $@
 

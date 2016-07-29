@@ -795,7 +795,7 @@ void frsky_main(void){
             //hal_timeout_delay_100us(9);
 
             //build & send packet
-            frsky_send_telemetry(requested_telemetry_id);
+            //frsky_send_telemetry(requested_telemetry_id);
 
             //mark as done
             send_telemetry = 0;
