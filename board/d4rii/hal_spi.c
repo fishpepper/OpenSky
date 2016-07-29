@@ -134,12 +134,15 @@ void hal_spi_dma_xfer(uint8_t *buffer, uint8_t len) {
     while (DMA_GetFlagStatus(CC25XX_SPI_RX_DMA_TC_FLAG)) {};
 
     //wait for SPI to be no longer busy
-    while (SPI_I2S_GetFlagStatus(SPI2, SPI_I2S_FLAG_BSY) != RESET){}
+    while (SPI_I2S_GetFlagStatus(CC25XX_SPI, SPI_I2S_FLAG_BSY) != RESET){}
     //debug("!BUSY\n"); debug_flush();
 #endif
 
-    while((SPI1->SR & 2) == 0);  // wait while TXE flag is 0 (TX is not empty)
-    while((SPI1->SR & (1 << 7)) != 0);  // wait while BSY flag is 1 (SPI is busy)
+    while (SPI_I2S_GetFlagStatus(CC25XX_SPI, SPI_I2S_FLAG_TXE) == RESET);
+    while (SPI_I2S_GetFlagStatus(CC25XX_SPI, SPI_I2S_FLAG_BSY) != RESET){}
+
+    //while((SPI1->SR & 2) == 0);  // wait while TXE flag is 0 (TX is not empty)
+    //while((SPI1->SR & (1 << 7)) != 0);  // wait while BSY flag is 1 (SPI is busy)
 
     //disable DMA
     DMA_Cmd(CC25XX_SPI_RX_DMA_CHANNEL, DISABLE);

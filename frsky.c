@@ -782,6 +782,9 @@ void frsky_main(void){
 
                 led_green_off();
             }
+        }else{
+            //invalid packet -> mark as not received
+            frsky_packet_received = 0;
         }
 
         if (send_telemetry){
