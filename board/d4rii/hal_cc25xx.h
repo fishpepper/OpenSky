@@ -25,7 +25,7 @@ void hal_cc25xx_process_packet(volatile uint8_t *packet_received, volatile uint8
 void hal_cc25xx_transmit_packet(volatile uint8_t *buffer, uint8_t len);
 
 void hal_cc25xx_read_fifo(uint8_t *buf, uint8_t len);
-void hal_cc25xx_register_read_multi(uint8_t address, uint8_t *buf, uint8_t len);
+void hal_cc25xx_register_read_multi(uint8_t address, uint8_t *buffer, uint8_t len);
 void hal_cc25xx_disable_rf_interrupt(void);
 
 //adress checks

@@ -26,7 +26,7 @@
 #include "cc25xx.h"
 #include "io.h"
 #include "storage.h"
-//ADDME//#include "adc.h"
+#include "adc.h"
 //ADDME//#include "ppm.h"
 //ADDME//#include "apa102.h"
 #include "failsafe.h"
@@ -313,7 +313,7 @@ void frsky_autotune(void){
             //handle any ovf conditions
             frsky_handle_overflows();
 
-            cc25xx_process_packet(&frsky_packet_received, &frsky_packet_buffer, FRSKY_PACKET_BUFFER_SIZE);
+            cc25xx_process_packet(&frsky_packet_received, (volatile uint8_t *)&frsky_packet_buffer, FRSKY_PACKET_BUFFER_SIZE);
 
 
             if (frsky_packet_received){
@@ -495,7 +495,7 @@ void frsky_fetch_txid_and_hoptable(void){
         }
 
         //process incoming data
-        cc25xx_process_packet(&frsky_packet_received, &frsky_packet_buffer, FRSKY_PACKET_BUFFER_SIZE);
+        cc25xx_process_packet(&frsky_packet_received, (volatile uint8_t *)&frsky_packet_buffer, FRSKY_PACKET_BUFFER_SIZE);
 
         if (frsky_packet_received){
             debug_putc('p');
@@ -733,7 +733,7 @@ void frsky_main(void){
         frsky_handle_overflows();
 
         //process incoming data
-        cc25xx_process_packet(&frsky_packet_received, &frsky_packet_buffer, FRSKY_PACKET_BUFFER_SIZE);
+        cc25xx_process_packet(&frsky_packet_received, (volatile uint8_t *)&frsky_packet_buffer, FRSKY_PACKET_BUFFER_SIZE);
 
         if (frsky_packet_received){
             //valid packet?
@@ -923,8 +923,8 @@ void frsky_send_telemetry(uint8_t telemetry_id){
     frsky_packet_buffer[1] = storage.frsky_txid[0];
     frsky_packet_buffer[2] = storage.frsky_txid[1];
     //ADC channels
-    frsky_packet_buffer[3] = 22; //FIXME//adc_get_scaled(0);
-    frsky_packet_buffer[4] = 33; //FIXME//adc_get_scaled(1);
+    frsky_packet_buffer[3] = adc_get_scaled(0);
+    frsky_packet_buffer[4] = adc_get_scaled(1);
     //RSSI
     frsky_packet_buffer[5] = frsky_rssi;
 
@@ -961,7 +961,7 @@ void frsky_send_telemetry(uint8_t telemetry_id){
 
     //re arm adc dma etc
     //it is important to call this after reading the values...
-    //FIXME//adc_process();
+    adc_process();
 
     //arm dma channel
     cc25xx_transmit_packet(frsky_packet_buffer, FRSKY_PACKET_BUFFER_SIZE);

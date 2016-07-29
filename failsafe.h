@@ -1,6 +1,8 @@
 #ifndef __FAILSAFE_H__
 #define __FAILSAFE_H__
 #include "main.h"
+#include "ppm.h"
+#include "sbus.h"
 #include <stdint.h>
 
 void failsafe_init(void);

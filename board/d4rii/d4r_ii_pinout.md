@@ -20,14 +20,17 @@ LAYOUT:
 STM32 <==> CC2500 <==> SW1 <===> LNA/PA <==> SW2 <===> ANT1/2
 
 Pinout SW1:
+```
 1 = RX  = T212.4 (LNA OUT)
 2 = GND = GND
 3 = TX  = T212.2 (PA_IN_P)
 4 = CTX = STM32.38 (PA15, PULLUP VCC, CAP TO GND)
 5 = ANT = --> CC2500
 6 = CRX = STM32.40 (PB4, PULLUP VCC, CAP TO GND)
+```
 
 Pinout T212:
+```
  1 = PA_IN_N   = ?
  2 = PA_IN_P   = SW1.3
  3 = Power Det = ? OPEN?
@@ -44,16 +47,20 @@ Pinout T212:
 14 = PAVCC1    = ...
 15 = VCBias    = ...
 16 = PAVCC2    = ...
+```
 
 Pinout SW1:
+```
 1 = RX  = ANTENNA E2
 2 = GND = GND
 3 = TX  = ANTENNA E1
 4 = CTX = STM32.4 (PC15, NO PULLx, CAP TO GND)
 5 = ANT = T212.9 (ANT)
 6 = CRX = STM32.3 (PC14, NO PULLx, CAP TO GND)
+```
 
 Pinout 24C02:
+```
 1 = ADDRESS0 = VCC (PULLUP 10K)
 2 = ADDRESS1 = GND
 3 = ADDRESS2 = GND
@@ -62,8 +69,10 @@ Pinout 24C02:
 6 = SCL      = STM32.42 (PB6, PULLUP 10K)
 7 = WP       = STM32.45 (PB8, PULLUP 10K)
 8 = VCC      = VCC
+```
 
 Pinout CC2500:
+```
  1 = SCLK      = STM32.15 (PA5, SPI1_SCK)
  2 = SO (GDO1) = STM32.16 (PA6, SPI1_MISO)
  3 = GDO2      = STM32.13 (PA3, misc)
@@ -84,10 +93,11 @@ Pinout CC2500:
 18 = DGUARD    = ...
 19 = GND       = ...
 20 = SI        = STM32.17 (PA7, SPI1_MOSI)
-
+```
 
 
 Pinout STM32:
+```
 ...
 5 = OSC_IN  = 12MHZ crystal
 6 = OSC_OUT = 12MHZ crystal
@@ -111,7 +121,7 @@ Pinout STM32:
 ...
 44 = BOOT0 = PULLDOWN 10K, jumperpad R19 has VCC, use to enter bootloader!
 ...
-
+```
 
 Observations
 ============
@@ -121,7 +131,7 @@ DIVERSITY:
 
 
 CC25 SETUP:
-/*
+```
 02 = 06
 00 = 06
 17 = 0C
@@ -170,6 +180,6 @@ GDO2 HI->LO
 FB DB
 FB DB
 36 3A 34
-*/
+```
 
 

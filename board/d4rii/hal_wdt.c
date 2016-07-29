@@ -16,31 +16,40 @@
 */
 #include "hal_wdt.h"
 #include "debug.h"
-#include "stm32f10x_wwdg.h"
+#include "stm32f10x_iwdg.h"
 #include "stm32f10x_rcc.h"
 
 void hal_wdt_init(void) {
-    // enable WWDG clock
-    RCC_APB1PeriphClockCmd(RCC_APB1Periph_WWDG, ENABLE);
+    // detect resets from wdt
+    if (RCC_GetFlagStatus(RCC_FLAG_IWDGRST) != RESET){
+        debug("hal_wdt: watchdog reset detected\n"); debug_flush();
+        RCC_ClearFlag();
+    }
 
-    //on Value line devices, WWDG clock counter = (PCLK1 (24MHz)/4096)/8 = 732 Hz (~1366 us)
-    //on other devices, WWDG clock counter = (PCLK1(36MHz)/4096)/8 = 1099 Hz (~910 us)
-    WWDG_SetPrescaler(WWDG_Prescaler_8);
+    // set iwdg timeout to roughly 500ms (varies due to LSI freq dispersion)
+    uint32_t timeout_ms = 500;
 
-    //set Window value to 80; WWDG counter should be refreshed only when the counter
-    //is below 80 (and greater than 64) otherwise a reset will be generated
-    WWDG_SetWindowValue(127);
+    // enable write access to IWDG_PR and IWDG_RLR registers
+    IWDG_WriteAccessCmd(IWDG_WriteAccess_Enable);
 
-    //- On Value line devices,
-    // Enable WWDG and set counter value to 127, WWDG timeout = ~1366 us * 64 = 87.42 ms
-    // In this case the refresh window is: ~1366us * (127-80) = 64.20 ms < refresh window < ~1366us * 64 = 87.42ms
-    // - On other devices
-    // Enable WWDG and set counter value to 127, WWDG timeout = ~910 us * 64 = 58.25 ms
-    // In this case the refresh window is: ~910 us * (127-80) = 42.77 ms < refresh window < ~910 us * 64 = 58.25ms
-    WWDG_Enable(127);
+    // IWDG counter clock: LSI/32
+    IWDG_SetPrescaler(IWDG_Prescaler_32);
+
+
+    // set counter reload value
+    // 250ms timeout -> reload value = 0.25 * (LSI/32) = 0.25 * 40000 / 32 = 312.5
+    // --> 1ms = 312.5 / 250 = 1.25 = 5/4
+    IWDG_SetReload(timeout_ms * 5/4);
+
+    // reload IWDG counter
+    IWDG_ReloadCounter();
+
+    // enable IWDG (the LSI oscillator will be enabled by hardware)
+    IWDG_Enable();
 }
 
-void hal_wdt_reset(void){
-    //reset wdt (special sequence)
-    WWDG_Enable(127);
+inline void hal_wdt_reset(void){
+    //reset wdt
+     IWDG_ReloadCounter();
 }
+

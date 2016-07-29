@@ -189,3 +189,15 @@ old/uart.h
 old/wdt.c
 old/wdt.h
 Makefile
+board/d4rii/hal_storage.h
+board/d4rii/hal_storage.c
+board/vd5m/hal_storage.h
+board/vd5m/hal_storage.c
+board/d4rii/hal_adc.h
+board/d4rii/hal_adc.c
+board/d4rii/adc.h
+board/d4rii/adc.c
+board/vd5m/hal_adc.h
+board/vd5m/hal_adc.c
+board/d4rii/sbus.c
+board/d4rii/sbus.h

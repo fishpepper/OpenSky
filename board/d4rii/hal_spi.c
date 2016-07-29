@@ -1,3 +1,19 @@
+/*
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+   author: fishpepper <AT> gmail.com
+*/
 #include "hal_spi.h"
 #include "debug.h"
 #include "led.h"
@@ -12,7 +28,7 @@ void hal_spi_init(void) {
     hal_spi_rcc_init();
     hal_spi_gpio_init();
     hal_spi_mode_init();
-    hal_spi_dma_setup();
+    hal_spi_dma_init();
     hal_spi_enable();
 }
 
@@ -42,147 +58,95 @@ static void hal_spi_mode_init(void) {
     SPI_Init(CC25XX_SPI, &spi_init);
 }
 
-static void hal_spi_dma_setup(void) {
+
+
+static void hal_spi_dma_init(void) {
     DMA_InitTypeDef dma_init;
 
-    GNARR USE hal_spi_dma_setup()!
+    // Enable DMA1 Peripheral Clock
+    RCC_AHBPeriphClockCmd(CC25XX_SPI_DMA_CLOCK, ENABLE);
 
-    test https://www.mikrocontroller.net/attachment/59501/spi_dma.c
-
-    // Enable DMA1 Peripheral Clock (SPI_DECAWAVE and SPI_BUS)
-    RCC_AHBPeriphClockCmd(RCC_AHBPeriph_DMA1, ENABLE);
-
-    // Configure SPI_BUS RX Channel
-    dma_init.DMA_DIR = DMA_DIR_PeripheralSRC; // From SPI to memory
+    // Configure SPI RX Channel
+    dma_init.DMA_DIR                = DMA_DIR_PeripheralSRC;
     dma_init.DMA_PeripheralBaseAddr = (uint32_t)&CC25XX_SPI->DR;
     dma_init.DMA_PeripheralDataSize = DMA_PeripheralDataSize_Byte;
-    dma_init.DMA_PeripheralInc = DMA_PeripheralInc_Disable;
-    dma_init.DMA_MemoryBaseAddr = 0; // To be set later
-    dma_init.DMA_MemoryDataSize = DMA_MemoryDataSize_Byte;
-    dma_init.DMA_MemoryInc = DMA_MemoryInc_Enable;
-    dma_init.DMA_BufferSize = 1; // To be set later
-    dma_init.DMA_Mode = DMA_Mode_Normal;
-    dma_init.DMA_Priority = DMA_Priority_VeryHigh;
-    dma_init.DMA_M2M = DMA_M2M_Disable;
-    DMA_Init(DMA1_Channel2, &dma_init);
+    dma_init.DMA_PeripheralInc      = DMA_PeripheralInc_Disable;
+    dma_init.DMA_MemoryBaseAddr     = 0; // will be set later
+    dma_init.DMA_MemoryDataSize     = DMA_MemoryDataSize_Byte;
+    dma_init.DMA_MemoryInc          = DMA_MemoryInc_Enable;
+    dma_init.DMA_BufferSize         = 1; // will be set later
+    dma_init.DMA_Mode               = DMA_Mode_Normal;
+    dma_init.DMA_Priority           = DMA_Priority_VeryHigh;
+    dma_init.DMA_M2M                = DMA_M2M_Disable;
+    DMA_Init(CC25XX_SPI_RX_DMA_CHANNEL, &dma_init);
 
-    // Configure SPI_BUS TX Channel
-    dma_init.DMA_DIR = DMA_DIR_PeripheralDST; // From memory to SPI
+    // configure SPI TX Channel
+    dma_init.DMA_DIR                = DMA_DIR_PeripheralDST;
     dma_init.DMA_PeripheralBaseAddr = (uint32_t)&CC25XX_SPI->DR;
     dma_init.DMA_PeripheralDataSize = DMA_PeripheralDataSize_Byte;
-    dma_init.DMA_PeripheralInc = DMA_PeripheralInc_Disable;
-    dma_init.DMA_MemoryBaseAddr = 0; // To be set later
-    dma_init.DMA_MemoryDataSize = DMA_MemoryDataSize_Byte;
-    dma_init.DMA_MemoryInc = DMA_MemoryInc_Enable;
-    dma_init.DMA_BufferSize = 1; // To be set later
-    dma_init.DMA_Mode = DMA_Mode_Normal;
-    dma_init.DMA_Priority = DMA_Priority_VeryHigh;
-    dma_init.DMA_M2M = DMA_M2M_Disable;
-    DMA_Init(DMA1_Channel3, &dma_init);
+    dma_init.DMA_PeripheralInc      = DMA_PeripheralInc_Disable;
+    dma_init.DMA_MemoryBaseAddr     = 0; // will be set later
+    dma_init.DMA_MemoryDataSize     = DMA_MemoryDataSize_Byte;
+    dma_init.DMA_MemoryInc          = DMA_MemoryInc_Enable;
+    dma_init.DMA_BufferSize         = 1; // will be set later
+    dma_init.DMA_Mode               = DMA_Mode_Normal;
+    dma_init.DMA_Priority           = DMA_Priority_VeryHigh;
+    dma_init.DMA_M2M                = DMA_M2M_Disable;
+    DMA_Init(CC25XX_SPI_TX_DMA_CHANNEL, &dma_init);
 
-    DMA_Cmd(DMA1_Channel2, DISABLE); // RX
-    DMA_Cmd(DMA1_Channel3, DISABLE); // TX
+    // start disabled
+    DMA_Cmd(CC25XX_SPI_TX_DMA_CHANNEL, DISABLE);
+    DMA_Cmd(CC25XX_SPI_RX_DMA_CHANNEL, DISABLE);
 
 }
 
-void hal_spi_tx_buffer_dma(uint8_t *buffer, uint8_t len) {
-    DMA1_Channel2->CMAR  = (uint32_t)buffer;
-    DMA1_Channel3->CMAR  = (uint32_t)buffer;
-    DMA1_Channel2->CNDTR = len;
-    DMA1_Channel3->CNDTR = len;
+// data in buffer will be sent and will be overwritten with
+// the data read back from the spi slave
+void hal_spi_dma_xfer(uint8_t *buffer, uint8_t len) {
+    debug("hal_spi_dma_xfer(..., "); debug_put_uint8(len); debug(")\n");
 
-    DMA_Cmd(DMA1_Channel2, ENABLE); // RX
-    DMA_Cmd(DMA1_Channel3, ENABLE); // TX
+    // TX: transfer buffer to slave
+    CC25XX_SPI_TX_DMA_CHANNEL->CMAR  = (uint32_t)buffer;
+    CC25XX_SPI_TX_DMA_CHANNEL->CNDTR = len;
 
-    while(1);
-#if 0
-    while (!(DMA1->ISR & DMA_ISR_TCIF4)) ;		// wait until RX DMA complete
-    DMA1->IFCR = DMA_IFCR_CGIF4 | DMA_IFCR_CGIF5;	// clear DMA interrupt flags
+    // RX: read back data from slave
+    CC25XX_SPI_RX_DMA_CHANNEL->CMAR  = (uint32_t)buffer;
+    CC25XX_SPI_RX_DMA_CHANNEL->CNDTR = len;
 
-    BBPeriphMask(DMA1_Channel4->CCR, DMA_CCR_EN) = 0;	// disable RX DMA
-    BBPeriphMask(DMA1_Channel5->CCR, DMA_CCR_EN) = 0;	// disable TX DMA
+    // enable both dma
+    DMA_Cmd(CC25XX_SPI_RX_DMA_CHANNEL, ENABLE);
+    DMA_Cmd(CC25XX_SPI_TX_DMA_CHANNEL, ENABLE);
 
+    debug("DMA EN\n"); debug_flush();
 
+    // trigger the SPI TX + RX dma
+    SPI_I2S_DMACmd(CC25XX_SPI, SPI_I2S_DMAReq_Rx | SPI_I2S_DMAReq_Tx, ENABLE);
 
-    // Prepare the DMA
-       DMA1_Channel3->CNDTR = len;
-       DMA1_Channel3->CMAR = (uint32_t)buffer;
-
-       // Enable the DMAs - They will await signals from the SPI hardware
-       DMA_Cmd(DMA1_Channel3, ENABLE); // TX
-
-       // Enable the SPI communication to the TX DMA, which will send the command
-       SPI_I2S_DMACmd(CC25XX_SPI, SPI_I2S_DMAReq_Tx, ENABLE);
-led_red_on();
-       // Wait until the command is sent to the DR
-       while (!DMA_GetFlagStatus(DMA1_FLAG_TC3));
-led_green_on();
-       // Wait until the transmission is completed
-       while (SPI_I2S_GetFlagStatus(CC25XX_SPI, SPI_I2S_FLAG_TXE) == RESET);
-       while (SPI_I2S_GetFlagStatus(CC25XX_SPI, SPI_I2S_FLAG_BSY) == RESET);
-
-       // Disable the TX DMA and clear DMA flags
-       SPI_I2S_DMACmd(CC25XX_SPI, SPI_I2S_DMAReq_Tx, DISABLE);
-       DMA_Cmd(DMA1_Channel3, DISABLE);
-       DMA_ClearFlag(DMA1_FLAG_GL3 | DMA1_FLAG_HT3 | DMA1_FLAG_TC3);
-       //NOTE: I checked the SPI OVR flag here, and it wasn't set...
-
-       DMA_Cmd(DMA1_Channel3, DISABLE); // TX
-#endif
-}
-
-void hal_spi_rx_buffer_dma(uint8_t *buffer, uint8_t len) {
-    uint8_t txbuf[len];
-    uint8_t i;
-    for(i=0; i<len; i++) txbuf[i] = 0xFF;
-
-    // wait for SPI Tx buffer empty
-    //while (SPI_I2S_GetFlagStatus(CC25XX_SPI, SPI_I2S_FLAG_TXE) == RESET);
-
-    // prepare the DMA
-    DMA1_Channel3->CNDTR = len;
-    DMA1_Channel3->CMAR = (uint32_t)txbuf;
-
-    //DMA1_Channel2->CNDTR = len;
-    //DMA1_Channel2->CMAR = (uint32_t)buffer;
-
-    // Enable the DMA - will await signals from the SPI hardware
-    DMA_Cmd(DMA1_Channel3, ENABLE); // TX
-  //  DMA_Cmd(DMA1_Channel2, ENABLE); // RX
-
-    // Enable the SPI communication to the TX DMA, which will send the command
-    SPI_I2S_DMACmd(CC25XX_SPI, SPI_I2S_DMAReq_Tx, ENABLE);
-  //  SPI_I2S_DMACmd(CC25XX_SPI, SPI_I2S_DMAReq_Rx, ENABLE);
+    debug("TRIG\n"); debug_flush();
 
     // Wait until the command is sent to the DR
-    while (!DMA_GetFlagStatus(DMA1_FLAG_TC3));
+    while (!DMA_GetFlagStatus(CC25XX_SPI_TX_DMA_TC_FLAG)) {};
 
-    // Wait until the transmission is completed
-    while (SPI_I2S_GetFlagStatus(CC25XX_SPI, SPI_I2S_FLAG_TXE) == RESET);
-    while (SPI_I2S_GetFlagStatus(CC25XX_SPI, SPI_I2S_FLAG_BSY) == RESET);
+    debug("ACTIVE\n"); debug_flush();
 
-    // Disable the TX DMA and clear DMA flags
-    SPI_I2S_DMACmd(CC25XX_SPI, SPI_I2S_DMAReq_Tx, DISABLE);
-    DMA_Cmd(DMA1_Channel3, DISABLE);
-    DMA_ClearFlag(DMA1_FLAG_GL5 | DMA1_FLAG_HT5 | DMA1_FLAG_TC3);
+    // wait for tx to be finished:
+    while (DMA_GetFlagStatus(CC25XX_SPI_TX_DMA_TC_FLAG) == RESET) { ; }
+    debug("TX ok\n"); debug_flush();
 
+    // wait for rx to be finished:
+    while (DMA_GetFlagStatus(CC25XX_SPI_RX_DMA_TC_FLAG) == RESET) { ; }
+    debug("RX ok\n"); debug_flush();
 
+    //wait for SPI to be no longer busy
+    while (SPI_I2S_GetFlagStatus(SPI2, SPI_I2S_FLAG_BSY) == RESET){}
+    debug("!BUSY\n"); debug_flush();
 
+    //disable DMA
+    DMA_Cmd(CC25XX_SPI_RX_DMA_CHANNEL, DISABLE);
+    DMA_Cmd(CC25XX_SPI_TX_DMA_CHANNEL, DISABLE);
 
-
-
-    // Enable the DMA - will await signals from the SPI hardware
-
-
-    // Enable SPI communication to the RX DMA, which should receive the data
-
-    debug("DMA RX\n");
-    while(1);
-    // Wait until the data is received
-    while (!DMA_GetFlagStatus(DMA1_FLAG_TC2));
-
-    // Disable the DMAs
-    DMA_Cmd(DMA1_Channel2, DISABLE); // RX
+    // clear DMA flags
+    SPI_I2S_DMACmd(CC25XX_SPI,SPI_I2S_DMAReq_Rx | SPI_I2S_DMAReq_Tx, DISABLE);
 }
 
 

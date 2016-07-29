@@ -1,3 +1,19 @@
+/*
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+   author: fishpepper <AT> gmail.com
+*/
 #include "hal_cc25xx.h"
 #include "hal_spi.h"
 #include "cc25xx.h"
@@ -5,6 +21,7 @@
 #include "stm32f10x_rcc.h"
 #include "debug.h"
 #include "timeout.h"
+#include <string.h>
 
 void hal_cc25xx_init(void){
     hal_spi_init();
@@ -81,7 +98,7 @@ void hal_cc25xx_disable_rf_interrupt(void) {
 }
 
 void hal_cc25xx_setup_rf_dma(uint8_t mode) {
-    //nothign to do
+    //nothing to do
 }
 
 inline void hal_cc25xx_set_gdo_mode(void) {
@@ -170,39 +187,43 @@ inline void hal_cc25xx_read_fifo(uint8_t *buf, uint8_t len){
     hal_cc25xx_register_read_multi(CC25XX_FIFO | READ_FLAG | BURST_FLAG, buf, len);
 }
 
-inline void hal_cc25xx_register_read_multi(uint8_t address, uint8_t *buf, uint8_t len){
-    //select device:
+inline void hal_cc25xx_register_read_multi(uint8_t address, uint8_t *buffer, uint8_t len){
+    // select device:
     hal_spi_csn_lo();
 
-    //wait for ready signal
+    // wait for ready signal
     while(GPIO_ReadInputDataBit(CC25XX_SPI_GPIO, CC25XX_SPI_MISO_PIN) == 1){}
 
     debug("read "); debug_put_uint8(len); debug_flush();
-    //request address (read request)
+    // request address (read request)
     uint8_t status = hal_spi_tx(address);
 
-    hal_spi_tx_buffer_dma(buf, len);
+    //fill buffer with read commands:
+    memset(buffer, 0xFF, len);
+
+    hal_spi_dma_xfer(buffer, len);
     /*
     while(len--){
         *buf = hal_spi_rx();
         buf++;
     }*/
 
-    //deselect device
+    // deselect device
     hal_spi_csn_hi();
 }
 
-inline void hal_cc25xx_register_write_multi(uint8_t address, uint8_t *buf, uint8_t len){
-    //select device:
+inline void hal_cc25xx_register_write_multi(uint8_t address, uint8_t *buffer, uint8_t len){
+    //s elect device:
     hal_spi_csn_lo();
 
-    //wait for RDY signal:
+    // wait for RDY signal:
     while(GPIO_ReadInputDataBit(CC25XX_SPI_GPIO, CC25XX_SPI_MISO_PIN) == 1){}
 
     //request address (write request)
     hal_spi_tx(address | BURST_FLAG);
 
-    hal_spi_tx_buffer_dma(buf, len);
+    // send array
+    hal_spi_dma_xfer(buffer, len);
     /*while(len--){
         hal_spi_tx(*buf);
         buf++;

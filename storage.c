@@ -16,22 +16,23 @@
 */
 
 #include "storage.h"
+#include "hal_storage.h"
 #include "debug.h"
 #include "wdt.h"
 #include "delay.h"
 #include "led.h"
-//#include "flash.h"
 #include "frsky.h"
 #include "hal_defines.h"
 
-//persistant storage in flash
-//FIXME __code __at (STORAGE_LOCATION) uint8_t storage_on_flash[STORAGE_PAGE_SIZE]; //no ini value -> sdcc does not init this!
 
 //run time copy of persistant storage data:
 EXTERNAL_MEMORY STORAGE_DESC storage;
 
 void storage_init(void){
     debug("storage: init\n"); debug_flush();
+
+    //init hal storage
+    hal_storage_init();
 
     //reload data from flash
     storage_read_from_flash();
@@ -44,29 +45,15 @@ void storage_init(void){
         debug_flush();
     }
     debug_put_newline();
-
-    /*frsky_enter_rxmode(0);
-    IEN2 &= ~(IEN2_RFIE);
-    RFIM = 0;
-    storage.version = 0xAB;
-    storage.frsky_txid[0] = 0x12;
-    storage.frsky_txid[1] = 0x34;
-    storage_write_to_flash();*/
-
 }
 
 void storage_read_from_flash(void){
-    /*uint16_t i;
-    uint8_t *storage_ptr = (uint8_t*)storage;
+    debug("storage: reading"); debug_flush();
+    uint8_t *storage_ptr = (uint8_t*)&storage;
+    uint16_t len = sizeof(storage);
 
-    debug("storage: loading from flash: "); debug_flush();
+    hal_storage_read(storage_ptr, len);
 
-    //copy from persistant flash to ram:
-    for(i=0; i<sizeof(storage); i++){
-        storage_ptr[i] = storage_on_flash[i];
-        debug_put_hex8(storage_on_flash[i]); debug_putc(' '); debug_flush();
-        wdt_reset();
-    }*/
     storage.version = 0xAB;
     //hard coded config for debugging:
     storage.frsky_txid[0] = 0x16;
@@ -83,12 +70,13 @@ void storage_read_from_flash(void){
 }
 
 void storage_write_to_flash(void){
-    /*
-    debug("storage: writing to flash\n"); debug_flush();
+    debug("storage: writing\n"); debug_flush();
     storage.version = STORAGE_VERSION_ID;
 
+    uint8_t *storage_ptr = (uint8_t*)&storage;
+    uint16_t len = sizeof(storage);
+
     //execute flash write:
-    flash_write((uint16_t)storage_on_flash, (uint8_t*)&storage, sizeof(storage));
-    */
+    hal_storage_write(storage_ptr, len);
 }
 

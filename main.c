@@ -1,3 +1,19 @@
+/*
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+   author: fishpepper <AT> gmail.com
+*/
 #include "stm32f10x.h"
 #include "led.h"
 #include "uart.h"
@@ -7,15 +23,8 @@
 #include "delay.h"
 #include "wdt.h"
 #include "frsky.h"
-
-int i = 0;
-int off = 5;
-
-void inc(void){
-    i += off;
-}
-
-
+#include "adc.h"
+#include "storage.h"
 
 int main(void){
     //leds:
@@ -56,7 +65,7 @@ int main(void){
     frsky_init();
 
     //init adc
-    //FIXME//adc_init();
+    adc_init();
 
     //init output
 #if SBUS_ENABLED
