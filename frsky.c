@@ -837,6 +837,9 @@ conn_lost = 1;
                 frsky_packet_buffer[FRSKY_PACKET_BUFFER_SIZE-1] = 0x00;
 
                 LED_GREEN_OFF();
+            }else{
+                //mark packet as invalid
+                frsky_packet_received = 0;
             }
         }
 
