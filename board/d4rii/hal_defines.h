@@ -1,6 +1,14 @@
-#ifndef __HAL_DEFINES__
-#define __HAL_DEFINES__
+#ifndef __HAL_DEFINES_H__
+#define __HAL_DEFINES_H__
 
-#define EXTERNAL_MEMORY  
+#include "stm32f10x_rcc.h"
 
-#endif // __HAL_DEFINES__
+#define EXTERNAL_MEMORY
+
+//auto selector for APB1/APB2:
+#define RCC_APBxPeriphClockCmd(rcc, p, s) { if (rcc == 1){ RCC_APB1PeriphClockCmd(p,s); }else{ RCC_APB2PeriphClockCmd(p, s); } }
+
+#define LO(w) (w & 0xFF)
+#define HI(w) ((w>>8) & 0xFF)
+
+#endif // __HAL_DEFINES_H__

@@ -15,13 +15,14 @@
    author: fishpepper <AT> gmail.com
 */
 #include "hal_led.h"
+#include "hal_defines.h"
 #include  "stm32f10x_rcc.h"
 
 void hal_led_init(uint16_t pin) {
     GPIO_InitTypeDef gpio_init;
 
     //periph clock enable for port
-    RCC_APB2PeriphClockCmd(LED_GPIO_CLK, ENABLE);
+    RCC_APBxPeriphClockCmd(LED_GPIO_CLK_RCC, LED_GPIO_CLK, ENABLE);
 
     //configure led output as push-pull
     gpio_init.GPIO_Pin = pin;

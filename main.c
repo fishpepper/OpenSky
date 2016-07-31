@@ -25,6 +25,7 @@
 #include "frsky.h"
 #include "adc.h"
 #include "storage.h"
+#include "sbus.h"
 
 int main(void){
     //leds:
@@ -70,7 +71,7 @@ int main(void){
 
     //init output
 #if SBUS_ENABLED
-    //FIXME//sbus_init();
+    sbus_init();
 #else
     //FIXME//ppm_init();
 #endif

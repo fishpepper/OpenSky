@@ -1,6 +1,6 @@
 # object files
 DRIVER_SRCS   = stm32f10x_rcc.o stm32f10x_gpio.o stm32f10x_usart.o misc.o stm32f10x_iwdg.o  stm32f10x_spi.o stm32f10x_dma.o stm32f10x_adc.o stm32f10x_i2c.o
-HAL_SRCS      = hal_led.o hal_uart.o hal_clocksource.o hal_timeout.o hal_wdt.o hal_delay.o hal_dma.o hal_spi.o hal_cc25xx.o hal_io.o hal_adc.o hal_storage.o
+HAL_SRCS      = hal_led.o hal_uart.o hal_clocksource.o hal_timeout.o hal_wdt.o hal_delay.o hal_dma.o hal_spi.o hal_cc25xx.o hal_io.o hal_adc.o hal_storage.o hal_sbus.o
 BOARD_SRCS    =  $(STARTUP) $(DRIVER_SRCS) $(HAL_SRCS) $(GENERIC_SRCS)
 
 #crystal frequency

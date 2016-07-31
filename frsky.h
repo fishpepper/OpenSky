@@ -47,7 +47,7 @@ void frsky_increment_channel(int8_t cnt);
 void frsky_set_channel(uint8_t hop_index);
 void frsky_send_telemetry(uint8_t telemetry_id);
 void frsky_update_ppm(void);
-void frsky_do_diversity(uint8_t packet_received, uint8_t bind_mode);
+
 
 #if 0
 void frsky_fetch_txid_and_hoptable(void);

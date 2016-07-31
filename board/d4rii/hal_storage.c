@@ -72,10 +72,10 @@ static void hal_storage_i2c_init(void){
 
 static void hal_storage_i2c_rcc_init(void) {
     // peripheral clock for i2c
-    RCC_APB1PeriphClockCmd(EEPROM_I2C_CLK, ENABLE);
+    RCC_APBxPeriphClockCmd(EEPROM_I2C_CLK_RCC, EEPROM_I2C_CLK, ENABLE);
 
     // gpio clock
-     RCC_APB2PeriphClockCmd(EEPROM_GPIO_CLK, ENABLE);
+     RCC_APBxPeriphClockCmd(EEPROM_GPIO_CLK_RCC, EEPROM_GPIO_CLK, ENABLE);
 }
 
 static void hal_storage_i2c_mode_init(void) {
@@ -98,13 +98,11 @@ static void hal_storage_i2c_mode_init(void) {
 
 static void hal_storage_i2c_gpio_init(void) {
     GPIO_InitTypeDef gpio_init;
+    uint8_t i;
 
-    //clock disable
-    //RCC_APB1PeriphClockCmd(EEPROM_I2C_CLK, DISABLE);
 
     //gpio init:
-    // reset i2c bus by setting clk as output and sending manual clock
-    // pulses till SDA goes high:
+    // reset i2c bus by setting clk as output and sending manual clock pulses
     gpio_init.GPIO_Pin   = EEPROM_I2C_SCL_PIN;
     gpio_init.GPIO_Mode  = GPIO_Mode_Out_OD;
     gpio_init.GPIO_Speed = GPIO_Speed_50MHz;
@@ -114,17 +112,23 @@ static void hal_storage_i2c_gpio_init(void) {
     gpio_init.GPIO_Speed = GPIO_Speed_50MHz;
     GPIO_Init(EEPROM_GPIO, &gpio_init);
 
-    if(GPIO_ReadInputDataBit(EEPROM_GPIO, EEPROM_I2C_SDA_PIN) == 0){
-        debug("hal_storage: i2c bus held low, sending reset clock pulses\n");
+    if(1){
+        debug("hal_storage: freeing i2c bus with clock train\n");
         debug_flush();
 
-        //send 100khz clock train:
-        while(GPIO_ReadInputDataBit(EEPROM_GPIO, EEPROM_I2C_SDA_PIN) == 0){
+        //send 100khz clock train for some 100ms
+        timeout_set(100);
+        while(!timeout_timed_out()){
+            if (GPIO_ReadInputDataBit(EEPROM_GPIO, EEPROM_I2C_SDA_PIN) == 1){
+                debug("hal_storage: i2c free again\n");
+                break;
+            }
             EEPROM_GPIO->BSRR = EEPROM_I2C_SCL_PIN;
             delay_us(10);
             EEPROM_GPIO->BRR  = EEPROM_I2C_SCL_PIN;
             delay_us(10);
         }
+
         //send stop condition:
         gpio_init.GPIO_Pin   = EEPROM_I2C_SDA_PIN;
         gpio_init.GPIO_Mode  = GPIO_Mode_Out_OD;
@@ -140,8 +144,6 @@ static void hal_storage_i2c_gpio_init(void) {
         //clock goes high
         EEPROM_GPIO->BSRR = EEPROM_I2C_SCL_PIN;
         delay_us(10);
-
-        debug("hal_storage: i2c bus free again\n");
     }
 
     //init mode before setting to AF

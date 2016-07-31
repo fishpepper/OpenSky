@@ -228,3 +228,13 @@ storage.h
 storage.c
 board/d4rii/d4r_ii_pinout.md
 pin_config.h
+old/sbus.c
+old/sbus.h
+sbus.h
+sbus.c
+board/vd5m/hal_sbus.h
+board/vd5m/hal_sbus.c
+board/d4rii/hal_sbus.c
+board/d4rii/hal_sbus.h
+board/d4rii/pin_config.h
+uart.c

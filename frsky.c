@@ -30,7 +30,7 @@
 //ADDME//#include "ppm.h"
 //ADDME//#include "apa102.h"
 #include "failsafe.h"
-//ADDME//#include "sbus.h"
+#include "sbus.h"
 
 //this will make binding not very reliable, use for debugging only!
 #define FRSKY_DEBUG_BIND_DATA 1
@@ -318,7 +318,6 @@ void frsky_autotune(void){
 
             cc25xx_process_packet(&frsky_packet_received, (volatile uint8_t *)&frsky_packet_buffer, FRSKY_PACKET_BUFFER_SIZE);
 
-
             if (frsky_packet_received){
                 //prepare for next packet:
                 frsky_packet_received = 0;
@@ -485,11 +484,11 @@ void frsky_fetch_txid_and_hoptable(void){
         //as this is just for binding, stay with this fix for now...
         if (timeout_timed_out()){
             //do diversity
-            frsky_do_diversity(0, 1);
+            cc25xx_switch_antenna();
 
             debug_putc('m');
 
-            //next packet should be ther ein 9ms
+            //next packet should be there ein 9ms
             //if no packet for 3*9ms -> reset rx chain:
             timeout_set(3*9+1);
 
@@ -637,28 +636,6 @@ void frsky_calib_pll(void){
     debug("frsky: calib pll done\n");
 }
 
-void frsky_do_diversity(uint8_t packet_received, uint8_t bindmode){
-    //handle antenna DIVERSITY:
-    if (bindmode){
-        //binding: wait 4 frametimes on ANT1, then 4 frametimes on ANT2
-        if (!packet_received){
-            frsky_diversity_count++;
-            if (frsky_diversity_count == 4){
-                cc25xx_switch_antenna();
-                frsky_diversity_count = 0;
-            }
-        }else{
-            //packet received, stay on that antenna!
-            frsky_diversity_count = 0;
-        }
-    }else{
-        //normal : whenever there is a missing/broken frame -> switch ANTENNA !
-        if (!packet_received){
-            cc25xx_switch_antenna();
-        }
-    }
-}
-
 void frsky_main(void){
     uint8_t send_telemetry = 0;
     uint8_t requested_telemetry_id = 0;
@@ -707,8 +684,10 @@ void frsky_main(void){
 
             frsky_increment_channel(1);
 
-            //diversity toggle?
-            frsky_do_diversity(packet_received, 0);
+            //diversity toggle on missing frame
+            if (!packet_received){
+                cc25xx_switch_antenna();
+            }
 
             //go back to rx mode
             frsky_packet_received = 0;

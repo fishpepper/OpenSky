@@ -33,13 +33,13 @@ static void hal_adc_rcc_init(void) {
     RCC_ADCCLKConfig(RCC_PCLK2_Div4);
 
     // enable ADC1 clock
-    RCC_APB2PeriphClockCmd(ADC_CLK, ENABLE);
+    RCC_APBxPeriphClockCmd(ADC_CLK_RCC, ADC_CLK, ENABLE);
 
     // enable dma clock
     RCC_AHBPeriphClockCmd(RCC_AHBPeriph_DMA1, ENABLE);
 
     //periph clock enable for port
-    RCC_APB2PeriphClockCmd(ADC_GPIO_CLK, ENABLE);
+    RCC_APBxPeriphClockCmd(ADC_GPIO_CLK_RCC, ADC_GPIO_CLK, ENABLE);
 }
 
 static void hal_adc_gpio_init(void) {

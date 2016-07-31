@@ -35,7 +35,7 @@ void hal_spi_init(void) {
 static void hal_spi_rcc_init(void) {
     // enable clocks
     RCC_APB2PeriphClockCmd(CC25XX_SPI_GPIO_CLK | RCC_APB2Periph_AFIO, ENABLE);
-    RCC_APB2PeriphClockCmd(RCC_APB2Periph_SPI1, ENABLE);
+    RCC_APBxPeriphClockCmd(CC25XX_SPI_CLK_RCC, CC25XX_SPI_CLK, ENABLE);
 }
 
 static void hal_spi_enable(void) {

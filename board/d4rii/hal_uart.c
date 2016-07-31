@@ -127,8 +127,8 @@ static void hal_uart_init_gpio(void){
 static void hal_uart_init_rcc(void){
     // configure clocks for uart:
     // enable GPIO clock
-    RCC_APB2PeriphClockCmd(DEBUG_USART_GPIO_CLK | RCC_APB2Periph_AFIO, ENABLE);
+    RCC_APBxPeriphClockCmd(DEBUG_USART_GPIO_CLK_RCC, DEBUG_USART_GPIO_CLK | RCC_APB2Periph_AFIO, ENABLE);
 
     // enable USART clock
-    RCC_APB2PeriphClockCmd(DEBUG_USART_CLK, ENABLE);
+    RCC_APBxPeriphClockCmd(DEBUG_USART_CLK_RCC, DEBUG_USART_CLK, ENABLE);
 }

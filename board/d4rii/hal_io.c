@@ -15,6 +15,7 @@
    author: fishpepper <AT> gmail.com
 */
 #include "hal_io.h"
+#include "hal_defines.h"
 #include "pin_config.h"
 #include  "stm32f10x_rcc.h"
 #include  "stm32f10x_gpio.h"
@@ -24,7 +25,7 @@ void hal_io_init(void) {
     GPIO_InitTypeDef gpio_init;
 
     //periph clock enable for port
-    RCC_APB2PeriphClockCmd(BIND_JUMPER_GPIO_CLK, ENABLE);
+    RCC_APBxPeriphClockCmd(BIND_JUMPER_GPIO_CLK_RCC, BIND_JUMPER_GPIO_CLK, ENABLE);
 
     //configure led output as push-pull
     gpio_init.GPIO_Pin = BIND_JUMPER_PIN;

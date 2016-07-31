@@ -33,8 +33,8 @@ static void hal_cc25xx_gpio_init(void) {
 
     // antenna switch
     // periph clock enable for port
-    RCC_APB2PeriphClockCmd(CC25XX_ANT_SW_CTX_GPIO_CLK, ENABLE);
-    RCC_APB2PeriphClockCmd(CC25XX_ANT_SW_CRX_GPIO_CLK, ENABLE);
+    RCC_APBxPeriphClockCmd(CC25XX_ANT_SW_CTX_GPIO_CLK_RCC, CC25XX_ANT_SW_CTX_GPIO_CLK, ENABLE);
+    RCC_APBxPeriphClockCmd(CC25XX_ANT_SW_CRX_GPIO_CLK_RCC, CC25XX_ANT_SW_CRX_GPIO_CLK, ENABLE);
 
     //CTX:
     gpio_init.GPIO_Pin = CC25XX_ANT_SW_CTX_PIN;
@@ -52,8 +52,9 @@ static void hal_cc25xx_gpio_init(void) {
 
     //PA/LNA:
     // periph clock enable for port
-    RCC_APB2PeriphClockCmd(CC25XX_LNA_SW_CTX_GPIO_CLK, ENABLE);
-    RCC_APB2PeriphClockCmd(CC25XX_LNA_SW_CRX_GPIO_CLK, ENABLE);
+    RCC_APBxPeriphClockCmd(CC25XX_LNA_SW_CTX_GPIO_CLK_RCC, CC25XX_LNA_SW_CTX_GPIO_CLK, ENABLE);
+    RCC_APBxPeriphClockCmd(CC25XX_LNA_SW_CTX_GPIO_CLK_RCC, CC25XX_LNA_SW_CRX_GPIO_CLK, ENABLE);
+
 
     //CTX:
     gpio_init.GPIO_Pin = CC25XX_LNA_SW_CTX_PIN;
@@ -68,12 +69,12 @@ static void hal_cc25xx_gpio_init(void) {
     hal_cc25xx_enter_rxmode();
 
     //JTAG IS ON LNA pins! -> DISABLE JTAG!
-    RCC_APB2PeriphClockCmd(RCC_APB2Periph_AFIO, ENABLE);
+    RCC_APBxPeriphClockCmd(2, RCC_APB2Periph_AFIO, ENABLE);
     GPIO_PinRemapConfig(GPIO_Remap_SWJ_JTAGDisable, ENABLE);
 
     //GDO2
     // periph clock enable for port
-    RCC_APB2PeriphClockCmd(CC25XX_GDO2_GPIO_CLK, ENABLE);
+    RCC_APBxPeriphClockCmd(CC25XX_GDO2_GPIO_CLK_RCC, CC25XX_GDO2_GPIO_CLK, ENABLE);
 
     // configure GDO2 pin as Input floating
     gpio_init.GPIO_Pin  = CC25XX_GDO2_PIN;
