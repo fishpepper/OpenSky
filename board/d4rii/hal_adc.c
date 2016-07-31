@@ -19,6 +19,7 @@ void hal_adc_init(void) {
 uint8_t hal_adc_get_scaled(uint8_t ch) {
     if (ch < 2){
         //12 bit adc -> scale to 8 bit -> shift by 4
+        //debug("adc: "); debug_put_uint8(hal_adc_data[ch]>>4); debug_put_newline();
         return hal_adc_data[ch]>>4;
     }else{
         debug("hal_adc: channel index out of bounds ");
@@ -111,6 +112,10 @@ static void hal_adc_dma_init(void) {
 
     //Enable the DMA1 - Channel1
     DMA_Cmd(ADC_DMA_CHANNEL, ENABLE);
+
+    //enable DMA for ADC
+    ADC_DMACmd(ADC, ENABLE);
+
 
     //start conversion:
     hal_adc_dma_arm();

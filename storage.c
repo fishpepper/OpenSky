@@ -53,7 +53,7 @@ void storage_read_from_flash(void){
     uint16_t len = sizeof(storage);
 
     hal_storage_read(storage_ptr, len);
-
+/*
     storage.version = 0xAB;
     //hard coded config for debugging:
     storage.frsky_txid[0] = 0x16;
@@ -67,7 +67,7 @@ void storage_read_from_flash(void){
     for(i=0; i<FRSKY_HOPTABLE_SIZE; i++){
         storage.frsky_hop_table[i] = tmp[i];
     }
-
+*/
 }
 
 void storage_write_to_flash(void){

@@ -238,3 +238,5 @@ board/d4rii/hal_sbus.c
 board/d4rii/hal_sbus.h
 board/d4rii/pin_config.h
 uart.c
+wdt.h
+wdt.c

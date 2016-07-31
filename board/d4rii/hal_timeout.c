@@ -49,18 +49,16 @@ void hal_timeout_delay_ms(uint32_t timeout){
     hal_timeout_100us_delay = 10*timeout;
 
     while(hal_timeout_100us_delay > 0){
-        wdt_reset();
     }
 }
 
-// seperate ms delay function
+/*// seperate ms delay function
 void hal_timeout_delay_100us(uint32_t timeout){
     hal_timeout_100us_delay = timeout;
 
     while(hal_timeout_100us_delay > 0){
-        wdt_reset();
     }
-}
+}*/
 
 void SysTick_Handler(void){
     if (hal_timeout_100us != 0){
