@@ -683,6 +683,7 @@ void frsky_main(void){
             //go back to rx mode
             frsky_packet_received = 0;
             cc25xx_enable_receive();
+            cc25xx_enter_rxmode();
             cc25xx_strobe(RFST_SRX);
 
             //if enabled, send a sbus frame in case we lost that frame:
@@ -728,10 +729,10 @@ void frsky_main(void){
             }
 
             led_red_off();
-        }
 
-        //handle ovfs
-        frsky_handle_overflows();
+            //handle ovfs
+            frsky_handle_overflows();
+        }
 
         //process incoming data
         cc25xx_process_packet(&frsky_packet_received, (volatile uint8_t *)&frsky_packet_buffer, FRSKY_PACKET_BUFFER_SIZE);
@@ -747,6 +748,7 @@ void frsky_main(void){
                 //this way we can have up to +/-1ms jitter on our 9ms timebase
                 //without missing packets
                 delay_us(500);
+
                 //hal_timeout_delay_100us(5);
                 timeout_set(0);
 
@@ -795,8 +797,7 @@ void frsky_main(void){
             frsky_increment_channel(1);
 
             //DO NOT go to SRX here
-            delay_us(900); //1340-500
-            //hal_timeout_delay_100us(9);
+            delay_us(1250); //vd5m 900us??
 
             //build & send packet
             frsky_send_telemetry(requested_telemetry_id);

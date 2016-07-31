@@ -228,8 +228,9 @@ inline void hal_cc25xx_register_write_multi(uint8_t address, uint8_t *buffer, ui
         hal_spi_tx(*buf);
         buf++;
     }*/
+
     //deselect device
-    hal_spi_csn_lo();
+    hal_spi_csn_hi();
 }
 
 inline void hal_cc25xx_process_packet(volatile uint8_t *packet_received, volatile uint8_t *buffer, uint8_t maxlen){
