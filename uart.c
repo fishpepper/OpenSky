@@ -26,6 +26,9 @@ EXTERNAL_MEMORY volatile uint8_t uart_tx_buffer_out;
 #define delay_us(n) {uint64_t i; for(i=0; i<n*0x00FFFF; i++) {}}
 #define delay_ms(n) {uint64_t i; for(i=0; i<n; i++) { delay_us(1000); }}
 
+#define DEBUG_DEFINE_TO_STR(x) #x
+#define DEBUG_DEFINE_TO_STR_VAL(x) DEBUG_DEFINE_TO_STR(x)
+
 void uart_init(void){
     hal_uart_init();
 
@@ -35,7 +38,9 @@ void uart_init(void){
     //wait some time for uart to become stable
     delay_us(100);
     debug_put_newline();
-    debug("### OpenSky -+- (c) by github.com/fishpepper ###\n"); debug_flush();
+    debug("### OpenSky - ");
+    debug(DEBUG_DEFINE_TO_STR_VAL(BUILD_TARGET));
+    debug(" - (c) by github.com/fishpepper ###\n"); debug_flush();
     debug("uart: init done\n");
 }
 

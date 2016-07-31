@@ -81,7 +81,7 @@ static void hal_uart_init_mode(void) {
     uart_init.USART_StopBits = USART_StopBits_1;
     uart_init.USART_Parity = USART_Parity_No;
     uart_init.USART_HardwareFlowControl = USART_HardwareFlowControl_None;
-    uart_init.USART_Mode = USART_Mode_Rx | USART_Mode_Tx;
+    uart_init.USART_Mode = USART_Mode_Tx;
     USART_Init(DEBUG_USART, &uart_init);
 }
 
@@ -116,11 +116,6 @@ static void hal_uart_init_gpio(void){
     gpio_init.GPIO_Pin   = DEBUG_USART_TX_PIN;
     gpio_init.GPIO_Speed = GPIO_Speed_50MHz;
     gpio_init.GPIO_Mode  = GPIO_Mode_AF_PP;
-    GPIO_Init(DEBUG_USART_GPIO, &gpio_init);
-
-    /* Configure USARTy RX as input floating */
-    gpio_init.GPIO_Pin  = DEBUG_USART_RX_PIN;
-    gpio_init.GPIO_Mode = GPIO_Mode_IN_FLOATING;
     GPIO_Init(DEBUG_USART_GPIO, &gpio_init);
 }
 

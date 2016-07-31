@@ -1,6 +1,6 @@
 #ifndef __PIN_CONFIG_H__
 #define __PIN_CONFIG_H__
-
+#include "main.h"
 
 #define LED_GPIO                  GPIOA
 #define LED_GPIO_CLK              RCC_APB2Periph_GPIOA
@@ -9,27 +9,49 @@
 #define LED_GREEN_PIN             GPIO_Pin_12
 
 
-#define DEBUG_USART               USART1
-#define DEBUG_USART_CLK           RCC_APB2Periph_USART1
-#define DEBUG_USART_CLK_RCC       2
-#define DEBUG_USART_GPIO          GPIOA
-#define DEBUG_USART_GPIO_CLK      RCC_APB2Periph_GPIOA
-#define DEBUG_USART_GPIO_CLK_RCC  2
-#define DEBUG_USART_RX_PIN        GPIO_Pin_10
-#define DEBUG_USART_TX_PIN        GPIO_Pin_9
-#define DEBUG_USART_IRQHANDLER    USART1_IRQHandler
-#define DEBUG_USART_IRQn          USART1_IRQn
-
-
-#define SBUS_USART                 USART3
-#define SBUS_USART_CLK             RCC_APB1Periph_USART3
-#define SBUS_USART_RCC             1
-#define SBUS_USART_GPIO            GPIOB
-#define SBUS_USART_GPIO_CLK        RCC_APB2Periph_GPIOB
-#define SBUS_USART_TX_PIN          GPIO_Pin_10
-#define SBUS_USART_IRQHANDLER      USART3_IRQHandler
-#define SBUS_USART_IRQn            USART3_IRQn
-
+#if SBUS_INVERTED
+    //DEBUG is on SERVO4 output:
+    #define DEBUG_USART               USART3
+    #define DEBUG_USART_CLK           RCC_APB1Periph_USART3
+    #define DEBUG_USART_CLK_RCC       1
+    #define DEBUG_USART_GPIO          GPIOB
+    #define DEBUG_USART_GPIO_CLK      RCC_APB2Periph_GPIOB
+    #define DEBUG_USART_GPIO_CLK_RCC  2
+    #define DEBUG_USART_TX_PIN        GPIO_Pin_10
+    #define DEBUG_USART_IRQHANDLER    USART3_IRQHandler
+    #define DEBUG_USART_IRQn          USART3_IRQn
+    //SBUS is INVERTED on 4 pin header TX pin
+    #define SBUS_USART                 USART1
+    #define SBUS_USART_CLK             RCC_APB2Periph_USART1
+    #define SBUS_USART_RCC             2
+    #define SBUS_USART_GPIO            GPIOA
+    #define SBUS_USART_GPIO_CLK        RCC_APB2Periph_GPIOA
+    #define SBUS_USART_GPIO_CLK_RCC    2
+    #define SBUS_USART_TX_PIN          GPIO_Pin_9
+    #define SBUS_USART_IRQHANDLER      USART1_IRQHandler
+    #define SBUS_USART_IRQn            USART1_IRQn
+#else
+    //DEBUG is INVERTED(!) on 4pin header TX pin
+    #define DEBUG_USART               USART1
+    #define DEBUG_USART_CLK           RCC_APB2Periph_USART1
+    #define DEBUG_USART_CLK_RCC       2
+    #define DEBUG_USART_GPIO          GPIOA
+    #define DEBUG_USART_GPIO_CLK      RCC_APB2Periph_GPIOA
+    #define DEBUG_USART_GPIO_CLK_RCC  2
+    #define DEBUG_USART_TX_PIN        GPIO_Pin_9
+    #define DEBUG_USART_IRQHANDLER    USART1_IRQHandler
+    #define DEBUG_USART_IRQn          USART1_IRQn
+    //SBUS is non-inverted on SERVO4 output:
+    #define SBUS_USART                 USART3
+    #define SBUS_USART_CLK             RCC_APB1Periph_USART3
+    #define SBUS_USART_RCC             1
+    #define SBUS_USART_GPIO            GPIOB
+    #define SBUS_USART_GPIO_CLK        RCC_APB2Periph_GPIOB
+    #define SBUS_USART_GPIO_CLK_RCC    2
+    #define SBUS_USART_TX_PIN          GPIO_Pin_10
+    #define SBUS_USART_IRQHANDLER      USART3_IRQHandler
+    #define SBUS_USART_IRQn            USART3_IRQn
+#endif
 
 #define CC25XX_SPI_GPIO             GPIOA
 #define CC25XX_SPI_SCK_PIN          GPIO_Pin_5

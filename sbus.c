@@ -68,8 +68,6 @@ void sbus_start_transmission(uint8_t frame_lost){
     //copy flags to buffer
     sbus_data[23] = HAL_SBUS_PREPARE_DATA( tmp );
 
-    for(tmp=0; tmp<SBUS_DATA_LEN; tmp++) sbus_data[tmp] = tmp;
-
     //send data!
     hal_sbus_start_transmission(sbus_data, SBUS_DATA_LEN-1);
 }

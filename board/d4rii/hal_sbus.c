@@ -64,7 +64,7 @@ static void hal_sbus_init_gpio(void){
 static void hal_sbus_init_rcc(void){
     // configure clocks for uart:
     // enable GPIO clock
-    RCC_APBxPeriphClockCmd(SBUS_USART_RCC, SBUS_USART_GPIO_CLK, ENABLE);
+    RCC_APBxPeriphClockCmd(SBUS_USART_GPIO_CLK_RCC, SBUS_USART_GPIO_CLK, ENABLE);
     RCC_APBxPeriphClockCmd(2, RCC_APB2Periph_AFIO, ENABLE);
 
     // enable USART clock
