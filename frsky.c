@@ -42,6 +42,9 @@
 //EXTERNAL_MEMORY int8_t storage.frsky_freq_offset;
 EXTERNAL_MEMORY uint8_t frsky_current_ch_idx;
 
+//diversity counter
+EXTERNAL_MEMORY uint8_t frsky_diversity_count;
+
 //rssi
 EXTERNAL_MEMORY uint8_t frsky_rssi;
 EXTERNAL_MEMORY uint8_t frsky_link_quality;
@@ -65,7 +68,7 @@ void frsky_init(void){
     cc25xx_init();
 
     frsky_link_quality = 0;
-
+    frsky_diversity_count = 0;
     frsky_packet_received = 0;
     frsky_packet_sent = 0;
 
@@ -481,6 +484,9 @@ void frsky_fetch_txid_and_hoptable(void){
         //FIXME: this should be handled in a cleaner way.
         //as this is just for binding, stay with this fix for now...
         if (timeout_timed_out()){
+            //do diversity
+            frsky_do_diversity(0, 1);
+
             debug_putc('m');
 
             //next packet should be ther ein 9ms
@@ -631,6 +637,27 @@ void frsky_calib_pll(void){
     debug("frsky: calib pll done\n");
 }
 
+void frsky_do_diversity(uint8_t packet_received, uint8_t bindmode){
+    //handle antenna DIVERSITY:
+    if (bindmode){
+        //binding: wait 4 frametimes on ANT1, then 4 frametimes on ANT2
+        if (!packet_received){
+            frsky_diversity_count++;
+            if (frsky_diversity_count == 4){
+                cc25xx_switch_antenna();
+                frsky_diversity_count = 0;
+            }
+        }else{
+            //packet received, stay on that antenna!
+            frsky_diversity_count = 0;
+        }
+    }else{
+        //normal : whenever there is a missing/broken frame -> switch ANTENNA !
+        if (!packet_received){
+            cc25xx_switch_antenna();
+        }
+    }
+}
 
 void frsky_main(void){
     uint8_t send_telemetry = 0;
@@ -679,6 +706,9 @@ void frsky_main(void){
             }
 
             frsky_increment_channel(1);
+
+            //diversity toggle?
+            frsky_do_diversity(packet_received, 0);
 
             //go back to rx mode
             frsky_packet_received = 0;

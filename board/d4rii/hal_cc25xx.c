@@ -224,10 +224,6 @@ inline void hal_cc25xx_register_write_multi(uint8_t address, uint8_t *buffer, ui
 
     // send array
     hal_spi_dma_xfer(buffer, len);
-    /*while(len--){
-        hal_spi_tx(*buf);
-        buf++;
-    }*/
 
     //deselect device
     hal_spi_csn_hi();

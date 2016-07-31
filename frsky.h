@@ -12,6 +12,7 @@
 //extern EXTERNAL_MEMORY uint8_t frsky_hop_table[FRSKY_HOPTABLE_SIZE];
 //extern EXTERNAL_MEMORY int8_t frsky_freq_offset;
 extern EXTERNAL_MEMORY uint8_t frsky_current_ch_idx;
+extern EXTERNAL_MEMORY uint8_t frsky_diversity_count;
 //rssi
 extern EXTERNAL_MEMORY uint8_t frsky_rssi;
 extern EXTERNAL_MEMORY uint8_t frsky_link_quality;
@@ -24,7 +25,7 @@ extern EXTERNAL_MEMORY uint8_t frsky_calib_fscal3;
 #define FRSKY_PACKET_LENGTH 17
 #define FRSKY_PACKET_BUFFER_SIZE (FRSKY_PACKET_LENGTH+3)
 extern EXTERNAL_MEMORY volatile uint8_t frsky_packet_buffer[FRSKY_PACKET_BUFFER_SIZE];
-extern EXTERNAL_MEMORY volatile uint8_t frsky_packet_received;
+//extern EXTERNAL_MEMORY volatile uint8_t frsky_packet_received;
 extern EXTERNAL_MEMORY volatile uint8_t frsky_packet_sent;
 extern EXTERNAL_MEMORY volatile uint8_t frsky_mode;
 
@@ -46,6 +47,7 @@ void frsky_increment_channel(int8_t cnt);
 void frsky_set_channel(uint8_t hop_index);
 void frsky_send_telemetry(uint8_t telemetry_id);
 void frsky_update_ppm(void);
+void frsky_do_diversity(uint8_t packet_received, uint8_t bind_mode);
 
 #if 0
 void frsky_fetch_txid_and_hoptable(void);
