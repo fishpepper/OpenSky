@@ -1,3 +1,4 @@
+*.user
 # Object files
 *.o
 *.d
