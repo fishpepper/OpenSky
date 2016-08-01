@@ -3,7 +3,10 @@
 
 #include "hal_defines.h"
 
-#define SBUS_ENABLED 1
+//invert ppm polarity?
+#define PPM_INVERTED 1
+//enable SBUS ? (will disable PPM)
+#define SBUS_ENABLED  0
 #define SBUS_INVERTED 1
 
 #define min(a,b) (((a)<(b))?(a):(b))
