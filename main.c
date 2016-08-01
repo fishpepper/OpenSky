@@ -73,7 +73,7 @@ int main(void){
 #if SBUS_ENABLED
     sbus_init();
 #else
-    //FIXME//ppm_init();
+    ppm_init();
 #endif
 
     //init failsafe

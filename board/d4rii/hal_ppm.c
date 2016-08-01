@@ -1,5 +1,9 @@
 #include "hal_ppm.h"
 #include "ppm.h"
+#include "debug.h"
+#include "led.h"
+#include "delay.h"
+#include "wdt.h"
 #include "pin_config.h"
 #include "stm32f10x_rcc.h"
 #include "stm32f10x_gpio.h"
@@ -41,11 +45,14 @@ static void hal_ppm_init_timer(void) {
     TIM_TimeBaseInitTypeDef tim_init;
     TIM_OCInitTypeDef  tim_oc_init;
 
+    TIM_TimeBaseStructInit(&tim_init);
+
     // time base configuration: count to 1000us (will be set properly lateron)
     tim_init.TIM_Period         = HAL_PPM_US_TO_TICKCOUNT(1000);
     // compute the prescaler value, we want a 0.5us resolution (= count with 2mhz):
-    tim_init.TIM_Prescaler      = (uint16_t) (SystemCoreClock / 2000000) - 1;
-    tim_init.TIM_ClockDivision  = 0;
+    //tim_init.TIM_Prescaler      = (uint16_t) (SystemCoreClock / 2000000) - 1;
+    tim_init.TIM_Prescaler      = (uint16_t) (SystemCoreClock / 200) - 1;
+    tim_init.TIM_ClockDivision  = TIM_CKD_DIV1;
     tim_init.TIM_CounterMode    = TIM_CounterMode_Up;
     TIM_TimeBaseInit(PPM_TIMER, &tim_init);
 
@@ -82,24 +89,31 @@ static void hal_ppm_init_timer(void) {
 static void hal_sbus_init_nvic(void) {
     NVIC_InitTypeDef nvic_init;
 
+    // configure the NVIC Preemption Priority Bits
+    NVIC_PriorityGroupConfig(NVIC_PriorityGroup_0);
+
+    //disable all timer interrupts
+    TIM_ITConfig(PPM_TIMER, TIM_IT_Update, DISABLE);
+    NVIC_DisableIRQ(PPM_TIMER_IRQn);
+
     // enable timer interrupt
     nvic_init.NVIC_IRQChannel                   = PPM_TIMER_IRQn;
     nvic_init.NVIC_IRQChannelPreemptionPriority = 0;
-    nvic_init.NVIC_IRQChannelSubPriority        = 0;
+    nvic_init.NVIC_IRQChannelSubPriority        = 14;
     nvic_init.NVIC_IRQChannelCmd                = ENABLE;
     NVIC_Init(&nvic_init);
+
+    //NVIC_EnableIRQ(PPM_TIMER_IRQn);
 
     //enable interrupt
     TIM_ITConfig(PPM_TIMER, TIM_IT_Update, ENABLE);
 
-    //counter enable
-    TIM_Cmd(PPM_TIMER, ENABLE);
-
     //output enable for counter
-    TIM_CtrlPWMOutputs(PPM_TIMER, ENABLE);
+    //TIM_CtrlPWMOutputs(PPM_TIMER, ENABLE);
 }
 
 void hal_ppm_failsafe_enter(void){
+     return;
     //set output to static value ZERO
     TIM_ITConfig(PPM_TIMER, TIM_IT_Update, DISABLE);
 
@@ -120,6 +134,8 @@ void hal_ppm_failsafe_enter(void){
 }
 
 void hal_ppm_failsafe_exit(void) {
+    return;
+
     //exit failsafe, back to pulse generation
     hal_ppm_init_gpio();
 
@@ -129,11 +145,29 @@ void hal_ppm_failsafe_exit(void) {
 
 
 void PPM_TIMER_IRQHANDLER(void){
+    led_red_on();
+    //led_green_off();
+    //debug_put_uint16(TIM3->SR);
+    uint32_t r = TIM3->SR;
+    wdt_reset();
     if (TIM_GetITStatus(PPM_TIMER, TIM_IT_Update) != RESET){
         //clear flag
         TIM_ClearITPendingBit(PPM_TIMER, TIM_IT_Update);
         //do processing
-        ppm_isr();
+        //ppm_isr();
     }
+    if (TIM_GetITStatus(PPM_TIMER, TIM_IT_CC1) != RESET){
+        TIM_ClearITPendingBit(PPM_TIMER, TIM_IT_CC1);
+    }
+    if (TIM_GetITStatus(PPM_TIMER, TIM_IT_CC2) != RESET){
+        TIM_ClearITPendingBit(PPM_TIMER, TIM_IT_CC2);
+    }
+    if (TIM_GetITStatus(PPM_TIMER, TIM_IT_CC3) != RESET){
+        TIM_ClearITPendingBit(PPM_TIMER, TIM_IT_CC3);
+    }
+    if (TIM_GetITStatus(PPM_TIMER, TIM_IT_CC4) != RESET){
+        TIM_ClearITPendingBit(PPM_TIMER, TIM_IT_CC4);
+    }
+    //TIM3->SR = 0xffff;
 }
 

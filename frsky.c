@@ -27,7 +27,7 @@
 #include "io.h"
 #include "storage.h"
 #include "adc.h"
-//ADDME//#include "ppm.h"
+#include "ppm.h"
 //ADDME//#include "apa102.h"
 #include "failsafe.h"
 #include "sbus.h"

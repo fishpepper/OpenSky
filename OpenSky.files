@@ -240,3 +240,7 @@ board/d4rii/pin_config.h
 uart.c
 wdt.h
 wdt.c
+board/d4rii/hal_ppm.h
+board/d4rii/hal_ppm.c
+ppm.h
+ppm.c

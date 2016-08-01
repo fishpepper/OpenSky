@@ -37,14 +37,13 @@ static void hal_uart_init_nvic(uint8_t enable) {
     // enable interrupts
     NVIC_InitTypeDef nvic_init;
 
-
     // configure the NVIC Preemption Priority Bits
     NVIC_PriorityGroupConfig(NVIC_PriorityGroup_0);
 
     // enable the USART interrupt
     nvic_init.NVIC_IRQChannel = DEBUG_USART_IRQn;
     nvic_init.NVIC_IRQChannelPreemptionPriority = 0;
-    nvic_init.NVIC_IRQChannelSubPriority = 0;
+    nvic_init.NVIC_IRQChannelSubPriority = 10;
     nvic_init.NVIC_IRQChannelCmd = enable ? ENABLE : DISABLE;
     NVIC_Init(&nvic_init);
 }

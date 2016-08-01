@@ -14,6 +14,8 @@ static void hal_ppm_init_gpio(void);
 static void hal_ppm_init_timer(void);
 static void hal_sbus_init_nvic(void);
 
+void PPM_TIMER_IRQHANDLER(void);
+
 //counter runs with 2MHz = 0.5us resolution
 #define HAL_PPM_US_TO_TICKCOUNT(us) (us * 2)
 
