@@ -1,4 +1,6 @@
 *.user
+*~
+old/
 # Object files
 *.o
 *.d
