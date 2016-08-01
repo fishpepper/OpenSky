@@ -25,10 +25,10 @@
 
 void hal_cc25xx_init(void){
     hal_spi_init();
-    hal_cc25xx_gpio_init();
+    hal_cc25xx_init_gpio();
 }
 
-static void hal_cc25xx_gpio_init(void) {
+static void hal_cc25xx_init_gpio(void) {
     GPIO_InitTypeDef gpio_init;
 
     // antenna switch

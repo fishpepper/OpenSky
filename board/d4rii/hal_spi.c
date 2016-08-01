@@ -25,14 +25,14 @@
 
 
 void hal_spi_init(void) {
-    hal_spi_rcc_init();
-    hal_spi_gpio_init();
-    hal_spi_mode_init();
-    hal_spi_dma_init();
+    hal_spi_init_rcc();
+    hal_spi_init_gpio();
+    hal_spi_init_mode();
+    hal_spi_init_dma();
     hal_spi_enable();
 }
 
-static void hal_spi_rcc_init(void) {
+static void hal_spi_init_rcc(void) {
     // enable clocks
     RCC_APB2PeriphClockCmd(CC25XX_SPI_GPIO_CLK | RCC_APB2Periph_AFIO, ENABLE);
     RCC_APBxPeriphClockCmd(CC25XX_SPI_CLK_RCC, CC25XX_SPI_CLK, ENABLE);
@@ -42,7 +42,7 @@ static void hal_spi_enable(void) {
     SPI_Cmd(CC25XX_SPI, ENABLE);
 }
 
-static void hal_spi_mode_init(void) {
+static void hal_spi_init_mode(void) {
     SPI_InitTypeDef spi_init;
 
     // mode config
@@ -60,7 +60,7 @@ static void hal_spi_mode_init(void) {
 
 
 
-static void hal_spi_dma_init(void) {
+static void hal_spi_init_dma(void) {
     DMA_InitTypeDef dma_init;
 
     // Enable DMA1 Peripheral Clock
@@ -153,7 +153,7 @@ void hal_spi_dma_xfer(uint8_t *buffer, uint8_t len) {
 }
 
 
-static void hal_spi_gpio_init(void) {
+static void hal_spi_init_gpio(void) {
     GPIO_InitTypeDef gpio_init;
 
     // configure SCK and MOSI pins as Alternate Function Push-Pull
