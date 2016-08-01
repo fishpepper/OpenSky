@@ -129,4 +129,15 @@
 #define ADC                       ADC1
 
 
+#define PPM_GPIO                  GPIOB
+#define PPM_GPIO_CLK              RCC_APB2Periph_GPIOB
+#define PPM_GPIO_CLK_RCC          2
+#define PPM_PIN                   GPIO_Pin_0
+#define PPM_TIMER                 TIM3
+#define PPM_TIMER_CLK             RCC_APB1Periph_TIM3
+#define PPM_TIMER_CLK_RCC         1
+#define PPM_TIMER_CH              3
+#define PPM_TIMER_IRQHANDLER      TIM3_IRQHandler
+#define PPM_TIMER_IRQn            TIM3_IRQn
+
 #endif //__PIN_CONFIG_H__
