@@ -1,5 +1,6 @@
 #include "hal_adc.h"
 #include "debug.h"
+#include "wdt.h"
 #include "pin_config.h"
 #include "stm32f10x_rcc.h"
 #include "stm32f10x_gpio.h"
@@ -10,30 +11,17 @@
 volatile uint16_t hal_adc_data[2];
 
 void hal_adc_init(void) {
-    hal_adc_rcc_init();
-    hal_adc_gpio_init();
-    hal_adc_mode_init();
-    hal_adc_dma_init();
+    hal_adc_init_rcc();
+    hal_adc_init_gpio();
+    hal_adc_init_mode();
+    hal_adc_init_dma();
 }
 
-uint8_t hal_adc_get_scaled(uint8_t ch) {
-    if (ch < 2){
-        //12 bit adc -> scale to 8 bit -> shift by 4
-        //debug("adc: "); debug_put_uint8(hal_adc_data[ch]>>4); debug_put_newline();
-        return hal_adc_data[ch]>>4;
-    }else{
-        debug("hal_adc: channel index out of bounds ");
-        debug_put_uint8(ch);
-        debug ("allowed 0,1)\n");
-        debug_flush();
-        return 0;
-    }
-}
-
-static void hal_adc_rcc_init(void) {
+static void hal_adc_init_rcc(void) {
+    //ADC CLOCK = 24 / 4 = 6MHz
     RCC_ADCCLKConfig(RCC_PCLK2_Div4);
 
-    // enable ADC1 clock
+    // enable ADC clock
     RCC_APBxPeriphClockCmd(ADC_CLK_RCC, ADC_CLK, ENABLE);
 
     // enable dma clock
@@ -43,7 +31,7 @@ static void hal_adc_rcc_init(void) {
     RCC_APBxPeriphClockCmd(ADC_GPIO_CLK_RCC, ADC_GPIO_CLK, ENABLE);
 }
 
-static void hal_adc_gpio_init(void) {
+static void hal_adc_init_gpio(void) {
     GPIO_InitTypeDef gpio_init;
 
     // set up analog inputs
@@ -52,7 +40,7 @@ static void hal_adc_gpio_init(void) {
     GPIO_Init(ADC_GPIO, &gpio_init);
 }
 
-static void hal_adc_mode_init(void) {
+static void hal_adc_init_mode(void) {
     ADC_InitTypeDef adc_init;
 
     //ADC configuration
@@ -89,7 +77,7 @@ static void hal_adc_mode_init(void) {
     while(ADC_GetCalibrationStatus(ADC)){}
 }
 
-static void hal_adc_dma_init(void) {
+static void hal_adc_init_dma(void) {
     DMA_InitTypeDef  dma_init;
 
     //reset DMA1 channe1 to default values
@@ -113,12 +101,23 @@ static void hal_adc_dma_init(void) {
     //Enable the DMA1 - Channel1
     DMA_Cmd(ADC_DMA_CHANNEL, ENABLE);
 
-    //enable DMA for ADC
-    ADC_DMACmd(ADC, ENABLE);
-
-
     //start conversion:
     hal_adc_dma_arm();
+
+
+    //TEST ADC
+    /*while(1){
+        debug_putc('A');
+        wdt_reset();
+        if (ADC_GetFlagStatus(ADC, ADC_FLAG_EOC) == SET){
+            uint16_t res = ADC_GetConversionValue(ADC);
+            debug("ADC = "); debug_put_uint16(res); debug_put_newline(); debug_flush();
+
+            ADC_ClearFlag(ADC, ADC_FLAG_EOC);
+            //start next ADC Software Conversion
+            ADC_SoftwareStartConvCmd(ADC, ENABLE);
+        }
+    }*/
 }
 
 static void hal_adc_dma_arm(void) {
@@ -136,3 +135,18 @@ void hal_adc_process(void) {
         //cancel and re arm dma ???
     }
 }
+
+uint8_t hal_adc_get_scaled(uint8_t ch) {
+    if (ch < 2){
+        //12 bit adc -> scale to 8 bit -> shift by 4
+        debug("ADC"); debug_put_uint8(ch); debug_putc('='); debug_put_uint16(hal_adc_data[ch]); debug_put_newline(); debug_flush();
+        return hal_adc_data[ch]>>4;
+    }else{
+        debug("hal_adc: channel index out of bounds ");
+        debug_put_uint8(ch);
+        debug ("allowed 0,1)\n");
+        debug_flush();
+        return 0;
+    }
+}
+
