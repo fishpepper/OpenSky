@@ -26,14 +26,14 @@ volatile uint8_t hal_usart_txe_is_on;
 void hal_uart_init(void) {
     hal_usart_txe_is_on = 0;
 
-    hal_uart_nvic_init(0);
+    hal_uart_init_nvic(0);
     hal_uart_init_rcc();
     hal_uart_init_gpio();
     hal_uart_init_mode();
     hal_uart_enable();
 }
 
-static void hal_uart_nvic_init(uint8_t enable) {
+static void hal_uart_init_nvic(uint8_t enable) {
     // enable interrupts
     NVIC_InitTypeDef nvic_init;
 
@@ -91,7 +91,7 @@ static void hal_uart_enable(void) {
 }
 
 void hal_uart_int_enable(uint8_t enable) {
-    hal_uart_nvic_init(enable);
+    hal_uart_init_nvic(enable);
 }
 
 uint8_t hal_uart_start_transmission(uint8_t ch) {
