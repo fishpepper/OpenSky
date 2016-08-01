@@ -3,7 +3,7 @@ TARGET ?= D4RII
 
 CFLAGS  = -O1 -g
 ASFLAGS = -g
-GENERIC_SRCS    =  main.o assert.o uart.o clocksource.o timeout.o wdt.o delay.o dma.o frsky.o spi.o cc25xx.o io.o storage.o failsafe.o ppm.o adc.o sbus.o
+GENERIC_SRCS    =  main.c assert.c uart.c clocksource.c timeout.c wdt.c delay.c dma.c frsky.c spi.c cc25xx.c io.c storage.c failsafe.c ppm.c adc.c sbus.c
 
 ifeq ($(TARGET),D4RII)
   include board/d4rii/Makefile.board
