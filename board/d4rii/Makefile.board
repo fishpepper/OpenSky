@@ -1,7 +1,7 @@
 # object files
-DRIVER_SRCS   = stm32f10x_rcc.o stm32f10x_gpio.o stm32f10x_usart.o misc.o stm32f10x_iwdg.o  stm32f10x_spi.o stm32f10x_dma.o stm32f10x_adc.o stm32f10x_i2c.o
-HAL_SRCS      = hal_led.o hal_uart.o hal_clocksource.o hal_timeout.o hal_wdt.o hal_delay.o hal_dma.o hal_spi.o hal_cc25xx.o hal_io.o hal_adc.o hal_storage.o hal_sbus.o
-BOARD_SRCS    =  $(STARTUP) $(DRIVER_SRCS) $(HAL_SRCS) $(GENERIC_SRCS)
+DRIVER_SRCS   = stm32f10x_rcc.c stm32f10x_gpio.c stm32f10x_usart.c misc.c stm32f10x_iwdg.c  stm32f10x_spi.c stm32f10x_dma.c stm32f10x_adc.c stm32f10x_i2c.c stm32f10x_tim.c
+HAL_SRCS      = hal_led.c hal_uart.c hal_clocksource.c hal_timeout.c hal_wdt.c hal_delay.c hal_dma.c hal_spi.c hal_cc25xx.c hal_io.c hal_adc.c hal_storage.c hal_sbus.c hal_ppm.c
+BOARD_SRCS    = $(STARTUP) $(DRIVER_SRCS) $(HAL_SRCS) $(GENERIC_SRCS)
 
 #crystal frequency
 CRYSTAL_FREQ = 12000000
@@ -9,11 +9,8 @@ CRYSTAL_FREQ = 12000000
 # fetch this dir during include
 SELF_DIR := $(dir $(lastword $(MAKEFILE_LIST)))
 
-# where to build
-BUILD_DIR := build/$(TARGET)
-
 #name of executable
-RESULT ?= $(BUILD_DIR)/opensky_$(notdir $(TARGET))
+RESULT ?= opensky_$(notdir $(TARGET))
 
 
 # include path
@@ -53,7 +50,7 @@ vpath %.c $(DEVICE)
 # Processor specific
 PTYPE = STM32F10X_MD_VL
 LDSCRIPT = $(LINK)/stm32f103c8.ld
-STARTUP = startup_stm32f10x.o system_stm32f10x.o
+STARTUP = startup_stm32f10x.c system_stm32f10x.c
 
 # Compilation Flags
 
@@ -68,38 +65,38 @@ CFLAGS+= -D$(PTYPE) -DUSE_STDPERIPH_DRIVER $(FULLASSERT) -DBUILD_TARGET=$(TARGET
 
 OPENOCD_PIDFILE = /tmp/openocd_opensky.pid
 
-LINK_OBJS=$(addprefix $(BUILD_DIR)/, $(BOARD_SRCS:%.c=%.o))
-
-$(shell mkdir -p $(BUILD_DIR) > /dev/null)
-DEPFLAGS = -MT $@ -MMD -MP -MF $(BUILD_DIR)/$*.Td
-POSTCOMPILE = mv -f $(BUILD_DIR)/$*.Td $(BUILD_DIR)/$*.d
-
+LINK_OBJS=$(BOARD_SRCS:%.c=%.o)
 
 # Build executable
 
-board : $(RESULT).elf 
+board: $(RESULT).elf 
 
-$(RESULT).elf : $(BOARD_SRCS:%.c=%.d)
+$(RESULT).elf: $(LINK_OBJS)
+	exit
+	@echo $(LINK_OBJS)
+	@echo prereqs that are newer than test: $?
 	$(LD) $(LDFLAGS) -o $@ $(LINK_OBJS) $(LDLIBS)
 
 %.bin: %.elf
 	$(OBJ) -O binary $< $@
 
+# pull in dependencies
+# this includes all .d files produced along when building .o.
+# On the first build there are not going to be any .d files.
+# Hence, ignore include errors with -.
+ALL_DEPS := $(patsubst %.c,%.d,$(BOARD_SRCS))
+-include $(ALL_DEPS)
+
 # compile and generate dependency info
 %.o: %.c
-%.o: %.c $(BUILD_DIR)/%.d
-	@mkdir -p $(BUILD_DIR)
-	$(CC) -c $(CFLAGS) $(DEPFLAGS) $< -o $(BUILD_DIR)/$@
-	#$(CC) -MM $(CFLAGS) $< > $(BUILD_DIR)/$*.d
-	$(POSTCOMPILE)
+	$(CC) -c $(CFLAGS) $< -o $@
+	$(CC) -MM -MP $(CFLAGS) $< > $@.d
 
 %.o: %.s
-	$(CC) -c $(CFLAGS) $< -o $(BUILD_DIR)/$@
-
-$(BUILD_DIR)/%.d: ;
+	$(CC) -c $(CFLAGS) $(DEPFLAGS) $< -o $@
 
 clean:
-	cd $(BUILD_DIR) && rm -f *.o *.d *.elf *.bin
+	rm -f *.o *.d *.elf *.bin
 
 debug: $(RESULT).elf
 	openocd -f /usr/share/openocd/scripts/interface/stlink-v2.cfg -f /usr/share/openocd/scripts/target/stm32f1x.cfg & echo $$! > $(OPENOCD_PIDFILE)
@@ -111,15 +108,4 @@ flash : $(RESULT).bin
 	if [ -a $(OPENOCD_PIDFILE) ]; then kill `cat $(OPENOCD_PIDFILE)`; fi;
 	st-flash write $(RESULT).bin 0x8000000
 
-.PRECIOUS: $(BUILD_DIR)/%.d
-
-# pull in dependencies
-
-#-include $(BOARD_OBJS:.o=.d)
-#-include $(BOARD_SRCS:.c=.d)
-
--include $(patsubst %,$(BUILD_DIR)/%.d,$(basename $(BOARD_SRCS)))
-
-
-
-
+.PHONY: board clean flash debug
