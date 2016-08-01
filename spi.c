@@ -15,6 +15,7 @@
    author: fishpepper <AT> gmail.com
 */
 #include "spi.h"
+#include "hal_spi.h"
 #include "debug.h"
 
 void spi_init(void){
