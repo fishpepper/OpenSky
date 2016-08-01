@@ -1,18 +1,16 @@
 #ifndef __PPM_H__
 #define __PPM_H__
-#include <stdio.h>
 #include <stdint.h>
-#include <cc25xx.h>
 #include "main.h"
+#include "hal_ppm.h"
 
 #if (SBUS_ENABLED == 0)
 void ppm_init(void);
-//void ppm_timer1_interrupt(void) __interrupt T1_VECTOR;
-
 
 void ppm_update(EXTERNAL_MEMORY uint16_t *data);
 void ppm_exit_failsafe(void);
 void ppm_enter_failsafe(void);
+void ppm_isr(void);
 
 extern EXTERNAL_MEMORY volatile uint8_t ppm_output_index;
 extern EXTERNAL_MEMORY uint16_t ppm_data_ticks[9];
