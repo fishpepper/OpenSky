@@ -26,6 +26,7 @@
 #include "adc.h"
 #include "storage.h"
 #include "sbus.h"
+#include "failsafe.h"
 
 int main(void){
     //leds:
