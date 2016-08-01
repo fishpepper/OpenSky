@@ -27,7 +27,7 @@
 #define EEPROM_I2C_FLAG_TIMEOUT 10
 
 void hal_storage_init(void) {
-    hal_storage_i2c_init();
+    hal_storage_init_i2c();
 }
 
 void hal_storage_write(uint8_t *buffer, uint16_t len){
@@ -60,17 +60,17 @@ void hal_storage_read(uint8_t *storage_ptr, uint16_t len) {
     }
 }
 
-static void hal_storage_i2c_init(void){
+static void hal_storage_init_i2c(void){
     //disable i2c:
     I2C_Cmd(EEPROM_I2C, DISABLE);
     I2C_DeInit(EEPROM_I2C);
 
-    hal_storage_i2c_rcc_init();
-    hal_storage_i2c_gpio_init();
+    hal_storage_init_i2c_rcc();
+    hal_storage_init_i2c_gpio();
 }
 
 
-static void hal_storage_i2c_rcc_init(void) {
+static void hal_storage_init_i2c_rcc(void) {
     // peripheral clock for i2c
     RCC_APBxPeriphClockCmd(EEPROM_I2C_CLK_RCC, EEPROM_I2C_CLK, ENABLE);
 
@@ -78,7 +78,7 @@ static void hal_storage_i2c_rcc_init(void) {
      RCC_APBxPeriphClockCmd(EEPROM_GPIO_CLK_RCC, EEPROM_GPIO_CLK, ENABLE);
 }
 
-static void hal_storage_i2c_mode_init(void) {
+static void hal_storage_init_i2c_mode(void) {
     I2C_InitTypeDef  i2c_init;
 
     i2c_init.I2C_Mode         = I2C_Mode_I2C;
@@ -96,7 +96,7 @@ static void hal_storage_i2c_mode_init(void) {
 
 }
 
-static void hal_storage_i2c_gpio_init(void) {
+static void hal_storage_init_i2c_gpio(void) {
     GPIO_InitTypeDef gpio_init;
     uint8_t i;
 
@@ -147,7 +147,7 @@ static void hal_storage_i2c_gpio_init(void) {
     }
 
     //init mode before setting to AF
-    hal_storage_i2c_mode_init();
+    hal_storage_init_i2c_mode();
 
     //SDA & SCL
     gpio_init.GPIO_Pin   = EEPROM_I2C_SDA_PIN | EEPROM_I2C_SCL_PIN;
