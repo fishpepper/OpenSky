@@ -9,6 +9,8 @@
 #include "stm32f10x_rcc.h"
 #include "misc.h" // this defines stm32 nvic stuff
 
+#if (SBUS_ENABLED)
+
 volatile uint8_t hal_sbus_tx_pos;
 volatile uint8_t *hal_sbus_tx_buffer;
 
@@ -99,3 +101,5 @@ uint8_t hal_sbus_start_transmission(uint8_t *buffer, uint8_t len) {
     //enable TXE int
     USART_ITConfig(SBUS_USART, USART_IT_TXE, ENABLE);
 }
+
+#endif
