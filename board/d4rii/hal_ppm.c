@@ -50,8 +50,9 @@ static void hal_ppm_init_timer(void) {
     // time base configuration: count to 1000us (will be set properly lateron)
     tim_init.TIM_Period         = HAL_PPM_US_TO_TICKCOUNT(1000);
     // compute the prescaler value, we want a 0.5us resolution (= count with 2mhz):
-    //tim_init.TIM_Prescaler      = (uint16_t) (SystemCoreClock / 2000000) - 1;
-    tim_init.TIM_Prescaler      = (uint16_t) (SystemCoreClock / 200) - 1;
+    tim_init.TIM_Prescaler      = (uint16_t) (SystemCoreClock / 2000000) - 1;
+    tim_init.TIM_Period         = 0xFFFF;
+    //tim_init.TIM_Prescaler      = (uint16_t) (SystemCoreClock / 200) - 1;
     tim_init.TIM_ClockDivision  = TIM_CKD_DIV1;
     tim_init.TIM_CounterMode    = TIM_CounterMode_Up;
     TIM_TimeBaseInit(PPM_TIMER, &tim_init);
@@ -146,6 +147,8 @@ void hal_ppm_failsafe_exit(void) {
 
 void PPM_TIMER_IRQHANDLER(void){
     led_red_on();
+
+    do a toggle here
     //led_green_off();
     //debug_put_uint16(TIM3->SR);
     uint32_t r = TIM3->SR;
