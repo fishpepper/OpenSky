@@ -1,0 +1,11 @@
+#ifndef __PORTMACROS_H__
+#define __PORTMACROS_H__
+
+
+#define PORT2DIR_(X) X ## DIR
+#define PORT2DIR(PORTNAME)  PORT2DIR_(PORTNAME)
+#define PORT2BIT_(X,N) X ## _ ## N
+#define PORT2BIT(PORTNAME, PIN)  PORT2BIT_(PORTNAME,PIN)
+
+
+#endif

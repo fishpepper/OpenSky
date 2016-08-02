@@ -1,7 +1,7 @@
 #ifndef __HAL_STORAGE__H_
 #define __HAL_STORAGE__H_
 #include <stdint.h>
-#include "pin_config.h"
+#include "config.h"
 #include "stm32f10x_gpio.h"
 
 void hal_storage_init(void);

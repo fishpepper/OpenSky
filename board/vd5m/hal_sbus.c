@@ -1,6 +1,13 @@
+#include "hal_sbus.h"
+#include "hal_dma.h"
+#include "debug.h"
+#include "sbus.h"
+
+#if SBUS_ENABLED
+
 void hal_sbus_init(uint8_t *sbus_data_ptr) {
 
-    EXTERNAL_MEMORY union uart_config_t sbus_uart_config;
+    EXTERNAL_MEMORY union hal_uart_config_t sbus_uart_config;
 
     //we will use SERVO_4 as sbus output:
     //therefore we configure
@@ -15,8 +22,8 @@ void hal_sbus_init(uint8_t *sbus_data_ptr) {
 
     //this assumes cpu runs from XOSC (26mhz) !
     //see sbus.h for calc and defines
-    U1BAUD = SBUS_BAUD_M;
-    U1GCR = (U1GCR & ~0x1F) | (SBUS_BAUD_E);
+    U1BAUD = HAL_SBUS_BAUD_M;
+    U1GCR = (U1GCR & ~0x1F) | (HAL_SBUS_BAUD_E);
 
     //set up config for USART -> 8E2
     #if SBUS_INVERTED
@@ -101,3 +108,5 @@ void hal_sbus_start_transmission(uint8_t *data, uint8_t len){
     //send the very first UART byte to trigger a UART TX session:
     U1DBUF = data[0];
 }
+
+#endif

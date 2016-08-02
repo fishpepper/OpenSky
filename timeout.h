@@ -1,5 +1,6 @@
 #ifndef __TIMEOUT_H__
 #define __TIMEOUT_H__
+#include "hal_timeout.h"
 
 void timeout_init(void);
 #define timeout_set(x) hal_timeout_set(x)

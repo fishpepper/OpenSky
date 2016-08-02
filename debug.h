@@ -4,9 +4,9 @@
 #define DEBUG 1
 
 #if DEBUG
-#include <stdio.h>
+#include <stdint.h>
 #include "uart.h"
-#define debug(__a) uart_puts(__a)
+#define debug(__ax) uart_puts(__ax)
 #define debug_put_hex8(__a) uart_put_hex8(__a)
 #define debug_put_uint8(__a) uart_put_uint8(__a)
 #define debug_put_uint16(__a) uart_put_uint16(__a)

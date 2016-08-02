@@ -1,14 +1,23 @@
 #include "hal_adc.h"
+#include "hal_defines.h"
+#include "hal_cc25xx.h"
+#include "portmacros.h"
+#include "config.h"
+#include "hal_dma.h"
+#include "debug.h"
+#include "delay.h"
+#include "wdt.h"
+
 
 //adc results
-__xdata uint16_t adc_data[2];
+__xdata uint16_t hal_adc_data[2];
 
 void hal_adc_init(void) {
     hal_adc_data[0] = 0;
     hal_adc_data[1] = 0;
 
     //pin config -> dir = input
-    P0DIR &= ~((1<<ADC1) | (1<<ADC0));
+    PORT2DIR(ADC_PORT) &= ~((1<<ADC1) | (1<<ADC0));
 
     //set special function ADC for those pins:
     ADCCFG = (1<<ADC1) | (1<<ADC0);
@@ -23,17 +32,19 @@ void hal_adc_init(void) {
     ADCCON1 = ADCCON1_ST | ADCCON1_STSEL_FULL_SPEED | 0b11;
 
     //configure DMA1 + DMA2:
-    hal_adc_dma_init(1, &adc_data[0], DMA_TRIG_ADC_CH5);
-    hal_adc_dma_init(2, &adc_data[1], DMA_TRIG_ADC_CH6);
+    hal_adc_dma_init(1, &hal_adc_data[0], DMA_TRIG_ADC_CH5);
+    hal_adc_dma_init(2, &hal_adc_data[1], DMA_TRIG_ADC_CH6);
 
     //set pointer to the DMA configuration struct into DMA-channel 1-4
     //configuration
-    SET_WORD(DMA1CFGH, DMA1CFGL, &dma_config[1]);
+    SET_WORD(DMA1CFGH, DMA1CFGL, &hal_dma_config[1]);
 
-    hal_adc_arm_dma();
+    hal_adc_dma_arm();
 
     //for testing only, do not use under normal use
-    //adc_test();
+#if ADC_DO_TEST
+    adc_test();
+#endif
 }
 
 void hal_adc_dma_arm(void){
@@ -55,20 +66,20 @@ void hal_adc_process(void){
 
 
 void hal_adc_dma_init(uint8_t dma_id, uint16_t __xdata *dest_adr, uint8_t trig){
-    dma_config[dma_id].PRIORITY       = DMA_PRI_LOW; //example used high...
-    dma_config[dma_id].M8             = DMA_M8_USE_7_BITS;
-    dma_config[dma_id].IRQMASK        = DMA_IRQMASK_DISABLE;
-    dma_config[dma_id].TRIG           = trig;
-    dma_config[dma_id].TMODE          = DMA_TMODE_BLOCK;
-    dma_config[dma_id].WORDSIZE       = DMA_WORDSIZE_BYTE;
+    hal_dma_config[dma_id].PRIORITY       = DMA_PRI_LOW; //example used high...
+    hal_dma_config[dma_id].M8             = DMA_M8_USE_7_BITS;
+    hal_dma_config[dma_id].IRQMASK        = DMA_IRQMASK_DISABLE;
+    hal_dma_config[dma_id].TRIG           = trig;
+    hal_dma_config[dma_id].TMODE          = DMA_TMODE_BLOCK;
+    hal_dma_config[dma_id].WORDSIZE       = DMA_WORDSIZE_BYTE;
 
-    SET_WORD(dma_config[dma_id].SRCADDRH,  dma_config[dma_id].SRCADDRL,  &X_ADCL);
-    SET_WORD(dma_config[dma_id].DESTADDRH, dma_config[dma_id].DESTADDRL, dest_adr);
-    dma_config[dma_id].VLEN           = DMA_VLEN_USE_LEN;
+    SET_WORD(hal_dma_config[dma_id].SRCADDRH,  hal_dma_config[dma_id].SRCADDRL,  &X_ADCL);
+    SET_WORD(hal_dma_config[dma_id].DESTADDRH, hal_dma_config[dma_id].DESTADDRL, dest_adr);
+    hal_dma_config[dma_id].VLEN           = DMA_VLEN_USE_LEN;
 
-    SET_WORD(dma_config[dma_id].LENH, dma_config[dma_id].LENL, 2);
-    dma_config[dma_id].SRCINC         = DMA_SRCINC_1;
-    dma_config[dma_id].DESTINC        = DMA_DESTINC_1;
+    SET_WORD(hal_dma_config[dma_id].LENH, hal_dma_config[dma_id].LENL, 2);
+    hal_dma_config[dma_id].SRCINC         = DMA_SRCINC_1;
+    hal_dma_config[dma_id].DESTINC        = DMA_DESTINC_1;
 }
 
 uint8_t hal_adc_dma_done(void){
@@ -99,12 +110,13 @@ uint8_t hal_adc_get_scaled(uint8_t ch){
     }
 }
 
+#if ADC_DO_TEST
 void hal_adc_test(void){
     debug("adc: running test\n"); debug_flush();
 
     while(1){
         debug("adc: re-arming adc\n"); debug_flush();
-        hal_adc_arm_dma();
+        hal_adc_dma_arm();
 
         debug("adc: waiting for adc completion\n"); debug_flush();
         while(!hal_adc_dma_done()){
@@ -129,3 +141,4 @@ void hal_adc_test(void){
         wdt_reset();
     }
 }
+#endif

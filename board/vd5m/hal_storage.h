@@ -1,8 +1,8 @@
 #ifndef __HAL_STORAGE_H__
 #define __HAL_STORAGE_H__
 #include <stdint.h>
-#include <cc2510fx.h>
-#include "dma.h"
+#include "hal_cc25xx.h"
+#include "hal_dma.h"
 
 //place data on end of flash
 //FIXME: this is for a cc2510f16 with flash size 0x4000, needs to be adjusted for bigger mcus
@@ -11,7 +11,7 @@
 
 //place persistant storage:
 extern __code __at (STORAGE_LOCATION) uint8_t storage_on_flash[STORAGE_PAGE_SIZE];
-extern __xdata DMA_DESC flash_dma_config;
+extern __xdata HAL_DMA_DESC flash_dma_config;
 
 
 void hal_storage_init(void);

@@ -13,7 +13,7 @@
    author: fishpepper <AT> gmail.com
 */
 
-#include "flash.h"
+#include "hal_storage.h"
 #include <cc2510fx.h>
 #include "debug.h"
 #include "main.h"
@@ -21,7 +21,7 @@
 #include "wdt.h"
 
 
-__xdata DMA_DESC flash_dma_config;
+__xdata HAL_DMA_DESC flash_dma_config;
 __code __at (STORAGE_LOCATION) uint8_t storage_on_flash[STORAGE_PAGE_SIZE]; //no ini value -> sdcc does not init this!
 
 void hal_storage_init(void) {
@@ -29,7 +29,7 @@ void hal_storage_init(void) {
 }
 
 void hal_storage_write(uint8_t *buffer, uint16_t len){
-    hal_storage_flash_write((uint16_t)storage_on_flash, (uint8_t*)&storage, sizeof(storage));
+    hal_storage_flash_write((uint16_t)storage_on_flash, buffer, len);
 }
 
 void hal_storage_read(uint8_t *storage_ptr, uint16_t len){

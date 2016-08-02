@@ -29,6 +29,8 @@
 EXTERNAL_MEMORY STORAGE_DESC storage;
 
 void storage_init(void){
+    uint8_t i;
+
     debug("storage: init\n"); debug_flush();
 
     //init hal storage
@@ -38,7 +40,6 @@ void storage_init(void){
     storage_read_from_flash();
 
     debug("storage: loaded hoptable[] = ");
-    uint8_t i;
     for(i=0; i<FRSKY_HOPTABLE_SIZE; i++){
         debug_put_hex8(storage.frsky_hop_table[i]);
         debug_putc(' ');
@@ -48,9 +49,12 @@ void storage_init(void){
 }
 
 void storage_read_from_flash(void){
+    uint8_t *storage_ptr;
+    uint16_t len;
+
     debug("storage: reading\n"); debug_flush();
-    uint8_t *storage_ptr = (uint8_t*)&storage;
-    uint16_t len = sizeof(storage);
+    storage_ptr = (uint8_t*)&storage;
+    len = sizeof(storage);
 
     hal_storage_read(storage_ptr, len);
 /*
@@ -71,11 +75,14 @@ void storage_read_from_flash(void){
 }
 
 void storage_write_to_flash(void){
+    uint8_t *storage_ptr ;
+    uint16_t len;
+
     debug("storage: writing\n"); debug_flush();
     storage.version = STORAGE_VERSION_ID;
 
-    uint8_t *storage_ptr = (uint8_t*)&storage;
-    uint16_t len = sizeof(storage);
+    storage_ptr = (uint8_t*)&storage;
+    len = sizeof(storage);
 
     //execute flash write:
     hal_storage_write(storage_ptr, len);

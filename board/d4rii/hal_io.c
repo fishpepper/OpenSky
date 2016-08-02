@@ -16,7 +16,7 @@
 */
 #include "hal_io.h"
 #include "hal_defines.h"
-#include "pin_config.h"
+#include "config.h"
 #include  "stm32f10x_rcc.h"
 #include  "stm32f10x_gpio.h"
 

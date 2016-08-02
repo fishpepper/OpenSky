@@ -1,4 +1,8 @@
+#include "hal_timeout.h"
 #include "delay.h"
+#include "debug.h"
+#include "timeout.h"
+#include "hal_cc25xx.h"
 
 //do not place this in xdata (faster this way)
 volatile uint16_t hal_timeout_countdown;
@@ -63,7 +67,7 @@ void hal_timeout_set(uint16_t timeout_ms){
     //prepare timeout val:
     hal_timeout_countdown = timeout_ms * 25;
 
-    if (timeout_countdown == 0)hal_{
+    if (hal_timeout_countdown == 0){
         return;
     }
 

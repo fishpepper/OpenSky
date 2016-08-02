@@ -1,3 +1,5 @@
 #include "hal_spi.h"
 
-// nothing to do here
+void hal_spi_init(void){
+}
+

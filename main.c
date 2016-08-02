@@ -14,7 +14,6 @@
 
    author: fishpepper <AT> gmail.com
 */
-#include "stm32f10x.h"
 #include "led.h"
 #include "uart.h"
 #include "debug.h"
@@ -27,6 +26,7 @@
 #include "storage.h"
 #include "sbus.h"
 #include "failsafe.h"
+#include "apa102.h"
 
 int main(void){
     //leds:
@@ -41,7 +41,6 @@ int main(void){
     //init wdt timer
     wdt_init();
 
-    //apa102_init();
 
     //enable timeout routines
     timeout_init();
@@ -49,19 +48,8 @@ int main(void){
     //init storage
     storage_init();
 
-
-    // 	uint16_t seconds=0;
-    // 	timeout_set(1000);
-    // 	while(1){
-    // 		while(!timeout_timed_out()){}
-    // 		timeout_set(1000);
-    // 		seconds++;
-    // 		debug_put_uint16(seconds);
-    // 		debug_put_newline();
-    // 	}
-    //
-
-    //FIXME//apa102_init();
+    //init apa led bar
+    apa102_init();
 
     //init frsky core
     frsky_init();

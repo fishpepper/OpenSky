@@ -1,6 +1,6 @@
 # object files
 DRIVER_SRCS   = stm32f10x_rcc.c stm32f10x_gpio.c stm32f10x_usart.c misc.c stm32f10x_iwdg.c  stm32f10x_spi.c stm32f10x_dma.c stm32f10x_adc.c stm32f10x_i2c.c stm32f10x_tim.c
-HAL_SRCS      = hal_led.c hal_uart.c hal_clocksource.c hal_timeout.c hal_wdt.c hal_delay.c hal_dma.c hal_spi.c hal_cc25xx.c hal_io.c hal_adc.c hal_storage.c hal_sbus.c hal_ppm.c
+HAL_SRCS      = hal_led.c hal_uart.c hal_timeout.c hal_wdt.c hal_delay.c hal_clocksource.c hal_spi.c hal_cc25xx.c hal_io.c hal_adc.c hal_storage.c hal_sbus.c hal_ppm.c hal_soft_spi.c
 BOARD_SRCS    = $(STARTUP) $(DRIVER_SRCS) $(HAL_SRCS) $(GENERIC_SRCS)
 
 #crystal frequency
@@ -12,6 +12,8 @@ SELF_DIR := $(dir $(lastword $(MAKEFILE_LIST)))
 #name of executable
 RESULT ?= opensky_$(notdir $(TARGET))
 
+#faster build
+MAKEFLAGS+="-j6 "
 
 # include path
 CFLAGS += -I$(SELF_DIR)

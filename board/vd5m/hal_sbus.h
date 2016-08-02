@@ -1,7 +1,8 @@
 #ifndef __HAL_SBUS_H__
 #define __HAL_SBUS_H__
-#include <cc2510fx.h>
-
+#include <stdint.h>
+#include "hal_defines.h"
+#include "hal_uart.h"
 
 //this helper routine will invert the data
 //stored in buffer in case the sbus is set
@@ -11,7 +12,12 @@
 #else
 #define HAL_SBUS_PREPARE_DATA(a) (a)
 #endif
-void sbus_uart_set_mode(EXTERNAL_MEMORY union uart_config_t *cfg);
+void sbus_uart_set_mode(EXTERNAL_MEMORY union hal_uart_config_t *cfg);
+
+//best match for 100kbit/s = 99975.5859375 bit/s
+//baudrate = (((256.0 + baud_m)*2.0**baud_e) / (2**28)) * 26000000.0
+#define HAL_SBUS_BAUD_E 11
+#define HAL_SBUS_BAUD_M 248
 
 
 #endif // __HAL_SBUS_H__

@@ -1,6 +1,6 @@
 #ifndef __HAL_TIMEOUT_H__
 #define __HAL_TIMEOUT_H__
-
+#include <stdint.h>
 #include "cc2510fx.h"
 
 extern volatile uint16_t hal_timeout_countdown;

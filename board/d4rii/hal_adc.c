@@ -1,7 +1,7 @@
 #include "hal_adc.h"
 #include "debug.h"
 #include "wdt.h"
-#include "pin_config.h"
+#include "config.h"
 #include "stm32f10x_rcc.h"
 #include "stm32f10x_gpio.h"
 #include "stm32f10x_dma.h"
@@ -44,12 +44,12 @@ static void hal_adc_init_mode(void) {
     ADC_InitTypeDef adc_init;
 
     //ADC configuration
-    adc_init.ADC_Mode                 = ADC_Mode_Independent;
+    adc_init.ADC_Mode = ADC_Mode_Independent;
     adc_init.ADC_ScanConvMode         = ENABLE;//We will convert multiple channels
     adc_init.ADC_ContinuousConvMode   = ENABLE; //! select continuous conversion mode
     adc_init.ADC_ExternalTrigConv     = ADC_ExternalTrigConv_None; //select no external triggering
     adc_init.ADC_DataAlign            = ADC_DataAlign_Right; //right 12-bit data alignment in ADC data register
-    adc_init.ADC_NbrOfChannel         = 2; //2 channels conversion
+    adc_init.ADC_NbrOfChannel          = 2; //2 channels conversion
 
     //load structure values to control and status registers
     ADC_Init(ADC, &adc_init);
@@ -85,7 +85,7 @@ static void hal_adc_init_dma(void) {
 
     // set up dma to convert 2 adc channels to two mem locations:
     dma_init.DMA_M2M                 = DMA_M2M_Disable; //channel will be used for memory to memory transfer
-    dma_init.DMA_Mode                = DMA_Mode_Circular; //setting normal mode (non circular)
+    dma_init.DMA_Mode                = DMA_Mode_Normal; //setting normal mode (non circular)
     dma_init.DMA_Priority            = DMA_Priority_High; //medium priority
     dma_init.DMA_PeripheralDataSize  = DMA_PeripheralDataSize_HalfWord; //source and destination 16bit
     dma_init.DMA_MemoryDataSize      = DMA_MemoryDataSize_HalfWord;
@@ -93,7 +93,7 @@ static void hal_adc_init_dma(void) {
     dma_init.DMA_PeripheralInc       = DMA_PeripheralInc_Disable; //source address increment disable
     dma_init.DMA_DIR                 = DMA_DIR_PeripheralSRC; //Location assigned to peripheral register will be source
     dma_init.DMA_BufferSize          = 2; //chunk of data to be transfered
-    dma_init.DMA_PeripheralBaseAddr  = (uint32_t)&ADC->DR; //source and destination start addresses
+    dma_init.DMA_PeripheralBaseAddr  = (uint32_t)ADC->DR; //source and destination start addresses
     dma_init.DMA_MemoryBaseAddr      = (uint32_t)hal_adc_data;
     //send values to DMA registers
     DMA_Init(ADC_DMA_CHANNEL, &dma_init);
@@ -106,7 +106,7 @@ static void hal_adc_init_dma(void) {
 
 
     //TEST ADC
-    /*while(1){
+    while(1){
         debug_putc('A');
         wdt_reset();
         if (ADC_GetFlagStatus(ADC, ADC_FLAG_EOC) == SET){
@@ -117,7 +117,7 @@ static void hal_adc_init_dma(void) {
             //start next ADC Software Conversion
             ADC_SoftwareStartConvCmd(ADC, ENABLE);
         }
-    }*/
+    }
 }
 
 static void hal_adc_dma_arm(void) {

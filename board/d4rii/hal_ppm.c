@@ -1,10 +1,6 @@
 #include "hal_ppm.h"
 #include "ppm.h"
-#include "debug.h"
 #include "led.h"
-#include "delay.h"
-#include "wdt.h"
-#include "pin_config.h"
 #include "stm32f10x_rcc.h"
 #include "stm32f10x_gpio.h"
 #include "stm32f10x_tim.h"
@@ -14,7 +10,7 @@ void hal_ppm_init(void) {
     hal_ppm_init_rcc();
     hal_ppm_init_gpio();
     hal_ppm_init_timer();
-    hal_sbus_init_nvic();
+    hal_ppm_init_nvic();
 }
 
 static void hal_ppm_init_rcc(void) {
@@ -45,17 +41,20 @@ static void hal_ppm_init_timer(void) {
     TIM_TimeBaseInitTypeDef tim_init;
     TIM_OCInitTypeDef  tim_oc_init;
 
-    TIM_TimeBaseStructInit(&tim_init);
-
     // time base configuration: count to 1000us (will be set properly lateron)
-    tim_init.TIM_Period         = HAL_PPM_US_TO_TICKCOUNT(1000);
+    //tim_init.TIM_Period         = HAL_PPM_US_TO_TICKCOUNT(1000);
+    tim_init.TIM_Period         = 24000;
     // compute the prescaler value, we want a 0.5us resolution (= count with 2mhz):
-    tim_init.TIM_Prescaler      = (uint16_t) (SystemCoreClock / 2000000) - 1;
-    tim_init.TIM_Period         = 0xFFFF;
-    //tim_init.TIM_Prescaler      = (uint16_t) (SystemCoreClock / 200) - 1;
-    tim_init.TIM_ClockDivision  = TIM_CKD_DIV1;
+    //tim_init.TIM_Prescaler      = (uint16_t) (SystemCoreClock / 2000000) - 1;
+    tim_init.TIM_Prescaler      = (uint16_t) (SystemCoreClock / 1000) - 1;
+    tim_init.TIM_ClockDivision  = 0;
     tim_init.TIM_CounterMode    = TIM_CounterMode_Up;
+
+    //set time base. NOTE: this will immediately trigger an INT!
     TIM_TimeBaseInit(PPM_TIMER, &tim_init);
+
+    //clear IT flag (caused by TimeBaseInit()):
+    TIM_ClearITPendingBit(PPM_TIMER, TIM_IT_Update);
 
 
     //Output Compare Active Mode configuration:
@@ -67,54 +66,35 @@ static void hal_ppm_init_timer(void) {
     tim_oc_init.TIM_OutputState = TIM_OutputState_Enable;
     tim_oc_init.TIM_Pulse       = PPM_SYNC_PULS_LEN_TICKS;
     tim_oc_init.TIM_OCPolarity  = TIM_OCPolarity_High;
+    hal_ppm_init_ocx(PPM_TIMER_CH, PPM_TIMER, &tim_oc_init);
 
-    switch(PPM_TIMER_CH){
-        default:
-        case(3):
-            TIM_OC3Init(PPM_TIMER, &tim_oc_init);
-            TIM_OC3PreloadConfig(PPM_TIMER, TIM_OCPreload_Disable);
-            break;
-        case(2):
-            TIM_OC2Init(PPM_TIMER, &tim_oc_init);
-            TIM_OC2PreloadConfig(PPM_TIMER, TIM_OCPreload_Disable);
-            break;
-        case(1):
-            TIM_OC1Init(PPM_TIMER, &tim_oc_init);
-            TIM_OC1PreloadConfig(PPM_TIMER, TIM_OCPreload_Disable);
-            break;
-    }
-
+    //enable counter
     TIM_Cmd(PPM_TIMER, ENABLE);
 }
 
-static void hal_sbus_init_nvic(void) {
+static void hal_ppm_init_nvic(void) {
     NVIC_InitTypeDef nvic_init;
 
-    // configure the NVIC Preemption Priority Bits
-    NVIC_PriorityGroupConfig(NVIC_PriorityGroup_0);
-
-    //disable all timer interrupts
+    //strange, somehow the Timer IT Flags seem to be already enabled?!
     TIM_ITConfig(PPM_TIMER, TIM_IT_Update, DISABLE);
-    NVIC_DisableIRQ(PPM_TIMER_IRQn);
+    TIM_ITConfig(PPM_TIMER, TIM_IT_Break, DISABLE);
+    TIM_ITConfig(PPM_TIMER, TIM_IT_CC1 | TIM_IT_CC2 | TIM_IT_CC3 | TIM_IT_CC4, DISABLE);
+    TIM_ITConfig(PPM_TIMER, TIM_IT_Trigger, DISABLE);
 
     // enable timer interrupt
     nvic_init.NVIC_IRQChannel                   = PPM_TIMER_IRQn;
     nvic_init.NVIC_IRQChannelPreemptionPriority = 0;
-    nvic_init.NVIC_IRQChannelSubPriority        = 14;
+    nvic_init.NVIC_IRQChannelSubPriority        = 0;
     nvic_init.NVIC_IRQChannelCmd                = ENABLE;
     NVIC_Init(&nvic_init);
 
-    //NVIC_EnableIRQ(PPM_TIMER_IRQn);
-
-    //enable interrupt
+    //enable ONLY update interrupt
     TIM_ITConfig(PPM_TIMER, TIM_IT_Update, ENABLE);
-
-    //output enable for counter
-    //TIM_CtrlPWMOutputs(PPM_TIMER, ENABLE);
 }
 
 void hal_ppm_failsafe_enter(void){
-     return;
+    return;
+
     //set output to static value ZERO
     TIM_ITConfig(PPM_TIMER, TIM_IT_Update, DISABLE);
 
@@ -146,31 +126,36 @@ void hal_ppm_failsafe_exit(void) {
 
 
 void PPM_TIMER_IRQHANDLER(void){
-    led_red_on();
-
-    do a toggle here
-    //led_green_off();
-    //debug_put_uint16(TIM3->SR);
-    uint32_t r = TIM3->SR;
-    wdt_reset();
     if (TIM_GetITStatus(PPM_TIMER, TIM_IT_Update) != RESET){
         //clear flag
-        TIM_ClearITPendingBit(PPM_TIMER, TIM_IT_Update);
+        TIM_ClearITPendingBit(PPM_TIMER, TIM_IT_Update); //THIS SHOULD NEVER BE THE LAST LINE IN AN ISR!
         //do processing
         //ppm_isr();
+        led_green_toggle();
+        //TEST: this should toggle with 1hz
     }
-    if (TIM_GetITStatus(PPM_TIMER, TIM_IT_CC1) != RESET){
-        TIM_ClearITPendingBit(PPM_TIMER, TIM_IT_CC1);
+}
+
+static void hal_ppm_init_ocx(uint8_t ch, TIM_TypeDef *TIMx, TIM_OCInitTypeDef *tim_oc_init) {
+    switch(PPM_TIMER_CH){
+        default:
+            break;
+        case(4):
+            TIM_OC4Init(TIMx, tim_oc_init);
+            TIM_OC4PreloadConfig(TIMx, TIM_OCPreload_Disable);
+            break;
+        case(3):
+            TIM_OC3Init(TIMx, tim_oc_init);
+            TIM_OC3PreloadConfig(TIMx, TIM_OCPreload_Disable);
+            break;
+        case(2):
+            TIM_OC2Init(TIMx, tim_oc_init);
+            TIM_OC2PreloadConfig(TIMx, TIM_OCPreload_Disable);
+            break;
+        case(1):
+            TIM_OC1Init(TIMx, tim_oc_init);
+            TIM_OC1PreloadConfig(TIMx, TIM_OCPreload_Disable);
+            break;
     }
-    if (TIM_GetITStatus(PPM_TIMER, TIM_IT_CC2) != RESET){
-        TIM_ClearITPendingBit(PPM_TIMER, TIM_IT_CC2);
-    }
-    if (TIM_GetITStatus(PPM_TIMER, TIM_IT_CC3) != RESET){
-        TIM_ClearITPendingBit(PPM_TIMER, TIM_IT_CC3);
-    }
-    if (TIM_GetITStatus(PPM_TIMER, TIM_IT_CC4) != RESET){
-        TIM_ClearITPendingBit(PPM_TIMER, TIM_IT_CC4);
-    }
-    //TIM3->SR = 0xffff;
 }
 

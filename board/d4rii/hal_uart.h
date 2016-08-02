@@ -1,10 +1,10 @@
 #ifndef __HAL_UART__H_
 #define __HAL_UART__H_
 #include "stm32f10x_gpio.h"
-#include "pin_config.h"
+#include "config.h"
 
 void hal_uart_init(void);
-uint8_t hal_uart_start_transmission(uint8_t ch);
+void hal_uart_start_transmission(uint8_t ch);
 void hal_uart_int_enable(uint8_t enable) ;
 uint8_t hal_uart_int_enabled(void);
 

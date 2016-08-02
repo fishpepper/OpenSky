@@ -15,20 +15,20 @@
    author: fishpepper <AT> gmail.com
 */
 #include "main.h"
-#include "frsky.h"
 #include <string.h>
+#include <stdio.h>
+#include "frsky.h"
 #include "debug.h"
 #include "timeout.h"
 #include "led.h"
 #include "delay.h"
-#include "dma.h"
 #include "wdt.h"
 #include "cc25xx.h"
 #include "io.h"
 #include "storage.h"
 #include "adc.h"
 #include "ppm.h"
-//ADDME//#include "apa102.h"
+#include "apa102.h"
 #include "failsafe.h"
 #include "sbus.h"
 
@@ -59,7 +59,7 @@ EXTERNAL_MEMORY uint8_t frsky_calib_fscal3;
 EXTERNAL_MEMORY volatile uint8_t frsky_packet_buffer[FRSKY_PACKET_BUFFER_SIZE];
 EXTERNAL_MEMORY volatile uint8_t frsky_packet_received;
 EXTERNAL_MEMORY volatile uint8_t frsky_packet_sent;
-EXTERNAL_MEMORY volatile uint8_t frsky_mode;
+
 
 void frsky_init(void){
     //uint8_t i;
@@ -104,16 +104,17 @@ void frsky_init(void){
 
 
 void frsky_show_partinfo(void) {
+    uint8_t partnum, version;
     //start idle
     cc25xx_strobe(RFST_SIDLE);
 
     //check version:
-    debug("frsky: cc25xx partnum 0x");
-    uint8_t partnum = cc25xx_get_register_burst(PARTNUM);
+    //uart_puts("frsky: cc25xx partnum 0x");
+    partnum = cc25xx_get_register_burst(PARTNUM);
     debug_put_hex8(partnum);
 
     debug(" version 0x");
-    uint8_t version = cc25xx_get_register_burst(VERSION);
+    version = cc25xx_get_register_burst(VERSION);
     debug_put_hex8(version);
     debug_put_newline();
 
@@ -439,8 +440,10 @@ void frsky_tune_channel(uint8_t ch){
 }
 
 void frsky_handle_overflows(void) {
-    return ;
-    uint8_t marc_state = cc25xx_get_register(MARCSTATE) & 0x1F;
+    uint8_t marc_state;
+
+    //fetch marc status
+    marc_state = cc25xx_get_register(MARCSTATE) & 0x1F;
     if (marc_state == 0x11){
         debug("frsky: RXOVF\n");
         //flush rx buf
@@ -661,7 +664,7 @@ void frsky_main(void){
 
     //start with conn lost (allow full sync)
     conn_lost = 1;
-    //FIXME//apa102_show_no_connection();
+    apa102_show_no_connection();
 
     //reset wdt once in order to have at least one second waiting for a packet:
     wdt_reset();
@@ -729,7 +732,7 @@ void frsky_main(void){
                     failsafe_enter();
                     debug("\nCONN LOST!\n");
                     //no connection led info
-                    //FIXME//apa102_show_no_connection();
+                    apa102_show_no_connection();
                 }
 
                 //statistics
@@ -816,7 +819,7 @@ void frsky_main(void){
         }
 
         //process leds:
-        //FIXME//apa102_statemachine();
+        apa102_statemachine();
 
     }
 
@@ -901,8 +904,8 @@ void frsky_update_ppm(void){
     channel_data[7] = (uint16_t)(((frsky_packet_buffer[17] & 0xF0)<<4 | frsky_packet_buffer[15]));
 
     //set apa leds:
-    //FIXME//apa102_update_leds(channel_data, frsky_link_quality);
-    //FIXME//apa102_start_transmission();
+    apa102_update_leds(channel_data, frsky_link_quality);
+    apa102_start_transmission();
 
     //exit failsafe mode
     failsafe_exit();
@@ -921,9 +924,11 @@ void frsky_update_ppm(void){
 
 void frsky_send_telemetry(uint8_t telemetry_id){
     uint8_t i;
+    static uint8_t test;
+
     //uint16_t tmp16;
     uint8_t bytes_used = 0;
-    static uint8_t test = 0;
+    test = 0;
 
     //Stop RX DMA
     cc25xx_strobe(RFST_SFRX);
@@ -986,25 +991,6 @@ void frsky_send_telemetry(uint8_t telemetry_id){
 
 
 #if 0
-
-void frsky_rf_interrupt(void) __interrupt RF_VECTOR{
-    //clear int flag
-    RFIF &= ~(1<<4);
-
-    //clear general statistics reg
-    S1CON &= ~0x03;
-
-
-    if (frsky_mode == FRSKY_MODE_RX){
-        //mark as received:
-        frsky_packet_received = 1;
-        //re arm DMA channel 0
-        cc25xx_enable_receive();
-    }else{
-        frsky_packet_sent = 1;
-    }
-}
-
 
 
 

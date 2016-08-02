@@ -9,7 +9,14 @@ LDFLAGS_FLASH = \
 ifdef DEBUG
 CFLAGS += --debug
 endif
-SRC = main.c uart.c delay.c clocksource.c frsky.c timeout.c adc.c dma.c wdt.c storage.c flash.c ppm.c apa102.c soft_spi.c failsafe.c sbus.c
+
+RESULT ?= opensky_$(notdir $(TARGET))
+
+# fetch this dir during include
+SELF_DIR := $(dir $(lastword $(MAKEFILE_LIST)))
+CFLAGS += -I$(SELF_DIR) -I ./
+HAL_SRC =  hal_led.c hal_uart.c hal_clocksource.c hal_timeout.c hal_wdt.c hal_delay.c hal_dma.c hal_spi.c hal_cc25xx.c hal_io.c hal_adc.c hal_storage.c hal_sbus.c hal_ppm.c hal_soft_spi.c
+SRC = $(GENERIC_SRCS) $(HAL_SRC:%.c=board/vd5m/%.c)
 ADB=$(SRC:.c=.adb)
 ASM=$(SRC:.c=.asm)
 LNK=$(SRC:.c=.lnk)
@@ -17,7 +24,9 @@ LST=$(SRC:.c=.lst)
 REL=$(SRC:.c=.rel)
 RST=$(SRC:.c=.rst)
 SYM=$(SRC:.c=.sym)
-PROGS=main.hex
+
+OUTPUT=$(RESULT).hex
+
 PCDB=$(PROGS:.hex=.cdb)
 PLNK=$(PROGS:.hex=.lnk)
 PMAP=$(PROGS:.hex=.map)
@@ -25,9 +34,11 @@ PMEM=$(PROGS:.hex=.mem)
 PAOM=$(PROGS:.hex=)
 %.rel : %.c
 	$(CC) -c $(CFLAGS) -o$*.rel $<
-all: $(PROGS)
-main.hex: $(REL) Makefile
-	$(CC) $(LDFLAGS_FLASH) $(CFLAGS) -o main.hex $(REL)
+
+board: $(OUTPUT)
+
+$(OUTPUT): $(REL) Makefile
+	$(CC) $(LDFLAGS_FLASH) $(CFLAGS) -o $(OUTPUT) $(REL)
 clean:
 	rm -f $(ADB) $(ASM) $(LNK) $(LST) $(REL) $(RST) $(SYM)
 	rm -f $(PROGS) $(PCDB) $(PLNK) $(PMAP) $(PMEM) $(PAOM)

@@ -4,7 +4,6 @@
 #include <stdint.h>
 #include "main.h"
 #include "hal_cc25xx.h"
-#include "dma.h"
 
 #define FRSKY_HOPTABLE_SIZE 47
 //
@@ -25,9 +24,9 @@ extern EXTERNAL_MEMORY uint8_t frsky_calib_fscal3;
 #define FRSKY_PACKET_LENGTH 17
 #define FRSKY_PACKET_BUFFER_SIZE (FRSKY_PACKET_LENGTH+3)
 extern EXTERNAL_MEMORY volatile uint8_t frsky_packet_buffer[FRSKY_PACKET_BUFFER_SIZE];
-//extern EXTERNAL_MEMORY volatile uint8_t frsky_packet_received;
+extern EXTERNAL_MEMORY volatile uint8_t frsky_packet_received;
 extern EXTERNAL_MEMORY volatile uint8_t frsky_packet_sent;
-extern EXTERNAL_MEMORY volatile uint8_t frsky_mode;
+
 
 void frsky_init(void);
 void frsky_show_partinfo(void);
@@ -67,8 +66,6 @@ void frsky_do_bind(void);
 void frsky_store_config(void);
 #endif
 
-#define FRSKY_MODE_RX 0
-#define FRSKY_MODE_TX 1
 
 //packet data example:
 //BIND:   [11 03 01 16 68 14 7E BF 15 56 97 00 00 00 00 00 00 0B F8 AF ]

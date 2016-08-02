@@ -1,5 +1,8 @@
+#include "hal_uart.h"
+#include "hal_defines.h"
+
 void hal_uart_init(void) {
-    __xdata union uart_config_t uart_config;
+    __xdata union hal_uart_config_t uart_config;
 
     //we will use SERVO_5 as tx output:
     //therefore we configure
@@ -29,18 +32,12 @@ void hal_uart_init(void) {
     uart_config.bit.D9     = 0; //8 Bits
     uart_config.bit.FLOW   = 0; //no hw flow control
     uart_config.bit.ORDER  = 0; //lsb first
-    uart_set_mode(&uart_config);
+    hal_uart_set_mode(&uart_config);
 
-    //init tx buffer
-    uart_tx_buffer_in = 0;
-    uart_tx_buffer_out = 0;
 
     //enable interrupts:
     sei();
 }
-
-#define hal_uart_int_enabled() (IEN2 & IEN2_UTX0IE)
-#define hal_uart_int_enable(enabled)  { if (enabled){ sei(); }else{ cli(); } }
 
 void hal_uart_start_transmission(uint8_t ch){
     //clear flags
@@ -54,8 +51,7 @@ void hal_uart_start_transmission(uint8_t ch){
     U0DBUF = ch;
 }
 
-
-void hal_uart_set_mode(__xdata union uart_config_t *cfg){
+static void hal_uart_set_mode(__xdata union hal_uart_config_t *cfg){
     //enable uart mode
     U0CSR |= 0x80;
 

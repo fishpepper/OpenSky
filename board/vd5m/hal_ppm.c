@@ -1,14 +1,7 @@
-
-void ppm_timer1_interrupt(void) __interrupt T1_VECTOR{
-    //clear pending interrupt flags (IRCON is reset by hw)
-    T1CTL &= ~(T1CTL_CH0_IF | T1CTL_CH1_IF | T1CTL_CH2_IF | T1CTL_OVFIF);
-
-    ppm_isr();
-}
-
+#include "hal_ppm.h"
+#include "ppm.h"
 
 void hal_ppm_init(void) {
-
     //no int on overflow:
     OVFIM = 0;
 
@@ -98,3 +91,12 @@ void hal_ppm_failsafe_enter(void) {
     P0 &= ~(1<<4);
     #endif
 }
+
+
+void hal_ppm_timer1_interrupt(void) __interrupt T1_VECTOR{
+    //clear pending interrupt flags (IRCON is reset by hw)
+    T1CTL &= ~(T1CTL_CH0_IF | T1CTL_CH1_IF | T1CTL_CH2_IF | T1CTL_OVFIF);
+
+    ppm_isr();
+}
+

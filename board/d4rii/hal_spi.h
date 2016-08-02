@@ -1,7 +1,7 @@
 #ifndef __HAL_SPI__H_
 #define __HAL_SPI__H_
 #include <stdint.h>
-#include "pin_config.h"
+#include "config.h"
 #include "delay.h"
 
 void hal_spi_init(void);

@@ -14,9 +14,9 @@
 
    author: fishpepper <AT> gmail.com
 */
-#include <stdio.h>
+#include <stdint.h>
 
-void assert_failed(uint8_t* file, uint32_t line){
+void assert_failed(uint8_t* filename, uint32_t line){
     //todo: add own implementation to report the file name and line number,
     //eg  : printf("Wrong parameters value: file %s on line %d\r\n", file, line)
 

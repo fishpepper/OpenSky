@@ -1,9 +1,10 @@
 #select target. supported: {VD5M, D4RII}
-TARGET ?= D4RII
+TARGET ?= VD5M
+#D4RII
 
 CFLAGS  = -O1 -g
 ASFLAGS = -g
-GENERIC_SRCS    =  main.c assert.c uart.c clocksource.c timeout.c wdt.c delay.c dma.c frsky.c spi.c cc25xx.c io.c storage.c failsafe.c ppm.c adc.c sbus.c
+GENERIC_SRCS    =  main.c assert.c uart.c clocksource.c timeout.c wdt.c delay.c frsky.c spi.c cc25xx.c io.c storage.c failsafe.c ppm.c adc.c sbus.c apa102.c soft_spi.c
 
 ifeq ($(TARGET),D4RII)
   include board/d4rii/Makefile.board
@@ -16,5 +17,4 @@ else
   endif
 endif
 
-all: board
-
+all  : board

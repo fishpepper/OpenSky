@@ -1,9 +1,9 @@
-#ifndef __CLOCKSOURCE_H__
-#define __CLOCKSOURCE_H__
+#ifndef __HAL_CLOCKSOURCE_H__
+#define __HAL_CLOCKSOURCE_H__
 
-#include "main.h"
+#include "hal_cc25xx.h"
 
-void clocksource_init(void);
+void hal_clocksource_init(void);
 
 //bit mask used to check the stability of XOSC
 #define CLOCKSOURCE_XOSC_STABLE_BIT   0x40

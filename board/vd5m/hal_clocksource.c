@@ -14,14 +14,14 @@
 
    author: fishpepper <AT> gmail.com
 */
-#include "clocksource.h"
-#include <cc2510fx.h>
+#include "hal_clocksource.h"
+#include "hal_cc25xx.h"
 #include "led.h"
 
-void clocksource_init(void){
+void hal_clocksource_init(void){
     //for debugging clocksource problems
-    LED_RED_ON();
-    LED_GREEN_ON();
+    led_red_on();
+    led_green_on();
 
     //power up osc (?)
     SLEEP &= ~CLOCKSOURCE_OSC_PD_BIT;
@@ -36,7 +36,7 @@ void clocksource_init(void){
 
 
     //for debugging clocksource problems
-    LED_RED_OFF();
-    LED_GREEN_OFF();
+    led_red_off();
+    led_green_off();
 }
 

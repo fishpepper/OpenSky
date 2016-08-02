@@ -1,6 +1,7 @@
 #ifndef __UART_H__
 #define __UART_H__
 #include "main.h"
+#include "hal_defines.h"
 #include <stdint.h>
 
 void uart_init(void);

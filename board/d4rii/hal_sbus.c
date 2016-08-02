@@ -2,7 +2,7 @@
 #include "debug.h"
 #include "sbus.h"
 #include "delay.h"
-#include "pin_config.h"
+#include "config.h"
 #include "hal_defines.h"
 #include "stm32f10x_usart.h"
 #include "stm32f10x_gpio.h"
@@ -48,7 +48,7 @@ static void hal_sbus_init_nvic(void) {
     // enable the USART interrupt
     nvic_init.NVIC_IRQChannel = SBUS_USART_IRQn;
     nvic_init.NVIC_IRQChannelPreemptionPriority = 0;
-    nvic_init.NVIC_IRQChannelSubPriority = 2;
+    nvic_init.NVIC_IRQChannelSubPriority = 0;
     nvic_init.NVIC_IRQChannelCmd = ENABLE;
     NVIC_Init(&nvic_init);
 }

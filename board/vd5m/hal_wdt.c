@@ -2,16 +2,17 @@
 #include "debug.h"
 #include "led.h"
 #include "delay.h"
+#include "hal_cc25xx.h"
 
 void hal_wdt_init(void) {
     //check if 32khz clock source is rcosc:
     if (!(CLKCON & CLKCON_OSC32K)){
         debug("wdt: error! low speed clock not based on int rc");
-        LED_GREEN_OFF();
+        led_green_on();
         while(1){
-            LED_RED_ON();
+            led_red_on();
             delay_ms(200);
-            LED_RED_OFF();
+            led_red_off();
             delay_ms(200);
         }
     }

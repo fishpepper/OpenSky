@@ -1,145 +1,176 @@
 #ifndef __HAL_CC25XX_H__
 #define __HAL_CC25XX_H__
+#include <cc2510fx.h>
+#include <stdint.h>
+#include "hal_defines.h"
 
-#include "cc2510fx.h"
 
-#define hal_cc25xx_init() {}
+#define CC25XX_FIFO FIFO
 #define hal_cc25xx_set_register(reg, val) { reg = val; }
 #define hal_cc25xx_strobe(val) { RFST = val; }
 #define hal_cc25xx_get_register(r) (r)
+#define hal_cc25xx_get_register_burst(r) (r)
+#define hal_cc25xx_set_antenna(x) {}
 
-#define CC25XX_FIFO FIFO
-
-void hal_cc25xx_set_gdo_mode(void) {
-	//not necessary here IOCFG0 = 0x01
-	//not necessary here IOCFG2 = 0x0E
-}
-
-void cc25xx_process_packets(uint8_t *frsky_packet_received){
-	//nothing to do, for vd5m we set the flag in the rf interrupt
-}
-
-void hal_cc25xx_disable_rf_interrupt(void) {
-    IEN2 &= ~(IEN2_RFIE);
-    RFIM = 0;
-}
-   
-void hal_cc25xx_enter_rxmode(void) {
-    //set up dma for radio--->buffer
-    frsky_setup_rf_dma(FRSKY_MODE_RX);
-
-    //configure interrupt for every received packet
-    IEN2 |= (IEN2_RFIE);
-
-    //set highest prio for ch0 (RF)
-    IP0 |= (1<<0);
-    IP1 |= (1<<0);
-
-    //mask done irq
-    RFIM = (1<<4);
-    //interrupts should be enabled globally already..
-    //skip this! sei();
-}
-
-void hal_cc25xx_enter_txmode(void) {
-    //abort ch0
-    DMAARM = DMA_ARM_ABORT | DMA_ARM_CH0;
-    frsky_setup_rf_dma(FRSKY_MODE_TX);
-}
-
-void hal_cc25xx_setup_rf_dma(uint8_t mode){
-    // CPU has priority over DMA
-    // Use 8 bits for transfer count
-    // No DMA interrupt when done
-    // DMA triggers on radio
-    // Single transfer per trigger.
-    // One byte is transferred each time.
-
-    dma_config[0].PRIORITY       = DMA_PRI_HIGH;
-    dma_config[0].M8             = DMA_M8_USE_8_BITS;
-    dma_config[0].IRQMASK        = DMA_IRQMASK_DISABLE;
-    dma_config[0].TRIG           = DMA_TRIG_RADIO;
-    dma_config[0].TMODE          = DMA_TMODE_SINGLE;
-    dma_config[0].WORDSIZE       = DMA_WORDSIZE_BYTE;
-
-    //store mode
-    frsky_mode = mode;
-
-    if (frsky_mode == FRSKY_MODE_TX) {
-        // Transmitter specific DMA settings
-        // Source: radioPktBuffer
-        // Destination: RFD register
-        // Use the first byte read + 1
-        // Sets the maximum transfer count allowed (length byte + data)
-        // Data source address is incremented by 1 byte
-        // Destination address is constant
-        SET_WORD(dma_config[0].SRCADDRH, dma_config[0].SRCADDRL, frsky_packet_buffer);
-        SET_WORD(dma_config[0].DESTADDRH, dma_config[0].DESTADDRL, &X_RFD);
-        dma_config[0].VLEN           = DMA_VLEN_FIRST_BYTE_P_1;
-        SET_WORD(dma_config[0].LENH, dma_config[0].LENL, (FRSKY_PACKET_LENGTH+1));
-        dma_config[0].SRCINC         = DMA_SRCINC_1;
-        dma_config[0].DESTINC        = DMA_DESTINC_0;
-    }else{
-        // Receiver specific DMA settings:
-        // Source: RFD register
-        // Destination: radioPktBuffer
-        // Use the first byte read + 3 (incl. 2 status bytes)
-        // Sets maximum transfer count allowed (length byte + data + 2 status bytes)
-        // Data source address is constant
-        // Destination address is incremented by 1 byte for each write
-        SET_WORD(dma_config[0].SRCADDRH, dma_config[0].SRCADDRL, &X_RFD);
-        SET_WORD(dma_config[0].DESTADDRH, dma_config[0].DESTADDRL, &frsky_packet_buffer[0]);
-        dma_config[0].VLEN           = DMA_VLEN_FIRST_BYTE_P_3;
-        SET_WORD(dma_config[0].LENH, dma_config[0].LENL, (FRSKY_PACKET_LENGTH+3));
-        dma_config[0].SRCINC         = DMA_SRCINC_0;
-        dma_config[0].DESTINC        = DMA_DESTINC_1;
-    }
-
-    // Save pointer to the DMA configuration struct into DMA-channel 0
-    // configuration registers
-    SET_WORD(DMA0CFGH, DMA0CFGL, &dma_config[0]);
-
-    frsky_packet_received = 0;
-}
+void hal_cc25xx_init(void);
+void hal_cc25xx_set_gdo_mode(void);
+void hal_cc25xx_process_packet(volatile uint8_t *packet_received, volatile uint8_t *buffer, uint8_t maxlen);
+void hal_cc25xx_disable_rf_interrupt(void);
+void hal_cc25xx_enter_rxmode(void);
+void hal_cc25xx_enter_txmode(void);
+void hal_cc25xx_setup_rf_dma(uint8_t mode);
+void hal_cc25xx_enable_receive(void);
+void hal_cc25xx_transmit_packet(volatile uint8_t *buffer, uint8_t len);
 
 
-
-void hal_cc25xx_enable_receive(void) {
-	//strange delay from spi dumps
-        delay_us(1000); //d4r uses 300?!
-	
-	//start receiving on dma channel 0
-	DMAARM = DMA_ARM_CH0;
-}
+#define HAL_CC25XX_MODE_RX 0
+#define HAL_CC25XX_MODE_TX 1
 
 
-void hal_cc25xx_transmit_packet(volatile uint8_t *buffer, uint8_t len) {
-	//start transmitting on dma channel 0
-	DMAARM = DMA_ARM_CH0;
-	
-	//tricky: this will force an int request and
-	//        initiate the actual transmission
-	S1CON |= 0x03;
-	
-	
-    //wait some time here. packet should be sent within our 9ms
-    //frame (actually within 5-6ms). if not print an error...
-    frsky_packet_sent = 0;
-    while(!frsky_packet_sent){
-        if (timeout_timed_out()){
-            break;
-        }
-    }
-    if (timeout_timed_out()){
-        debug("\nfrsky: ERROR tx timed out\n");
-    }
+#define PERCFG_U0CFG (1<<0)
+#define PERCFG_U1CFG (1<<1)
+#define PERCFG_T4CFG (1<<4)
+#define PERCFG_T3CFG (1<<5)
+#define PERCFG_T1CFG (1<<6)
 
-    frsky_packet_sent = 0;
-}
+#define IEN0_RFTXRXIE (1<<0)
+#define IEN0_ADCIE (1<<1)
+#define IEN0_URX0IE (1<<2)
+#define IEN0_URX1IE (1<<3)
+#define IEN0_ENCIE (1<<4)
+#define IEN0_STIE (1<<5)
+#define IEN0_EA (1<<7)
 
-void hal_cc25xx_transmit_packet(buffer, len){
-	nothing
-	
-}
+#define IEN1_P0IE  (1<<5)
+#define IEN1_T4IE  (1<<4)
+#define IEN1_T3IE  (1<<3)
+#define IEN1_T2IE  (1<<2)
+#define IEN1_T1IE  (1<<1)
+#define IEN1_DMAIE (1<<0)
+
+#define IEN2_RFIE (1<<0)
+#define IEN2_P2IE (1<<1)
+#define IEN2_UTX0IE (1<<2)
+#define IEN2_UTX1IE (1<<3)
+#define IEN2_P1IE   (1<<4)
+#define IEN2_WDTIE  (1<<5)
+
+#define U0GCR_ORDER (1<<5)
+#define U0GCR_CPHA  (1<<6)
+#define U0GCR_CPOL  (1<<7)
+#define U0CSR_TX_BYTE (1<<1)
+
+#define U1GCR_ORDER (1<<5)
+#define U1GCR_CPHA  (1<<6)
+#define U1GCR_CPOL  (1<<7)
+#define U1CSR_TX_BYTE (1<<1)
+
+#define RFST_SNOP    0x05
+#define RFST_SIDLE   0x04
+#define RFST_STX     0x03
+#define RFST_SRX     0x02
+#define RFST_SCAL    0x01
+#define RFST_SFSTXON 0x00
+// statemachine on cc2510 is different.
+// instead of SF*X we should use SIDLE
+#define RFST_SFTX    RFST_SIDLE
+#define RFST_SFRX    RFST_SIDLE
+
+//append status
+#define CC2500_PKTCTRL1_APPEND_STATUS     (1<<2)
+//crc autoflush
+#define CC2500_PKTCTRL1_CRC_AUTOFLUSH     (1<<3)
+//adress checks
+#define CC2500_PKTCTRL1_FLAG_ADR_CHECK_00 ((0<<1) | (0<<0))
+#define CC2500_PKTCTRL1_FLAG_ADR_CHECK_01 ((0<<1) | (1<<0))
+#define CC2500_PKTCTRL1_FLAG_ADR_CHECK_10 ((1<<1) | (0<<0))
+#define CC2500_PKTCTRL1_FLAG_ADR_CHECK_11 ((1<<1) | (1<<0))
+
+
+#define CLKCON_TICKSPD_001 (0b00001000)
+#define CLKCON_TICKSPD_010 (0b00010000)
+#define CLKCON_TICKSPD_011 (0b00011000)
+#define CLKCON_TICKSPD_100 (0b00100000)
+#define CLKCON_TICKSPD_101 (0b00101000)
+#define CLKCON_TICKSPD_110 (0b00110000)
+#define CLKCON_TICKSPD_111 (0b00111000)
+#define CLKCON_OSC32K (1<<7)
+
+#define ADCCON2_SREF_INT  (0b00<<6)
+#define ADCCON2_SREF_EXT  (0b01<<6)
+#define ADCCON2_SREF_AVDD (0b10<<6)
+#define ADCCON2_SREF_EXTDIFF  (0b11<<6)
+#define ADCCON2_SDIV_7BIT   (0b00<<4)
+#define ADCCON2_SDIV_9BIT   (0b01<<4)
+#define ADCCON2_SDIV_10BIT  (0b10<<4)
+#define ADCCON2_SDIV_12BIT  (0b11<<4)
+#define ADCCON2_SCH_AIN0   (0b0000<<0)
+#define ADCCON2_SCH_AIN1   (0b0001<<0)
+#define ADCCON2_SCH_AIN2   (0b0010<<0)
+#define ADCCON2_SCH_AIN3   (0b0011<<0)
+#define ADCCON2_SCH_AIN4   (0b0100<<0)
+#define ADCCON2_SCH_AIN5   (0b0101<<0)
+#define ADCCON2_SCH_AIN6   (0b0110<<0)
+#define ADCCON2_SCH_AIN7   (0b0111<<0)
+#define ADCCON2_SCH_AIN0AIN1   (0b1000<<0)
+#define ADCCON2_SCH_AIN2AIN3   (0b1001<<0)
+#define ADCCON2_SCH_AIN4AIN5   (0b1010<<0)
+#define ADCCON2_SCH_AIN6AIN7   (0b1011<<0)
+#define ADCCON2_SCH_GND        (0b1100<<0)
+#define ADCCON2_SCH_POSVREF    (0b1101<<0)
+#define ADCCON2_SCH_TEMP       (0b1110<<0)
+#define ADCCON2_SCH_VDD3       (0b1111<<0)
+
+#define ADCCON1_ST               (1<<6)
+#define ADCCON1_STSEL_FULL_SPEED (0b01<<4)
+
+#define WDCTL_EN (1<<3)
+#define WDCTL_MODE (1<<2)
+#define WDCTL_INT (0b11)
+#define WDCTL_INT_1S (0b00)
+
+#define FCTL_BUSY (1<<7)
+#define FCTL_SWBUSY (1<<6)
+#define FCTL_WRITE (1<<1)
+#define FCTL_ERASE (1<<0)
+
+
+#define T1CTL_MODE_SUSPEND (0b00<<0)
+#define T1CTL_MODE_FREE_RUNNING (0b01<<0)
+#define T1CTL_MODE_MODULO  (0b10<<0)
+#define T1CTL_MODE_UPDOWN  (0b11<<0)
+#define T1CTL_DIV_1     (0b00<<2)
+#define T1CTL_DIV_8     (0b01<<2)
+#define T1CTL_DIV_32    (0b10<<2)
+#define T1CTL_DIV_128   (0b11<<2)
+#define T1CTL_OVFIF     (1<<4)
+#define T1CTL_CH0_IF    (1<<5)
+#define T1CTL_CH1_IF    (1<<6)
+#define T1CTL_CH2_IF    (1<<7)
+
+#define T1CCTLx_CAP_NO       (0b00<<0)
+#define T1CCTLx_CAP_RISING   (0b01<<0)
+#define T1CCTLx_CAP_FALLING  (0b10<<0)
+#define T1CCTLx_CAP_BOTH     (0b11<<0)
+#define T1CCTLx_MODE_CAPTURE (0<<2)
+#define T1CCTLx_MODE_COMPARE (1<<2)
+#define T1CCTLx_CMP_SET      (0b000<<3)
+#define T1CCTLx_CMP_CLEAR    (0b001<<3)
+#define T1CCTLx_CMP_TOGGLE   (0b010<<3)
+#define T1CCTLx_CMP_SETCLR0  (0b011<<3)
+#define T1CCTLx_CMP_CLRSET0  (0b100<<3)
+#define T1CCTLx_CMP_RES0     (0b101<<3)
+#define T1CCTLx_CMP_RES1     (0b110<<3)
+#define T1CCTLx_CMP_RES2     (0b111<<3)
+#define T1CCTLx_IM           (1<<6)
+#define T1CCTLx_CPSEL_RF     (1<<7)
+
+
+//add missing defines
+#include <compiler.h>
+SFRX(TEST2,  0xDF23);
+SFRX(TEST1,  0xDF24);
+SFRX(TEST0,  0xDF25);
+
 
 #endif // __HAL_CC25XX_H__
