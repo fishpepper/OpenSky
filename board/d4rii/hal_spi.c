@@ -17,6 +17,7 @@
 #include "hal_spi.h"
 #include "debug.h"
 #include "led.h"
+#include "config.h"
 #include "stm32f10x_gpio.h"
 #include "stm32f10x_spi.h"
 #include "stm32f10x_rcc.h"
@@ -34,7 +35,7 @@ void hal_spi_init(void) {
 static void hal_spi_init_rcc(void) {
     // enable clocks
     RCC_APB2PeriphClockCmd(CC25XX_SPI_GPIO_CLK | RCC_APB2Periph_AFIO, ENABLE);
-    RCC_APB2PeriphClockCmd(RCC_APB2Periph_SPI1, ENABLE);
+    RCC_APBxPeriphClockCmd(CC25XX_SPI_CLK_RCC, CC25XX_SPI_CLK, ENABLE);
 }
 
 static void hal_spi_enable(void) {
@@ -102,7 +103,7 @@ static void hal_spi_init_dma(void) {
 // data in buffer will be sent and will be overwritten with
 // the data read back from the spi slave
 void hal_spi_dma_xfer(uint8_t *buffer, uint8_t len) {
-    debug("hal_spi_dma_xfer(..., "); debug_put_uint8(len); debug(")\n");
+    //debug("xfer "); debug_put_uint8(len); debug(")\n");
 
     // TX: transfer buffer to slave
     CC25XX_SPI_TX_DMA_CHANNEL->CMAR  = (uint32_t)buffer;
@@ -116,29 +117,32 @@ void hal_spi_dma_xfer(uint8_t *buffer, uint8_t len) {
     DMA_Cmd(CC25XX_SPI_RX_DMA_CHANNEL, ENABLE);
     DMA_Cmd(CC25XX_SPI_TX_DMA_CHANNEL, ENABLE);
 
-    debug("DMA EN\n"); debug_flush();
+    //debug("DMA EN\n"); debug_flush();
 
     // trigger the SPI TX + RX dma
     SPI_I2S_DMACmd(CC25XX_SPI, SPI_I2S_DMAReq_Rx | SPI_I2S_DMAReq_Tx, ENABLE);
 
-    debug("TRIG\n"); debug_flush();
-
+    //debug("TRIG\n"); debug_flush();
+#if 0
     // Wait until the command is sent to the DR
     while (!DMA_GetFlagStatus(CC25XX_SPI_TX_DMA_TC_FLAG)) {};
 
-    debug("ACTIVE\n"); debug_flush();
+    //debug("ACTIVE\n"); debug_flush();
 
     // wait for tx to be finished:
-    while (DMA_GetFlagStatus(CC25XX_SPI_TX_DMA_TC_FLAG) == RESET) { ; }
-    debug("TX ok\n"); debug_flush();
-
-    // wait for rx to be finished:
-    while (DMA_GetFlagStatus(CC25XX_SPI_RX_DMA_TC_FLAG) == RESET) { ; }
-    debug("RX ok\n"); debug_flush();
+    while (DMA_GetFlagStatus(CC25XX_SPI_TX_DMA_TC_FLAG)) {};
+    while (DMA_GetFlagStatus(CC25XX_SPI_RX_DMA_TC_FLAG)) {};
 
     //wait for SPI to be no longer busy
-    while (SPI_I2S_GetFlagStatus(SPI2, SPI_I2S_FLAG_BSY) == RESET){}
-    debug("!BUSY\n"); debug_flush();
+    while (SPI_I2S_GetFlagStatus(CC25XX_SPI, SPI_I2S_FLAG_BSY) != RESET){}
+    //debug("!BUSY\n"); debug_flush();
+#endif
+
+    while (SPI_I2S_GetFlagStatus(CC25XX_SPI, SPI_I2S_FLAG_TXE) == RESET);
+    while (SPI_I2S_GetFlagStatus(CC25XX_SPI, SPI_I2S_FLAG_BSY) != RESET){}
+
+    //while((SPI1->SR & 2) == 0);  // wait while TXE flag is 0 (TX is not empty)
+    //while((SPI1->SR & (1 << 7)) != 0);  // wait while BSY flag is 1 (SPI is busy)
 
     //disable DMA
     DMA_Cmd(CC25XX_SPI_RX_DMA_CHANNEL, DISABLE);

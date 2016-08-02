@@ -43,7 +43,7 @@ static void hal_ppm_init_timer(void) {
 
     // time base configuration: count to 1000us (will be set properly lateron)
     //tim_init.TIM_Period         = HAL_PPM_US_TO_TICKCOUNT(1000);
-    tim_init.TIM_Period         = 24000;
+    tim_init.TIM_Period         = 600;
     // compute the prescaler value, we want a 0.5us resolution (= count with 2mhz):
     //tim_init.TIM_Prescaler      = (uint16_t) (SystemCoreClock / 2000000) - 1;
     tim_init.TIM_Prescaler      = (uint16_t) (SystemCoreClock / 1000) - 1;
@@ -131,7 +131,7 @@ void PPM_TIMER_IRQHANDLER(void){
         TIM_ClearITPendingBit(PPM_TIMER, TIM_IT_Update); //THIS SHOULD NEVER BE THE LAST LINE IN AN ISR!
         //do processing
         //ppm_isr();
-        led_green_toggle();
+        led_red_toggle();
         //TEST: this should toggle with 1hz
     }
 }

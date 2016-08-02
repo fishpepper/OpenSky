@@ -85,7 +85,7 @@ static void hal_adc_init_dma(void) {
 
     // set up dma to convert 2 adc channels to two mem locations:
     dma_init.DMA_M2M                 = DMA_M2M_Disable; //channel will be used for memory to memory transfer
-    dma_init.DMA_Mode                = DMA_Mode_Normal; //setting normal mode (non circular)
+    dma_init.DMA_Mode                = DMA_Mode_Circular; //setting normal mode (non circular)
     dma_init.DMA_Priority            = DMA_Priority_High; //medium priority
     dma_init.DMA_PeripheralDataSize  = DMA_PeripheralDataSize_HalfWord; //source and destination 16bit
     dma_init.DMA_MemoryDataSize      = DMA_MemoryDataSize_HalfWord;
@@ -93,7 +93,7 @@ static void hal_adc_init_dma(void) {
     dma_init.DMA_PeripheralInc       = DMA_PeripheralInc_Disable; //source address increment disable
     dma_init.DMA_DIR                 = DMA_DIR_PeripheralSRC; //Location assigned to peripheral register will be source
     dma_init.DMA_BufferSize          = 2; //chunk of data to be transfered
-    dma_init.DMA_PeripheralBaseAddr  = (uint32_t)ADC->DR; //source and destination start addresses
+    dma_init.DMA_PeripheralBaseAddr  = (uint32_t)&ADC->DR; //source and destination start addresses
     dma_init.DMA_MemoryBaseAddr      = (uint32_t)hal_adc_data;
     //send values to DMA registers
     DMA_Init(ADC_DMA_CHANNEL, &dma_init);
@@ -104,7 +104,7 @@ static void hal_adc_init_dma(void) {
     //start conversion:
     hal_adc_dma_arm();
 
-
+#if ADC_DO_TEST
     //TEST ADC
     while(1){
         debug_putc('A');
@@ -118,6 +118,7 @@ static void hal_adc_init_dma(void) {
             ADC_SoftwareStartConvCmd(ADC, ENABLE);
         }
     }
+#endif
 }
 
 static void hal_adc_dma_arm(void) {
