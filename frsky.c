@@ -685,6 +685,9 @@ void frsky_main(void){
                 timeout_set(500);
             }
 
+            //wdt reset
+            wdt_reset();
+
             frsky_increment_channel(1);
 
             //diversity toggle on missing frame
@@ -731,6 +734,7 @@ void frsky_main(void){
                     //enter failsafe mode
                     failsafe_enter();
                     debug("\nCONN LOST!\n");
+
                     //no connection led info
                     apa102_show_no_connection();
                 }

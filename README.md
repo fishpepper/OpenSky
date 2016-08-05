@@ -1,9 +1,17 @@
 # OpenSky
 
+This is an open source implementation for the pololar frsky protocol using
+a cc25xx transceiver chip. This software can be flashed on a DIY RX,
+a FrSky VD5M, or a FrSky D4R-ii receiver.
+Support for other FrSky receivers could be added. E.g. porting this to a X4R should be really easy.
+
+This custom firmware implementation will give you full 8-Channel SBUS or CPPM output,
+full telemetry (2Channels Analog + RSSI) and much more :)
+
 ## Warning
 
-*THIS SOFTWARE IS FOR EDUCATIONAL USE ONLY*
-*DO NOT* use this software to control real planes/quadrocopters.
+*THIS SOFTWARE IS FOR EDUCATIONAL USE ONLY*  
+*DO NOT* use this software to control real planes/quadrocopters.  
 
 This is for educational use only, bad things could happen
 if you run this on a real vehicle.
@@ -18,16 +26,6 @@ I AM NOT RESPONSIBLE FOR ANY DAMAGE/INJURIES CAUSED BY USING THIS CODE!
 Additionally: Do not blame me if you brick your RX during the flash upgrade.
 There is currently no way back to the original stock firmware once you erase/flash the devcie 
 with my code.
-
-# About
-
-This is an open source implementation for the pololar frsky protocol using
-a cc25xx transceiver chip. This software can be flashed on a DIY RX, 
-a FrSky VD5M, or a D4R-ii receiver.
-Support for other FrSky receivers could be added. E.g. porting this to a X4R should be really easy.
-
-My custom firmware implementation will give you full 8-Channel SBUS or CPPM output,
-full telemetry (2Channels Analog + RSSI) and much more :)
 
 # Features
 
@@ -74,7 +72,11 @@ CH4 = Debug UART @115200 8N1 OR non-inverted SBUS (see main.h)
 
 Serial Port:
 <pre>
-TODO
+(Pin 1 = left = the same side as the LEDs)
+[1] = GND
+[2] = AD2 input (max 3.3V!)
+[3] = inverted SBUS (if enabled in main.h) or Debug UART 
+[4] = NC
 </pre>
 
 

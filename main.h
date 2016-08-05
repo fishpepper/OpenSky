@@ -10,7 +10,7 @@
 //for a CC3D running OpenPilot use SBUS_INVERTED=1 !
 #define SBUS_INVERTED 1  //0 = not inverted => idle = high, 1 = INVERTED => idle = LOW
 //invert ppm polarity?
-#define PPM_INVERTED 1
+#define PPM_INVERTED 0
 
 
 //send ADC data as hub telemetry as well:

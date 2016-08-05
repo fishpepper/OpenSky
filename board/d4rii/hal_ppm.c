@@ -1,5 +1,6 @@
 #include "hal_ppm.h"
 #include "ppm.h"
+#include "wdt.h"
 #include "led.h"
 #include "stm32f10x_rcc.h"
 #include "stm32f10x_gpio.h"
@@ -42,11 +43,9 @@ static void hal_ppm_init_timer(void) {
     TIM_OCInitTypeDef  tim_oc_init;
 
     // time base configuration: count to 1000us (will be set properly lateron)
-    //tim_init.TIM_Period         = HAL_PPM_US_TO_TICKCOUNT(1000);
-    tim_init.TIM_Period         = 600;
+    tim_init.TIM_Period         = HAL_PPM_US_TO_TICKCOUNT(1000);
     // compute the prescaler value, we want a 0.5us resolution (= count with 2mhz):
-    //tim_init.TIM_Prescaler      = (uint16_t) (SystemCoreClock / 2000000) - 1;
-    tim_init.TIM_Prescaler      = (uint16_t) (SystemCoreClock / 1000) - 1;
+    tim_init.TIM_Prescaler      = (uint16_t) (SystemCoreClock / 2000000) - 1;
     tim_init.TIM_ClockDivision  = 0;
     tim_init.TIM_CounterMode    = TIM_CounterMode_Up;
 
@@ -55,7 +54,6 @@ static void hal_ppm_init_timer(void) {
 
     //clear IT flag (caused by TimeBaseInit()):
     TIM_ClearITPendingBit(PPM_TIMER, TIM_IT_Update);
-
 
     //Output Compare Active Mode configuration:
 #if PPM_INVERTED
@@ -93,8 +91,6 @@ static void hal_ppm_init_nvic(void) {
 }
 
 void hal_ppm_failsafe_enter(void){
-    return;
-
     //set output to static value ZERO
     TIM_ITConfig(PPM_TIMER, TIM_IT_Update, DISABLE);
 
@@ -115,8 +111,6 @@ void hal_ppm_failsafe_enter(void){
 }
 
 void hal_ppm_failsafe_exit(void) {
-    return;
-
     //exit failsafe, back to pulse generation
     hal_ppm_init_gpio();
 
@@ -130,9 +124,14 @@ void PPM_TIMER_IRQHANDLER(void){
         //clear flag
         TIM_ClearITPendingBit(PPM_TIMER, TIM_IT_Update); //THIS SHOULD NEVER BE THE LAST LINE IN AN ISR!
         //do processing
-        //ppm_isr();
-        led_red_toggle();
-        //TEST: this should toggle with 1hz
+        ppm_isr();
+        /*asm("NOP");
+        asm("NOP");
+        asm("NOP");
+        asm("NOP");
+        asm("NOP");
+        asm("NOP");
+        asm("NOP");*/
     }
 }
 

@@ -18,15 +18,10 @@ extern EXTERNAL_MEMORY uint16_t ppm_data_ticks[9];
 
 //300us sync pulse
 #define PPM_SYNC_DURATION_US 300
-//from frsky to ticks coresponding to 1000...2000 us
-//frsky seems to send us*1.5 (~1480...3020) -> divide by 1.5 (=*2/3) to get us
-//us -> ticks = ((_us*13)/4) -> (((_frsky*2/3)*13)/4) = ((_frsky*13)/6)
-#define PPM_FRSKY_TO_TICKCOUNT(_frsky) (((_frsky<<3)+(_frsky<<2)+(_frsky))/6)
-//from us to ticks:
-//                               ((_us*13)/4) = ((_us * (8+4+1))/4) = (((_us<<3)+(_us<<2)+(_us))>>2)
-#define PPM_US_TO_TICKCOUNT(_us) (((_us<<3)+(_us<<2)+(_us))>>2)
-#define PPM_FRAME_LEN PPM_US_TO_TICKCOUNT(20000L)
-#define PPM_SYNC_PULS_LEN_TICKS (PPM_US_TO_TICKCOUNT(PPM_SYNC_DURATION_US))
+#define PPM_US_TO_TICKCOUNT(us) HAL_PPM_US_TO_TICKCOUNT(us)
+#define PPM_FRSKY_TO_TICKCOUNT(_frsky) HAL_PPM_FRSKY_TO_TICKCOUNT(_frsky);
+#define PPM_FRAME_LEN HAL_PPM_US_TO_TICKCOUNT(20000L)
+#define PPM_SYNC_PULS_LEN_TICKS (HAL_PPM_US_TO_TICKCOUNT(PPM_SYNC_DURATION_US))
 
 #endif
 
