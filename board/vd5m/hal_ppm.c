@@ -1,6 +1,13 @@
 #include "hal_ppm.h"
 #include "ppm.h"
 
+#if SBUS_ENABLED == 1
+
+void hal_ppm_init(void){
+}
+
+#else
+
 void hal_ppm_init(void) {
     //no int on overflow:
     OVFIM = 0;
@@ -100,3 +107,4 @@ void hal_ppm_timer1_interrupt(void) __interrupt T1_VECTOR{
     ppm_isr();
 }
 
+#endif

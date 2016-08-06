@@ -7,6 +7,14 @@
 #include "stm32f10x_tim.h"
 #include "misc.h" //stm32 nvic stuff
 
+
+#if SBUS_ENABLED == 1
+
+void hal_ppm_init(void){
+}
+
+#else
+
 void hal_ppm_init(void) {
     hal_ppm_init_rcc();
     hal_ppm_init_gpio();
@@ -158,3 +166,4 @@ static void hal_ppm_init_ocx(uint8_t ch, TIM_TypeDef *TIMx, TIM_OCInitTypeDef *t
     }
 }
 
+#endif

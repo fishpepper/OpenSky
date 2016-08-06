@@ -721,7 +721,7 @@ void frsky_main(void){
             }
             packet_received = 0;
 
-            if (hopcount++ >= 100){
+            if (hopcount++ >= FRSKY_COUNT_RXSTATS){
                 debug("STAT: ");
                 debug_put_uint8(stat_rxcount);
                 debug_put_newline();

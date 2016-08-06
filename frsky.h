@@ -6,6 +6,10 @@
 #include "hal_cc25xx.h"
 
 #define FRSKY_HOPTABLE_SIZE 47
+
+//#define FRSKY_COUNT_RXSTATS 100
+#define FRSKY_COUNT_RXSTATS 50
+
 //
 //extern EXTERNAL_MEMORY uint8_t frsky_txid[2];
 //extern EXTERNAL_MEMORY uint8_t frsky_hop_table[FRSKY_HOPTABLE_SIZE];
