@@ -3,7 +3,11 @@
 
 #include "hal_cc25xx.h"
 
+extern uint8_t cc25xx_current_antenna;
+
 void cc25xx_init(void);
+void cc25xx_switch_antenna(void);
+
 #define cc25xx_set_register(reg, val) hal_cc25xx_set_register(reg, val);
 #define cc25xx_strobe(val) hal_cc25xx_strobe(val);
 #define cc25xx_get_register(address) hal_cc25xx_get_register(address)
@@ -18,6 +22,7 @@ void cc25xx_init(void);
 #define cc25xx_disable_rf_interrupt() hal_cc25xx_disable_rf_interrupt()
 #define cc25xx_transmit_packet(buffer, len) hal_cc25xx_transmit_packet(buffer, len)
 
-void cc25xx_switch_antenna(void);
+#define cc25xx_get_current_antenna() (cc25xx_current_antenna)
+
 
 #endif // __CC25XX_H__

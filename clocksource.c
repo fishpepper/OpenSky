@@ -14,6 +14,7 @@
 
    author: fishpepper <AT> gmail.com
 */
+
 #include "clocksource.h"
 
 // nothing to do here

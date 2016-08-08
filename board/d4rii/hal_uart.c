@@ -14,6 +14,7 @@
 
    author: fishpepper <AT> gmail.com
 */
+
 #include "hal_uart.h"
 #include  "stm32f10x_rcc.h"
 #include  "stm32f10x_usart.h"
@@ -33,7 +34,7 @@ void hal_uart_init(void) {
     hal_uart_enable();
 }
 
-static void hal_uart_init_nvic(uint8_t enable) {
+void hal_uart_init_nvic(uint8_t enable) {
     // enable interrupts
     NVIC_InitTypeDef nvic_init;
 
@@ -88,10 +89,6 @@ static void hal_uart_init_mode(void) {
 static void hal_uart_enable(void) {
     //enable uart
     USART_Cmd(DEBUG_USART, ENABLE);
-}
-
-void hal_uart_int_enable(uint8_t enable) {
-    hal_uart_init_nvic(enable);
 }
 
 void hal_uart_start_transmission(uint8_t ch) {

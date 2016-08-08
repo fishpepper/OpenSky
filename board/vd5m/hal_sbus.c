@@ -1,11 +1,29 @@
+/*
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+   author: fishpepper <AT> gmail.com
+*/
+
 #include "hal_sbus.h"
 #include "hal_dma.h"
 #include "debug.h"
+#include "delay.h"
 #include "sbus.h"
 
 #if SBUS_ENABLED
 
-void hal_sbus_init(uint8_t *sbus_data_ptr) {
+void hal_sbus_init(EXTERNAL_MEMORY uint8_t *sbus_data_ptr) {
 
     EXTERNAL_MEMORY union hal_uart_config_t sbus_uart_config;
 
@@ -48,30 +66,30 @@ void hal_sbus_init(uint8_t *sbus_data_ptr) {
     sbus_uart_config.bit.BIT9   = 1; //8bit
     sbus_uart_config.bit.FLOW   = 0; //no hw flow control
     sbus_uart_config.bit.ORDER  = 0; //lsb first
-    sbus_uart_set_mode(&sbus_uart_config);
+    hal_sbus_uart_set_mode(&sbus_uart_config);
 
     //use dma channel 3 for transmission:
-    dma_config[3].PRIORITY       = DMA_PRI_LOW;
-    dma_config[3].M8             = DMA_M8_USE_7_BITS;
-    dma_config[3].IRQMASK        = DMA_IRQMASK_DISABLE;
-    dma_config[3].TRIG           = DMA_TRIG_UTX1;
-    dma_config[3].TMODE          = DMA_TMODE_SINGLE;
-    dma_config[3].WORDSIZE       = DMA_WORDSIZE_BYTE;
+    hal_dma_config[3].PRIORITY       = DMA_PRI_LOW;
+    hal_dma_config[3].M8             = DMA_M8_USE_7_BITS;
+    hal_dma_config[3].IRQMASK        = DMA_IRQMASK_DISABLE;
+    hal_dma_config[3].TRIG           = DMA_TRIG_UTX1;
+    hal_dma_config[3].TMODE          = DMA_TMODE_SINGLE;
+    hal_dma_config[3].WORDSIZE       = DMA_WORDSIZE_BYTE;
 
     //important: src addr start is sbus_data[1] as we
     //initiate the transfer by manually sending sbus_data[0]!
-    SET_WORD(dma_config[3].SRCADDRH,  dma_config[3].SRCADDRL,  &sbus_data_ptr[1]);
-    SET_WORD(dma_config[3].DESTADDRH, dma_config[3].DESTADDRL, &X_U1DBUF);
-    dma_config[3].VLEN           = DMA_VLEN_USE_LEN;
+    SET_WORD(hal_dma_config[3].SRCADDRH,  hal_dma_config[3].SRCADDRL,  &sbus_data_ptr[1]);
+    SET_WORD(hal_dma_config[3].DESTADDRH, hal_dma_config[3].DESTADDRL, &X_U1DBUF);
+    hal_dma_config[3].VLEN           = DMA_VLEN_USE_LEN;
 
     //transfer SBUS_DATA_LEN-1 bytes (first byte is transmitted on start of transmission)
-    SET_WORD(dma_config[3].LENH, dma_config[3].LENL, SBUS_DATA_LEN-1);
-    dma_config[3].SRCINC         = DMA_SRCINC_1;
-    dma_config[3].DESTINC        = DMA_DESTINC_0;
+    SET_WORD(hal_dma_config[3].LENH, hal_dma_config[3].LENL, SBUS_DATA_LEN-1);
+    hal_dma_config[3].SRCINC         = DMA_SRCINC_1;
+    hal_dma_config[3].DESTINC        = DMA_DESTINC_0;
 
     //set pointer to the DMA configuration struct into DMA-channel 1-4
     //configuration, should have happened in adc.c already...
-    SET_WORD(DMA1CFGH, DMA1CFGL, &dma_config[1]);
+    SET_WORD(DMA1CFGH, DMA1CFGL, &hal_dma_config[1]);
 
     //arm the relevant DMA channel for UART TX, and apply 45 NOP's
     //to allow the DMA configuration to load
@@ -81,7 +99,7 @@ void hal_sbus_init(uint8_t *sbus_data_ptr) {
 }
 
 
-void sbus_uart_set_mode(EXTERNAL_MEMORY union uart_config_t *cfg){
+void hal_sbus_uart_set_mode(EXTERNAL_MEMORY union hal_uart_config_t *cfg){
     //enable uart mode
     U1CSR |= 0x80;
 

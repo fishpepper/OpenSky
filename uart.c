@@ -26,9 +26,6 @@ EXTERNAL_MEMORY uint8_t uart_tx_buffer[UART_TX_BUFFER_SIZE];
 EXTERNAL_MEMORY volatile uint8_t uart_tx_buffer_in;
 EXTERNAL_MEMORY volatile uint8_t uart_tx_buffer_out;
 
-#define DEBUG_DEFINE_TO_STR(x) #x
-#define DEBUG_DEFINE_TO_STR_VAL(x) DEBUG_DEFINE_TO_STR(x)
-
 void uart_init(void){
     hal_uart_init();
 
@@ -37,11 +34,6 @@ void uart_init(void){
 
     //wait some time for uart to become stable
     delay_us(100);
-    debug_put_newline();
-    debug("### OpenSky - ");
-    debug(DEBUG_DEFINE_TO_STR_VAL(BUILD_TARGET));
-    debug(" - (c) by github.com/fishpepper ###\n"); debug_flush();
-    debug("uart: init done\n");
 }
 
 void uart_test(void){
@@ -57,7 +49,7 @@ void uart_putc(uint8_t ch){
     if (ch == '\n') uart_putc('\r');
 
     //disable interrupts
-    hal_uart_int_enable(0);
+    hal_uart_int_disable();
 
     if (hal_uart_int_enabled()){
         //int already active, copy to buffer!
@@ -90,7 +82,7 @@ void uart_putc(uint8_t ch){
     }
 
     //re enable interrupts
-    hal_uart_int_enable(1);
+    hal_uart_int_enable();
 }
 
 void uart_flush(void){
@@ -126,6 +118,20 @@ void uart_put_hex8(uint8_t val){
     }
     uart_putc(hi);
     uart_putc(lo);
+}
+
+//put 16bit hexadecimal number to debug out
+void uart_put_hex16(uint16_t val){
+    uart_put_hex8(val>>8);
+    uart_put_hex8(val & 0xFF);
+}
+
+//put 32bit hexadecimal number to debug out
+void uart_put_hex32(uint32_t val){
+    uart_put_hex8(val>>24);
+    uart_put_hex8(val>>16);
+    uart_put_hex8(val>> 8);
+    uart_put_hex8(val & 0xFF);
 }
 
 //output a signed 8-bit number to uart

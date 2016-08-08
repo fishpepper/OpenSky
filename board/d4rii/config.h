@@ -136,15 +136,32 @@
 #define PPM_TIMER                 TIM3
 #define PPM_TIMER_CLK             RCC_APB1Periph_TIM3
 #define PPM_TIMER_CLK_RCC         1
-#define PPM_TIMER_CH              3
+#define PPM_TIMER_CH              TIM_Channel_3
 #define PPM_TIMER_IRQHANDLER      TIM3_IRQHandler
 #define PPM_TIMER_IRQn            TIM3_IRQn
 
 //soft spi for apa102 led
 #define SOFT_SPI_GPIO             GPIOB
 #define SOFT_SPI_GPIO_CLK         RCC_APB2Periph_GPIOB
+#define SOFT_SPI_GPIO_CLK_RCC     2
 #define SOFT_SPI_MOSI             GPIO_Pin_1
 #define SOFT_SPI_SCK              GPIO_Pin_2
+
+//hub telemetry input NOTE: this has to be a timer io
+#define SOFT_SERIAL_GPIO          GPIOA
+#define SOFT_SERIAL_CLK           RCC_APB2Periph_GPIOA
+#define SOFT_SERIAL_CLK_RCC       2
+#define SOFT_SERIAL_PIN           GPIO_Pin_10
+#define SOFT_SERIAL_TIMER         TIM1
+#define SOFT_SERIAL_TIMER_CLK     RCC_APB2Periph_TIM1
+#define SOFT_SERIAL_TIMER_CLK_RCC 2
+#define SOFT_SERIAL_TIMER_CH      TIM_Channel_3
+#define SOFT_SERIAL_TIMER_IT_IC   TIM_IT_CC3
+#define SOFT_SERIAL_TIMER_IT_UP   TIM_IT_Update
+#define SOFT_SERIAL_TIMER_IRQHandler TIM1_IRQHandler
+#define SOFT_SERIAL_TIMER_IC_IRQn TIM1_CC_IRQn
+#define SOFT_SERIAL_TIMER_UP_IRQn TIM1_UP_IRQn
+
 
 
 #endif //__PIN_CONFIG_H__

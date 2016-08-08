@@ -13,6 +13,8 @@
 //normal is non inverted (=0)
 #define PPM_INVERTED 0
 
+//is frsky hub telemerty inverted?
+#define HUB_TELEMETRY_INVERTED 1
 
 //send ADC data as hub telemetry as well:
 #define FRSKY_SEND_HUB_TELEMETRY 0

@@ -15,11 +15,21 @@
    author: fishpepper <AT> gmail.com
 */
 
-#include "spi.h"
-#include "hal_spi.h"
 #include "debug.h"
+#include "uart.h"
 
-void spi_init(void){
-    debug("spi: init\n"); debug_flush();
-    hal_spi_init();
+#define DEBUG_DEFINE_TO_STR(x) #x
+#define DEBUG_DEFINE_TO_STR_VAL(x) DEBUG_DEFINE_TO_STR(x)
+
+EXTERNAL_MEMORY uint8_t debug_init_done = 0;
+
+void debug_init(void) {
+    uart_init();
+    debug_init_done = 1;
+
+    debug_put_newline();
+    debug("### OpenSky - ");
+    debug(DEBUG_DEFINE_TO_STR_VAL(BUILD_TARGET));
+    debug(" - (c) by github.com/fishpepper ###\n"); debug_flush();
+    debug("uart: init done\n");
 }

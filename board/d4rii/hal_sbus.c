@@ -1,5 +1,23 @@
+/*
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+   author: fishpepper <AT> gmail.com
+*/
+
 #include "hal_sbus.h"
 #include "debug.h"
+#include "main.h"
 #include "sbus.h"
 #include "delay.h"
 #include "config.h"
@@ -14,7 +32,7 @@
 volatile uint8_t hal_sbus_tx_pos;
 volatile uint8_t *hal_sbus_tx_buffer;
 
-void hal_sbus_init(void) {
+void hal_sbus_init(EXTERNAL_MEMORY uint8_t *data_ptr) {
     hal_sbus_init_rcc();
     hal_sbus_init_gpio();
     hal_sbus_init_nvic();
@@ -91,7 +109,7 @@ static void hal_sbus_init_mode(void) {
     USART_Cmd(SBUS_USART, ENABLE);
 }
 
-uint8_t hal_sbus_start_transmission(uint8_t *buffer, uint8_t len) {
+void hal_sbus_start_transmission(uint8_t *buffer, uint8_t len) {
     //copy data ptr:
     hal_sbus_tx_buffer = buffer;
 

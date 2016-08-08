@@ -14,6 +14,7 @@
 
    author: fishpepper <AT> gmail.com
 */
+
 #include "led.h"
 #include "uart.h"
 #include "debug.h"
@@ -27,6 +28,7 @@
 #include "sbus.h"
 #include "failsafe.h"
 #include "apa102.h"
+#include "telemetry.h"
 
 int main(void){
     //leds:
@@ -35,12 +37,11 @@ int main(void){
     //init clock sources:
     clocksource_init();
 
-    //init uart
-    uart_init();
+    //init debug
+    debug_init();
 
     //init wdt timer
-    wdt_init();
-
+    ///wdt_init();
 
     //enable timeout routines
     timeout_init();
@@ -67,9 +68,12 @@ int main(void){
     //init failsafe
     failsafe_init();
 
-    debug("main: init done\n");
+    //init telemetry
+    telemetry_init();
 
     //run main
+    debug("main: init done\n");
+
     //frsky_frame_sniffer();
     frsky_main();
 

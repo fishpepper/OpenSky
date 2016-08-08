@@ -14,9 +14,10 @@
 
    author: fishpepper <AT> gmail.com
 */
+
 #include "failsafe.h"
 #include "debug.h"
-//FIXME//#include "sbus.h"
+#include "sbus.h"
 #include "ppm.h"
 
 EXTERNAL_MEMORY volatile uint8_t failsafe_active;

@@ -5,7 +5,6 @@
 
 #define EXTERNAL_MEMORY
 #define EXTERNAL_DATA
-#define inline
 
 //auto selector for APB1/APB2:
 #define RCC_APBxPeriphClockCmd(rcc, p, s) { if (rcc == 1){ RCC_APB1PeriphClockCmd(p,s); }else{ RCC_APB2PeriphClockCmd(p, s); } }

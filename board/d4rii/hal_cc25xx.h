@@ -18,7 +18,7 @@ void hal_cc25xx_enter_txmode(void);
 void hal_cc25xx_setup_rf_dma(uint8_t mode);
 
 static void hal_cc25xx_init_gpio(void);
-void hal_cc25xx_set_antenna(uint8_t id);
+uint32_t hal_cc25xx_set_antenna(uint8_t id);
 void hal_cc25xx_set_gdo_mode(void);
 uint8_t hal_cc25xx_get_gdo_status(void);
 void hal_cc25xx_process_packet(volatile uint8_t *packet_received, volatile uint8_t *buffer, uint8_t maxlen);

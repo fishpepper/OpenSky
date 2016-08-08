@@ -14,6 +14,7 @@
 
    author: fishpepper <AT> gmail.com
 */
+
 #include "hal_spi.h"
 #include "debug.h"
 #include "led.h"

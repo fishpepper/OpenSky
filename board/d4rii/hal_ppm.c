@@ -1,3 +1,20 @@
+/*
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+   author: fishpepper <AT> gmail.com
+*/
+
 #include "hal_ppm.h"
 #include "ppm.h"
 #include "wdt.h"
@@ -50,6 +67,8 @@ static void hal_ppm_init_timer(void) {
     TIM_TimeBaseInitTypeDef tim_init;
     TIM_OCInitTypeDef  tim_oc_init;
 
+
+    TIM_TimeBaseStructInit(&tim_init);
     // time base configuration: count to 1000us (will be set properly lateron)
     tim_init.TIM_Period         = HAL_PPM_US_TO_TICKCOUNT(1000);
     // compute the prescaler value, we want a 0.5us resolution (= count with 2mhz):
@@ -64,6 +83,7 @@ static void hal_ppm_init_timer(void) {
     TIM_ClearITPendingBit(PPM_TIMER, TIM_IT_Update);
 
     //Output Compare Active Mode configuration:
+    TIM_OCStructInit(&tim_oc_init);
 #if PPM_INVERTED
     tim_oc_init.TIM_OCMode      = TIM_OCMode_PWM2;
 #else
@@ -147,19 +167,19 @@ static void hal_ppm_init_ocx(uint8_t ch, TIM_TypeDef *TIMx, TIM_OCInitTypeDef *t
     switch(PPM_TIMER_CH){
         default:
             break;
-        case(4):
+        case(TIM_Channel_4):
             TIM_OC4Init(TIMx, tim_oc_init);
             TIM_OC4PreloadConfig(TIMx, TIM_OCPreload_Disable);
             break;
-        case(3):
+        case(TIM_Channel_3):
             TIM_OC3Init(TIMx, tim_oc_init);
             TIM_OC3PreloadConfig(TIMx, TIM_OCPreload_Disable);
             break;
-        case(2):
+        case(TIM_Channel_2):
             TIM_OC2Init(TIMx, tim_oc_init);
             TIM_OC2PreloadConfig(TIMx, TIM_OCPreload_Disable);
             break;
-        case(1):
+        case(TIM_Channel_1):
             TIM_OC1Init(TIMx, tim_oc_init);
             TIM_OC1PreloadConfig(TIMx, TIM_OCPreload_Disable);
             break;

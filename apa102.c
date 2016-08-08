@@ -14,6 +14,7 @@
 
    author: fishpepper <AT> gmail.com
 */
+
 #include "apa102.h"
 #include "debug.h"
 #include "delay.h"

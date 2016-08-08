@@ -14,6 +14,7 @@
 
    author: fishpepper <AT> gmail.com
 */
+
 #include "hal_timeout.h"
 #include "debug.h"
 #include "wdt.h"

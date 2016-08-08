@@ -14,6 +14,7 @@
 
    author: fishpepper <AT> gmail.com
 */
+
 #include "adc.h"
 #include "hal_adc.h"
 #include "debug.h"

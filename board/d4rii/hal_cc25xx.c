@@ -14,6 +14,7 @@
 
    author: fishpepper <AT> gmail.com
 */
+
 #include "hal_cc25xx.h"
 #include "hal_spi.h"
 #include "cc25xx.h"
@@ -82,7 +83,7 @@ static void hal_cc25xx_init_gpio(void) {
     GPIO_Init(CC25XX_GDO2_GPIO, &gpio_init);
 }
 
-inline void hal_cc25xx_set_antenna(uint8_t id){
+inline uint32_t hal_cc25xx_set_antenna(uint8_t id){
     //select antenna 0 or 1:
     if (id) {
         CC25XX_ANT_SW_CTX_GPIO->BRR  = (CC25XX_ANT_SW_CTX_PIN); //0
@@ -91,6 +92,7 @@ inline void hal_cc25xx_set_antenna(uint8_t id){
         CC25XX_ANT_SW_CTX_GPIO->BSRR = (CC25XX_ANT_SW_CTX_PIN); //1
         CC25XX_ANT_SW_CRX_GPIO->BRR  = (CC25XX_ANT_SW_CRX_PIN); //0
     }
+    return id;
 }
 
 

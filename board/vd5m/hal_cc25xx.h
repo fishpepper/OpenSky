@@ -10,7 +10,7 @@
 #define hal_cc25xx_strobe(val) { RFST = val; }
 #define hal_cc25xx_get_register(r) (r)
 #define hal_cc25xx_get_register_burst(r) (r)
-#define hal_cc25xx_set_antenna(x) {}
+#define hal_cc25xx_set_antenna(x) (0)
 
 void hal_cc25xx_init(void);
 void hal_cc25xx_set_gdo_mode(void);
@@ -40,6 +40,15 @@ void hal_cc25xx_transmit_packet(volatile uint8_t *buffer, uint8_t len);
 #define IEN0_ENCIE (1<<4)
 #define IEN0_STIE (1<<5)
 #define IEN0_EA (1<<7)
+
+//bit 7 - unused
+//bit 6 - unused
+#define PICTL_P2IEN  (1<<5)
+#define PICTL_P0IENH (1<<4)
+#define PICTL_P0IENL (1<<3)
+#define PICTL_P2ICON (1<<2)
+#define PICTL_P1ICON (1<<1)
+#define PICTL_P0ICON (1<<0)
 
 #define IEN1_P0IE  (1<<5)
 #define IEN1_T4IE  (1<<4)
@@ -147,6 +156,42 @@ void hal_cc25xx_transmit_packet(volatile uint8_t *buffer, uint8_t len);
 #define T1CTL_CH0_IF    (1<<5)
 #define T1CTL_CH1_IF    (1<<6)
 #define T1CTL_CH2_IF    (1<<7)
+
+
+
+#define T3CTL_MODE_SUSPEND (0b00<<0)
+#define T3CTL_MODE_FREE_RUNNING (0b01<<0)
+#define T3CTL_MODE_MODULO  (0b10<<0)
+#define T3CTL_MODE_UPDOWN  (0b11<<0)
+#define T3CTL_CLR          (1<<2)
+#define T3CTL_OVFIM        (1<<3)
+#define T3CTL_START        (1<<4)
+#define T3CTL_DIV_1        (0b000<<5)
+#define T3CTL_DIV_2        (0b001<<5)
+#define T3CTL_DIV_4        (0b010<<5)
+#define T3CTL_DIV_8        (0b011<<5)
+#define T3CTL_DIV_16       (0b100<<5)
+#define T3CTL_DIV_32       (0b101<<5)
+#define T3CTL_DIV_64       (0b110<<5)
+#define T3CTL_DIV_128      (0b111<<5)
+
+
+#define T4CTL_MODE_SUSPEND (0b00<<0)
+#define T4CTL_MODE_FREE_RUNNING (0b01<<0)
+#define T4CTL_MODE_MODULO  (0b10<<0)
+#define T4CTL_MODE_UPDOWN  (0b11<<0)
+#define T4CTL_CLR          (1<<2)
+#define T4CTL_OVFIM        (1<<3)
+#define T4CTL_START        (1<<4)
+#define T4CTL_DIV_1        (0b000<<5)
+#define T4CTL_DIV_2        (0b001<<5)
+#define T4CTL_DIV_4        (0b010<<5)
+#define T4CTL_DIV_8        (0b011<<5)
+#define T4CTL_DIV_16       (0b100<<5)
+#define T4CTL_DIV_32       (0b101<<5)
+#define T4CTL_DIV_64       (0b110<<5)
+#define T4CTL_DIV_128      (0b111<<5)
+
 
 #define T1CCTLx_CAP_NO       (0b00<<0)
 #define T1CCTLx_CAP_RISING   (0b01<<0)

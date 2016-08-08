@@ -14,6 +14,7 @@
 
    author: fishpepper <AT> gmail.com
 */
+
 #include "main.h"
 #include "hal_defines.h"
 #include "debug.h"
@@ -33,7 +34,7 @@ EXTERNAL_MEMORY uint8_t sbus_data[SBUS_DATA_LEN];
 void sbus_init(void){
     debug("sbus: init\n"); debug_flush();
 
-    hal_sbus_init();
+    hal_sbus_init(sbus_data);
 
     //start in failsafe mode:
     failsafe_enter();

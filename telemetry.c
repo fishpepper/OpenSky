@@ -15,11 +15,23 @@
    author: fishpepper <AT> gmail.com
 */
 
-#include "spi.h"
-#include "hal_spi.h"
+#include "telemetry.h"
+#include "soft_serial.h"
 #include "debug.h"
 
-void spi_init(void){
-    debug("spi: init\n"); debug_flush();
-    hal_spi_init();
+void telemetry_init(void) {
+    debug("telemetry: init\n"); debug_flush();
+
+    // init software serial port:
+    soft_serial_init();
+
+    // attach callback
+    soft_serial_set_rx_callback(&telemetry_rx_callback);
+}
+
+
+void telemetry_rx_callback(uint8_t data) {
+    debug("telemetry rx 0x");
+    debug_put_hex8(data);
+    debug_put_newline();
 }

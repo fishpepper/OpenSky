@@ -3,6 +3,7 @@
 
 #define EXTERNAL_MEMORY __xdata
 #define EXTERNAL_DATA __data
+#define inline
 
 #define sei() { IEN0 |= IEN0_EA; }
 #define cli() { IEN0 &= ~IEN0_EA; }

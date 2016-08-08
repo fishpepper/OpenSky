@@ -3,7 +3,7 @@
 
 #include "portmacros.h"
 #include "config.h"
-
+#include "hal_cc25xx.h"
 
 //use helper macros to do expansion to *DIR etc
 //LEDS

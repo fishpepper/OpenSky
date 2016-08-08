@@ -96,7 +96,7 @@ void ppm_enter_failsafe(void){
     //debug("ppm: entered FS\n");
 }
 
-//timer1 interrupt, this handles the reloading of the
+//this handles the reloading of the
 //channel data to the timer cmp register
 void ppm_isr(void) {
     uint16_t pulse_len = PPM_US_TO_TICKCOUNT(1000);

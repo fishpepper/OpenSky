@@ -5,6 +5,9 @@
 #include "hal_cc25xx.h"
 #include <stdint.h>
 
+#if SBUS_ENABLED
+#define hal_ppm_init() {}
+#else
 void hal_ppm_init(void);
 
 void hal_ppm_failsafe_exit(void);
@@ -35,5 +38,6 @@ static void hal_ppm_init_ocx(uint8_t ch, TIM_TypeDef *TIMx, TIM_OCInitTypeDef *t
 #define HAL_PPM_UPDATE_CCVALUE(val) SET_WORD_LO_FIRST(T1CC0H, T1CC0L, val)
 #define HAL_PPM_ISR_DISABLE() { cli(); }
 #define HAL_PPM_ISR_ENABLE()  { sei(); }
+#endif
 
 #endif // __HAL_PPM_H__

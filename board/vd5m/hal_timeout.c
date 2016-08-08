@@ -1,3 +1,20 @@
+/*
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+   author: fishpepper <AT> gmail.com
+*/
+
 #include "hal_timeout.h"
 #include "delay.h"
 #include "debug.h"
@@ -15,11 +32,11 @@ void hal_timeout_init(void){
 
     //prepare timer3 for 0.01ms steps:
     //TICKSPD 011 -> /8 = 3250 kHz timer clock input
-    T3CTL = (0b001<<5) | // /2
-            (1<<4) |   //start
-            (1<<3) |   //OVInt enabled
-            (1<<2) |   //clear
-            (0b10<<0); // 01 = count to CC and the overflow
+    T3CTL = T3CTL_DIV_2 | // /2
+            T3CTL_START |   //start
+            T3CTL_OVFIM |   //OVInt enabled
+            T3CTL_CLR  |   //clear
+            T3CTL_MODE_MODULO; // 01 = count to CC and the overflow
 
     //3250/2/65 = 25khz
     T3CC0 = 65-1;

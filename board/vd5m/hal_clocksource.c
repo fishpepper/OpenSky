@@ -14,6 +14,7 @@
 
    author: fishpepper <AT> gmail.com
 */
+
 #include "hal_clocksource.h"
 #include "hal_cc25xx.h"
 #include "led.h"

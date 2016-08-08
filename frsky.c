@@ -14,6 +14,7 @@
 
    author: fishpepper <AT> gmail.com
 */
+
 #include "main.h"
 #include <string.h>
 #include <stdio.h>
@@ -714,7 +715,7 @@ void frsky_main(void){
 
             //check for packets
             if (packet_received){
-                debug_putc('.');
+                debug_putc('0' + cc25xx_get_current_antenna());
             }else{
                 debug_putc('!');
                 missing++;
@@ -826,9 +827,6 @@ void frsky_main(void){
         apa102_statemachine();
 
     }
-
-    debug("frsky: main loop ended. THIS SHOULD NEVER HAPPEN!\n");
-    while(1);
 }
 
 

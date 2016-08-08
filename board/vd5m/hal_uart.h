@@ -18,7 +18,8 @@ void hal_uart_init(void);
 void hal_uart_start_transmission(uint8_t ch);
 
 #define hal_uart_int_enabled() (IEN2 & IEN2_UTX0IE)
-#define hal_uart_int_enable(enabled)  { if (enabled){ sei(); }else{ cli(); } }
+#define hal_uart_int_enable() { sei(); }
+#define hal_uart_int_disable() { cli(); }
 
 union hal_uart_config_t{
   uint8_t byte;

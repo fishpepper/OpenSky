@@ -10,6 +10,8 @@ void uart_putc(uint8_t ch);
 void uart_flush(void);
 void uart_puts(uint8_t *data);
 void uart_put_hex8(uint8_t val);
+void uart_put_hex16(uint16_t val);
+void uart_put_hex32(uint32_t val);
 void uart_put_uint8(uint8_t c);
 void uart_put_int8(int8_t c);
 void uart_put_uint16(uint16_t c);
