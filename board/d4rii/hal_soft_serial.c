@@ -18,6 +18,7 @@
 #include "hal_soft_serial.h"
 #include "debug.h"
 #include "config.h"
+#include "led.h"
 #include "soft_serial.h"
 #include "stm32f10x.h"
 #include "stm32f10x_rcc.h"
@@ -112,14 +113,14 @@ static void hal_soft_serial_init_nvic(void) {
 }
 
 
-void SOFT_SERIAL_TIMER_IRQHandler(void){
+void SOFT_SERIAL_TIMER_IC_IRQHandler(void) {
     // handle startbit:
     if (HAL_SOFT_SERIAL_IC_ISR_FLAG_SET()){
         // disable IC interrupt (only compare match interrupts will trigger this isr)
         HAL_SOFT_SERIAL_IC_ISR_DISABLE();
 
         // enable overflow isr
-        HAL_SOFT_SERIAL_UP_ISR_ENABLE();
+        HAL_SOFT_SERIAL_UP_ISR_ENABLE(); UP ISR never fires?
 
         // clear flag - NOTE: this should never be done at the end of the isr!
         HAL_SOFT_SERIAL_IC_ISR_FLAG_CLEAR();
@@ -128,8 +129,12 @@ void SOFT_SERIAL_TIMER_IRQHandler(void){
 
         //process
         soft_serial_process_startbit();
+    }
+}
 
-    }else if (HAL_SOFT_SERIAL_UP_ISR_FLAG_SET()) {
+void SOFT_SERIAL_TIMER_UP_IRQHandler(void) {
+    debug_putc('o');
+    if (HAL_SOFT_SERIAL_UP_ISR_FLAG_SET()) {
         // clear flag - NOTE: this should never be done at the end of the isr!
         HAL_SOFT_SERIAL_UP_ISR_FLAG_CLEAR();
 

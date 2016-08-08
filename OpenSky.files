@@ -268,3 +268,12 @@ board/d4rii/hal_soft_spi.h
 board/d4rii/hal_soft_spi.c
 board/d4rii/hal_soft_spi.c
 board/vd5m/hal_soft_spi.c
+board/d4rii/hal_soft_serial.h
+board/d4rii/hal_soft_serial.c
+board/d4rii/device/startup_stm32f10x.c
+board/d4rii/device/stm32f10x_conf.h
+board/d4rii/device/stm32f10x.h
+board/d4rii/device/system_stm32f10x.c
+board/d4rii/device/system_stm32f10x.h
+soft_serial.c
+soft_serial.h

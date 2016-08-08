@@ -33,5 +33,6 @@ static void hal_soft_serial_init_nvic(void);
 
 #define HAL_SOFT_SERIAL_UPDATE_TOP_VALUE(x)   { SOFT_SERIAL_TIMER->ARR = x; }
 
-void SOFT_SERIAL_TIMER_IRQHandler(void);
+void SOFT_SERIAL_TIMER_IC_IRQHandler(void);
+void SOFT_SERIAL_TIMER_UP_IRQHandler(void);
 #endif // __HAL_SOFT_SERIAL_H__
