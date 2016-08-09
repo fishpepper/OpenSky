@@ -17,6 +17,7 @@
 #include "hal_io.h"
 #include "hal_defines.h"
 #include "config.h"
+#include "delay.h"
 #include  "stm32f10x_rcc.h"
 #include  "stm32f10x_gpio.h"
 
@@ -35,6 +36,9 @@ void hal_io_init(void) {
 }
 
 uint8_t hal_io_bind_request(void) {
+    //wait for pin status to settle
+    delay_ms(20);
+
     //Returs pin state (1 if HIGH, 0 if LOW)
     if (GPIO_ReadInputDataBit(BIND_JUMPER_GPIO, BIND_JUMPER_PIN)){
         //HIGH -> button not pressed
