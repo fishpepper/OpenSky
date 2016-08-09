@@ -77,9 +77,9 @@ static void hal_soft_serial_init_timer(void) {
     TIM_ICStructInit(&tim_ic_init);
     tim_ic_init.TIM_Channel        = SOFT_SERIAL_TIMER_CH;
 #if HUB_TELEMETRY_INVERTED
-    tim_ic_init.TIM_ICPolarity     = TIM_ICPolarity_Falling;
-#else
     tim_ic_init.TIM_ICPolarity     = TIM_ICPolarity_Rising;
+#else
+    tim_ic_init.TIM_ICPolarity     = TIM_ICPolarity_Falling;
 #endif
     tim_ic_init.TIM_ICSelection    = TIM_ICSelection_DirectTI;
     tim_ic_init.TIM_ICPrescaler    = TIM_ICPSC_DIV1;
@@ -134,6 +134,9 @@ static void hal_soft_serial_init_nvic(void) {
 void SOFT_SERIAL_TIMER_IC_IRQHandler(void) {
     // handle startbit:
     if (HAL_SOFT_SERIAL_IC_ISR_FLAG_SET()){
+        // reset counter
+        SOFT_SERIAL_TIMER->CNT = 0;
+
         // disable IC interrupt (only compare match interrupts will trigger this isr)
         HAL_SOFT_SERIAL_IC_ISR_DISABLE();
 
@@ -151,7 +154,6 @@ void SOFT_SERIAL_TIMER_IC_IRQHandler(void) {
 }
 
 void SOFT_SERIAL_TIMER_UP_IRQHandler(void) {
-    debug_putc('o');
     if (HAL_SOFT_SERIAL_UP_ISR_FLAG_SET()) {
         // clear flag - NOTE: this should never be done at the end of the isr!
         HAL_SOFT_SERIAL_UP_ISR_FLAG_CLEAR();
@@ -162,6 +164,7 @@ void SOFT_SERIAL_TIMER_UP_IRQHandler(void) {
         if (soft_serial_process_databit()) {
             // finished transmission, disable UP and enable IC isr
             HAL_SOFT_SERIAL_UP_ISR_DISABLE();
+            HAL_SOFT_SERIAL_IC_ISR_FLAG_CLEAR();
             HAL_SOFT_SERIAL_IC_ISR_ENABLE();
         }
     }

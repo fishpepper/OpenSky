@@ -45,7 +45,7 @@ void failsafe_exit(void){
         ppm_exit_failsafe();
 #endif
 
-        debug("failsafe: left\n");
+        //debug("failsafe: left\n");
     }
 }
 

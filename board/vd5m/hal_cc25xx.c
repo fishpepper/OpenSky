@@ -122,6 +122,8 @@ void hal_cc25xx_setup_rf_dma(uint8_t mode){
 void hal_cc25xx_enable_receive(void) {
     //start receiving on dma channel 0
     DMAARM = DMA_ARM_CH0;
+    //FIXME: test this
+    cc25xx_strobe(RFST_SRX);
 }
 
 

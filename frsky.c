@@ -949,7 +949,6 @@ void frsky_send_telemetry(uint8_t telemetry_id){
     frsky_packet_buffer[4] = adc_get_scaled(1);
     //RSSI
     frsky_packet_buffer[5] = frsky_rssi;
-
     //append any received hub telemetry data
     telemetry_fill_buffer(&frsky_packet_buffer[6], telemetry_id);
 
@@ -961,9 +960,6 @@ void frsky_send_telemetry(uint8_t telemetry_id){
     cc25xx_transmit_packet(frsky_packet_buffer, FRSKY_PACKET_BUFFER_SIZE);
     cc25xx_setup_rf_dma(CC25XX_MODE_RX);
     cc25xx_enable_receive();
-
-    //FIXME: still working on d4rii??
-    cc25xx_strobe(RFST_SRX);
 }
 
 

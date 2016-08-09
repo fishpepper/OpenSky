@@ -64,6 +64,7 @@ void telemetry_fill_buffer(volatile EXTERNAL_MEMORY uint8_t *buffer, uint8_t tel
     //set up header
     buffer[0] = telemetry_bytecount;
     buffer[1] = telemetry_id;
+
 }
 
 
@@ -84,9 +85,9 @@ uint8_t telemetry_pop(volatile EXTERNAL_MEMORY uint8_t *byte) {
 void telemetry_rx_callback(uint8_t data) {
     uint8_t next;
 
-    debug("telemetry rx 0x");
-    debug_put_hex8(data);
-    debug_put_newline();
+    //debug("telemetry rx 0x");
+    //debug_put_hex8(data);
+    //debug_put_newline();
 
     //push 1 byte into fifo:
     next = (telemetry_buffer.write + 1) & (TELEMETRY_BUFFER_SIZE-1);

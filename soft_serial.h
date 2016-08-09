@@ -1,6 +1,7 @@
 #ifndef __SOFT_SERIAL_H__
 #define __SOFT_SERIAL_H__
 #include <stdint.h>
+#include "main.h"
 
 typedef void (*soft_serial_rx_callback_t)(uint8_t);
 

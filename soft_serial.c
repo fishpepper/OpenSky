@@ -47,7 +47,7 @@ void soft_serial_set_rx_callback(soft_serial_rx_callback_t callback){
 
 void soft_serial_process_startbit(void) {
     // debugging
-    debug_putc('>');
+    //debug_putc('>');
 
     // this is the startbit -> re synchronize the timer to this
     // by setting the next cc interrupt to 1/2 bit length:
@@ -68,33 +68,35 @@ uint8_t soft_serial_process_databit(void) {
         #else
         if (HAL_SOFT_SERIAL_PIN_HI()){
         #endif
-            soft_serial_databits |= 1;
+            soft_serial_databits |= (1<<10);
         }
-        soft_serial_databits <<= 1;
         soft_serial_databit_count--;
-    } else {
+        soft_serial_databits >>= 1;
+    }
+
+    if (soft_serial_databit_count == 0){
+        uint8_t data_byte;
+        data_byte = (soft_serial_databits >> 1) & 0xFF;
+
         // process incoming data byte
-        if ((soft_serial_databits & (1<<9)) != 0){
+        if ((soft_serial_databits & (1<<0)) != 0){
             // FRAME ERROR: start bit invalid
-            debug_putc('S'); 
-        }else if ((soft_serial_databits & (1<<0)) != 1){
+            debug_putc('S');
+        }else if ((soft_serial_databits & (1<<9)) == 0){
             // FRAME ERROR: stop bit invalid
             debug_putc('s');
         }else{
             // fine, data byte received
-            uint8_t data_byte;
-            data_byte = (soft_serial_databits >> 1) & 0xFF;
-            debug("RX: 0x"); debug_put_hex8(data_byte); debug_put_newline();
-
             // process data
             if (soft_serial_rx_callback != 0) {
                 // execute callback
-                soft_serial_rx_callback(data_byte); 
+                soft_serial_rx_callback(data_byte);
             }
-
-            // finished data byte
-            return 1;
         }
+        //debug("RX: 0x"); debug_put_hex8(data_byte); debug_put_newline();
+
+        // finished data byte
+        return 1;
     }
 
     // not yet finished
