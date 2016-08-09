@@ -37,10 +37,10 @@ void soft_serial_init(void) {
 
 
 void soft_serial_set_rx_callback(soft_serial_rx_callback_t callback){
-    debug("soft_serial: stored callback 0x");
+    /*debug("soft_serial: stored callback 0x");
     debug_put_hex32((uint32_t)callback);
     debug_put_newline();
-    debug_flush();
+    debug_flush();*/
 
     soft_serial_rx_callback = callback;
 }

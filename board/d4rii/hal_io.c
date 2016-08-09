@@ -36,9 +36,28 @@ void hal_io_init(void) {
 }
 
 uint8_t hal_io_bind_request(void) {
+    uint8_t i;
+
     //wait for pin status to settle
     delay_ms(20);
 
+    //check if pressed at least 200ms:
+    if (hal_io_bind_request_pressed()){
+        // double check to see if this was really a press:
+        for(i=0; i<20; i++){
+            delay_ms(10);
+            if (! hal_io_bind_request_pressed()){
+                // not pressed any more -> return
+                return 0;
+            }
+        }
+        //still pressed, return true
+        return 1;
+    }
+    return 0;
+}
+
+static uint8_t hal_io_bind_request_pressed(void) {
     //Returs pin state (1 if HIGH, 0 if LOW)
     if (GPIO_ReadInputDataBit(BIND_JUMPER_GPIO, BIND_JUMPER_PIN)){
         //HIGH -> button not pressed
