@@ -85,8 +85,16 @@ static void hal_soft_serial_init_timer(void) {
     tim_ic_init.TIM_ICFilter       = 0x0;
     TIM_ICInit(SOFT_SERIAL_TIMER, &tim_ic_init);
 
-    TIM_ClearITPendingBit(SOFT_SERIAL_TIMER, SOFT_SERIAL_TIMER_CH);
-
+    TIM_ClearITPendingBit(SOFT_SERIAL_TIMER, SOFT_SERIAL_TIMER_IT_IC);
+/*
+    //Output Compare Active Mode configuration:
+    TIM_OCStructInit(&tim_oc_init);
+    tim_oc_init.TIM_OCMode      = TIM_OCMode_ disable;
+    tim_oc_init.TIM_OutputState = TIM_OutputState_ disable;
+    tim_oc_init.TIM_Pulse       = PPM_SYNC_PULS_LEN_TICKS;
+    tim_oc_init.TIM_OCPolarity  = TIM_OCPolarity_High;
+    hal_ppm_init_ocx(PPM_TIMER_CH, PPM_TIMER, &tim_oc_init);
+    /*
     //enable counter
     TIM_Cmd(SOFT_SERIAL_TIMER, ENABLE);
 }
