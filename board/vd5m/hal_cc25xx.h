@@ -10,22 +10,23 @@
 #define hal_cc25xx_strobe(val) { RFST = val; }
 #define hal_cc25xx_get_register(r) (r)
 #define hal_cc25xx_get_register_burst(r) (r)
+
+//not used on vd5m
 #define hal_cc25xx_set_antenna(x) (0)
+#define hal_cc25xx_process_packet(packet_received, buffer, maxlen) {}
 
 void hal_cc25xx_init(void);
 void hal_cc25xx_set_gdo_mode(void);
-void hal_cc25xx_process_packet(volatile uint8_t *packet_received, volatile uint8_t *buffer, uint8_t maxlen);
 void hal_cc25xx_disable_rf_interrupt(void);
+
+#define hal_cc25xx_rx_sleep() { delay_us(1000); }
+#define hal_cc25xx_tx_sleep() { delay_us( 900); }
+
 void hal_cc25xx_enter_rxmode(void);
 void hal_cc25xx_enter_txmode(void);
 void hal_cc25xx_setup_rf_dma(uint8_t mode);
 void hal_cc25xx_enable_receive(void);
 void hal_cc25xx_transmit_packet(volatile uint8_t *buffer, uint8_t len);
-
-
-#define HAL_CC25XX_MODE_RX 0
-#define HAL_CC25XX_MODE_TX 1
-
 
 #define PERCFG_U0CFG (1<<0)
 #define PERCFG_U1CFG (1<<1)

@@ -52,10 +52,10 @@ void hal_ppm_init(void) {
 
     //select P0_4 for peripheral function
     //NOTE: make sure to set usart1 to alt2 config!
-    P0SEL |= (1<<4);
+    P0SEL |= (1<<PPM_OUT_PIN);
 
     //select P0_4 as output
-    P0DIR |= (1<<4);
+    P0DIR |= (1<<PPM_OUT_PIN);
 
     //prescaler = 128
     //tickspeed = 26MHz / 8 = 3,25MHz (TICKSPD is set in timeout.c!)
@@ -67,7 +67,7 @@ void hal_ppm_init(void) {
     SET_WORD_LO_FIRST(T1CC2H, T1CC2L, PPM_SYNC_PULS_LEN_TICKS);
 
     //overflow:
-    SET_WORD_LO_FIRST(T1CC0H, T1CC0L, PPM_US_TO_TICKCOUNT(1000));
+    SET_WORD_LO_FIRST(T1CC0H, T1CC0L, HAL_PPM_US_TO_TICKCOUNT(1000));
 
     ppm_output_index = 0;
 
@@ -114,14 +114,6 @@ void hal_ppm_failsafe_enter(void) {
     //set on zero -> default is low
     P0 &= ~(1<<4);
     #endif
-}
-
-
-void hal_ppm_timer1_interrupt(void) __interrupt T1_VECTOR{
-    //clear pending interrupt flags (IRCON is reset by hw)
-    T1CTL &= ~(T1CTL_CH0_IF | T1CTL_CH1_IF | T1CTL_CH2_IF | T1CTL_OVFIF);
-
-    ppm_isr();
 }
 
 #endif

@@ -37,7 +37,11 @@ union hal_uart_config_t{
 
 static void hal_uart_set_mode(__xdata union hal_uart_config_t *cfg);
 
-void hal_uart_tx_interrupt(void) __interrupt UTX0_VECTOR;
+#define DEBUG_ISR(void) hal_uart_tx_interrupt(void) __interrupt UTX0_VECTOR
+#define HAL_UART_ISR_FLAG_SET() (1)
+#define HAL_UART_ISR_CLEAR_FLAG() { UTX0IF = 0; }
+#define HAL_UART_ISR_DISABLE() { IEN2 &= ~(IEN2_UTX0IE); }
+#define HAL_UART_TX_DATA(data) { U0DBUF = data; }
 
 
 

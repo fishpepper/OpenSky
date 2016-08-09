@@ -35,9 +35,14 @@ static void hal_ppm_init_ocx(uint8_t ch, TIM_TypeDef *TIMx, TIM_OCInitTypeDef *t
 #define HAL_PPM_US_TO_TICKCOUNT(_us) (((_us<<3)+(_us<<2)+(_us))>>2)
 
 
+#define PPM_TIMER_ISR(void) hal_ppm_timer1_interrupt(void) __interrupt T1_VECTOR
+
 #define HAL_PPM_UPDATE_CCVALUE(val) SET_WORD_LO_FIRST(T1CC0H, T1CC0L, val)
 #define HAL_PPM_ISR_DISABLE() { cli(); }
 #define HAL_PPM_ISR_ENABLE()  { sei(); }
+#define HAL_PPM_ISR_FLAG_SET() (1)
+#define HAL_PPM_ISR_CLEAR_FLAG() { T1CTL &= ~(T1CTL_CH0_IF | T1CTL_CH1_IF | T1CTL_CH2_IF | T1CTL_OVFIF);}
+
 #endif
 
 #endif // __HAL_PPM_H__

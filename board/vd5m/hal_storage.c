@@ -185,7 +185,6 @@ static void hal_storage_flash_write(uint16_t address, uint8_t *data, uint16_t le
     debug("hal_storage: write done");
 }
 
-
 //this has to be placed at a 2byte boundary, as sdcc does not support .align
 //pragmas this is done in this hacky way...
 BEGIN_CODE_ABS_LOCATION(FLASH_ENABLE_WRITE, 0x1000)  // NOTE:  No semicolon!

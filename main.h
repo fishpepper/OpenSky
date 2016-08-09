@@ -4,7 +4,7 @@
 #include "hal_defines.h"
 
 //enable SBUS output. NOTE: enabling SBUS will DISABLE ppm!
-#define SBUS_ENABLED  1  //0 = disabled, 1 = enabled
+#define SBUS_ENABLED  0  //0 = disabled, 1 = enabled
 //invert SBUS output
 //Note: default/futaba is INVERTED=1
 //for a CC3D running OpenPilot use SBUS_INVERTED=1 !
@@ -19,6 +19,8 @@
 //send ADC data as hub telemetry as well:
 #define FRSKY_SEND_HUB_TELEMETRY 0
 
+//debugging data
+#define DEBUG 1
 
 
 //useful for debugging. DO NOT USE!
@@ -28,5 +30,8 @@
 #define min(a,b) (((a)<(b))?(a):(b))
 #define max(a,b) (((a)>(b))?(a):(b))
 
+
+#define DEFINE_TO_STR(x) #x
+#define DEFINE_TO_STR_VAL(x) DEFINE_TO_STR(x)
 
 #endif // __MAIN_H__

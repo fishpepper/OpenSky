@@ -65,7 +65,7 @@ static void hal_sbus_init_nvic(void) {
 
     // enable the USART interrupt
     nvic_init.NVIC_IRQChannel = SBUS_USART_IRQn;
-    nvic_init.NVIC_IRQChannelPreemptionPriority = 0;
+    nvic_init.NVIC_IRQChannelPreemptionPriority = NVIC_PRIO_SBUS;
     nvic_init.NVIC_IRQChannelSubPriority = 0;
     nvic_init.NVIC_IRQChannelCmd = ENABLE;
     NVIC_Init(&nvic_init);

@@ -163,6 +163,15 @@
 #define SOFT_SERIAL_TIMER_IC_IRQn TIM1_CC_IRQn
 #define SOFT_SERIAL_TIMER_UP_IRQn TIM1_UP_IRQn
 
-
+// THIS CONFIGURES IRQ PRIORITIES - DO NOT MESS THIS UP!
+// this is the most critical stuff:
+#define NVIC_PRIO_PPM 0
+// sbus is a tx interrupt, this can be delayed at no cost
+#define NVIC_PRIO_SBUS 5
+// this is very time critical, but as telemetry data is not that important
+// we allow this to be interrupted (=corrupted) occasionally
+#define NVIC_PRIO_SOFT_SERIAL 1
+// debugging data is not critical
+#define NVIC_PRIO_DEBUG_UART 6
 
 #endif //__PIN_CONFIG_H__

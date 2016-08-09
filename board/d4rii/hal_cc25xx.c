@@ -95,15 +95,6 @@ inline uint32_t hal_cc25xx_set_antenna(uint8_t id){
     return id;
 }
 
-
-void hal_cc25xx_disable_rf_interrupt(void) {
-    //nothing to do here
-}
-
-void hal_cc25xx_setup_rf_dma(uint8_t mode) {
-    //nothing to do
-}
-
 inline void hal_cc25xx_set_gdo_mode(void) {
     cc25xx_set_register(IOCFG0, 0x01); //6);
     //cc25xx_set_register(IOCFG1, ???);
@@ -173,8 +164,7 @@ inline void hal_cc25xx_enter_txmode(void) {
 
 
 inline void hal_cc25xx_enable_receive(void){
-    //this is called after freq tuning before activating SRX
-    delay_us(1352);
+    //nothing to do
 }
 
 

@@ -38,7 +38,8 @@ static void hal_soft_serial_init_rcc(void) {
     RCC_APBxPeriphClockCmd(SOFT_SERIAL_CLK_RCC, SOFT_SERIAL_CLK, ENABLE);
     // timer clock enable
     RCC_APBxPeriphClockCmd(SOFT_SERIAL_TIMER_CLK_RCC, SOFT_SERIAL_TIMER_CLK, ENABLE);
-
+    // release reset cmd (?)
+    RCC_APBxPeriphResetCmd(SOFT_SERIAL_TIMER_CLK_RCC,SOFT_SERIAL_TIMER_CLK,DISABLE);
 }
 
 static void hal_soft_serial_init_gpio(void) {
@@ -94,7 +95,7 @@ static void hal_soft_serial_init_timer(void) {
     tim_oc_init.TIM_Pulse       = PPM_SYNC_PULS_LEN_TICKS;
     tim_oc_init.TIM_OCPolarity  = TIM_OCPolarity_High;
     hal_ppm_init_ocx(PPM_TIMER_CH, PPM_TIMER, &tim_oc_init);
-    /*
+    */
     //enable counter
     TIM_Cmd(SOFT_SERIAL_TIMER, ENABLE);
 }
@@ -103,20 +104,29 @@ static void hal_soft_serial_init_timer(void) {
 static void hal_soft_serial_init_nvic(void) {
     NVIC_InitTypeDef nvic_init;
 
-    //strange, somehow the Timer IT Flags seem to be already enabled?!
+    // strange, somehow the Timer IT Flags seem to be already enabled?!
     TIM_ITConfig(SOFT_SERIAL_TIMER, TIM_IT_Update, DISABLE);
     TIM_ITConfig(SOFT_SERIAL_TIMER, TIM_IT_Break, DISABLE);
     TIM_ITConfig(SOFT_SERIAL_TIMER, TIM_IT_CC1 | TIM_IT_CC2 | TIM_IT_CC3 | TIM_IT_CC4, DISABLE);
     TIM_ITConfig(SOFT_SERIAL_TIMER, TIM_IT_Trigger, DISABLE);
 
-    // enable timer interrupts
-    nvic_init.NVIC_IRQChannel                   = SOFT_SERIAL_TIMER_IC_IRQn | SOFT_SERIAL_TIMER_UP_IRQn;
-    nvic_init.NVIC_IRQChannelPreemptionPriority = 1;
-    nvic_init.NVIC_IRQChannelSubPriority        = 1;
+    // enable input capture timer interrupt
+    nvic_init.NVIC_IRQChannel                   = SOFT_SERIAL_TIMER_IC_IRQn;
+    nvic_init.NVIC_IRQChannelPreemptionPriority = NVIC_PRIO_SOFT_SERIAL;
+    nvic_init.NVIC_IRQChannelSubPriority        = 0;
     nvic_init.NVIC_IRQChannelCmd                = ENABLE;
     NVIC_Init(&nvic_init);
 
-    //enable ONLY the capture interrupt
+    // enable update timer interrupt
+    nvic_init.NVIC_IRQChannel                   = SOFT_SERIAL_TIMER_UP_IRQn;
+    nvic_init.NVIC_IRQChannelPreemptionPriority = NVIC_PRIO_SOFT_SERIAL;
+    nvic_init.NVIC_IRQChannelSubPriority        = 0;
+    nvic_init.NVIC_IRQChannelCmd                = ENABLE;
+    NVIC_Init(&nvic_init);
+
+
+    // for now enable ONLY the capture interrupt
+    TIM_ClearITPendingBit(SOFT_SERIAL_TIMER, SOFT_SERIAL_TIMER_IT_IC);
     TIM_ITConfig(SOFT_SERIAL_TIMER, SOFT_SERIAL_TIMER_IT_IC, ENABLE);
 }
 
@@ -128,7 +138,7 @@ void SOFT_SERIAL_TIMER_IC_IRQHandler(void) {
         HAL_SOFT_SERIAL_IC_ISR_DISABLE();
 
         // enable overflow isr
-        HAL_SOFT_SERIAL_UP_ISR_ENABLE(); UP ISR never fires?
+        HAL_SOFT_SERIAL_UP_ISR_ENABLE();
 
         // clear flag - NOTE: this should never be done at the end of the isr!
         HAL_SOFT_SERIAL_IC_ISR_FLAG_CLEAR();

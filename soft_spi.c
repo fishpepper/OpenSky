@@ -26,11 +26,11 @@ void soft_spi_init(void){
     hal_soft_spi_init();
 
     //init to idle values:
-    if (SOFT_SPI_SCK_INIT){
+    #if SOFT_SPI_SCK_INIT
         SOFT_SPI_CLOCK_HI();
-    }else{
+    #else
         SOFT_SPI_CLOCK_LO();
-    }
+    #endif
 }
 
 void soft_spi_tx_do(void){

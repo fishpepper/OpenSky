@@ -19,8 +19,13 @@
 #include "soft_serial.h"
 #include "debug.h"
 
+volatile EXTERNAL_MEMORY telemetry_buffer_t telemetry_buffer;
+
 void telemetry_init(void) {
     debug("telemetry: init\n"); debug_flush();
+
+    telemetry_buffer.write = 0;
+    telemetry_buffer.read  = 0;
 
     // init software serial port:
     soft_serial_init();
@@ -29,9 +34,69 @@ void telemetry_init(void) {
     soft_serial_set_rx_callback(&telemetry_rx_callback);
 }
 
+// hub telemetry input will be forwarded in frsky frames
+// see http://www.rcgroups.com/forums/showthread.php?t=2547257 for a documentation
+//
+// buffer[0]  = bytes used
+// buffer[1]  = last received telemetry id
+// buffer[2]  = byte 1
+// ...
+// buffer[11] = byte 10
+//
+// NOTES:
+// * buffer[ 0] corresponds to frsky_buffer[ 6]
+// * buffer[11] corresponds to frsky_buffer[17]
+// * not all 10 bytes has to be filled in, only the number of bytes that were received
+//   will be sent in one frame
+//
+void telemetry_fill_buffer(volatile EXTERNAL_MEMORY uint8_t *buffer, uint8_t telemetry_id) {
+    uint8_t telemetry_bytecount = 0;
+    uint8_t i;
+
+    //fetch all stored bytes (max 10)
+    for(i=2; i<2+10; i++){
+        if (!telemetry_pop(&buffer[i])){
+            break;
+        }
+        telemetry_bytecount++;
+    }
+
+    //set up header
+    buffer[0] = telemetry_bytecount;
+    buffer[1] = telemetry_id;
+}
+
+
+//fetch byte from buffer, returns 0 on no data available, 1 on success
+uint8_t telemetry_pop(volatile EXTERNAL_MEMORY uint8_t *byte) {
+    if (telemetry_buffer.read == telemetry_buffer.write){
+        // no data available
+        return 0;
+    }
+
+    // fetch byte
+    *byte = telemetry_buffer.data[telemetry_buffer.read];
+    telemetry_buffer.read = (telemetry_buffer.read + 1) & (TELEMETRY_BUFFER_SIZE-1);
+
+    return 1;
+}
 
 void telemetry_rx_callback(uint8_t data) {
+    uint8_t next;
+
     debug("telemetry rx 0x");
     debug_put_hex8(data);
     debug_put_newline();
+
+    //push 1 byte into fifo:
+    next = (telemetry_buffer.write + 1) & (TELEMETRY_BUFFER_SIZE-1);
+
+    if (telemetry_buffer.read == next){
+        //no more space in buffer - byte is discarded!
+        return;
+    }
+
+    //space available -> add data byte
+    telemetry_buffer.data[telemetry_buffer.write] = data;
+    telemetry_buffer.write = next;
 }

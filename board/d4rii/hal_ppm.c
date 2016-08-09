@@ -109,7 +109,7 @@ static void hal_ppm_init_nvic(void) {
 
     // enable timer interrupt
     nvic_init.NVIC_IRQChannel                   = PPM_TIMER_IRQn;
-    nvic_init.NVIC_IRQChannelPreemptionPriority = 0;
+    nvic_init.NVIC_IRQChannelPreemptionPriority = NVIC_PRIO_PPM;
     nvic_init.NVIC_IRQChannelSubPriority        = 0;
     nvic_init.NVIC_IRQChannelCmd                = ENABLE;
     NVIC_Init(&nvic_init);
@@ -144,23 +144,6 @@ void hal_ppm_failsafe_exit(void) {
 
     //re-enable ppm output isr
     TIM_ITConfig(PPM_TIMER, TIM_IT_Update, ENABLE);
-}
-
-
-void PPM_TIMER_IRQHANDLER(void){
-    if (TIM_GetITStatus(PPM_TIMER, TIM_IT_Update) != RESET){
-        //clear flag
-        TIM_ClearITPendingBit(PPM_TIMER, TIM_IT_Update); //THIS SHOULD NEVER BE THE LAST LINE IN AN ISR!
-        //do processing
-        ppm_isr();
-        /*asm("NOP");
-        asm("NOP");
-        asm("NOP");
-        asm("NOP");
-        asm("NOP");
-        asm("NOP");
-        asm("NOP");*/
-    }
 }
 
 static void hal_ppm_init_ocx(uint8_t ch, TIM_TypeDef *TIMx, TIM_OCInitTypeDef *tim_oc_init) {

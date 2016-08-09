@@ -19,7 +19,7 @@
 #include  "stm32f10x_rcc.h"
 #include  "stm32f10x_usart.h"
 #include  "misc.h" //this is actually a stm32 include (nvic stuff)
-#include  "uart.h"
+#include  "debug.h"
 #include  "led.h"
 
 volatile uint8_t hal_usart_txe_is_on;
@@ -44,32 +44,12 @@ void hal_uart_init_nvic(uint8_t enable) {
 
     // enable the USART interrupt
     nvic_init.NVIC_IRQChannel = DEBUG_USART_IRQn;
-    nvic_init.NVIC_IRQChannelPreemptionPriority = 0;
+    nvic_init.NVIC_IRQChannelPreemptionPriority = NVIC_PRIO_DEBUG_UART;
     nvic_init.NVIC_IRQChannelSubPriority = 0;
     nvic_init.NVIC_IRQChannelCmd = enable ? ENABLE : DISABLE;
     NVIC_Init(&nvic_init);
 }
 
-void DEBUG_USART_IRQHANDLER(void){
-    led_red_off();
-
-    if(USART_GetITStatus(DEBUG_USART, USART_IT_TXE) != RESET){
-        //TXE interrupt
-        //finished with sending?
-        if(uart_tx_buffer_in == uart_tx_buffer_out ){
-            //no data in fifo -> disable tx int:
-            USART_ITConfig(DEBUG_USART, USART_IT_TXE, DISABLE);
-            hal_usart_txe_is_on  = 0;
-            return;
-        }
-
-        //else: data to tx
-        USART_SendData(DEBUG_USART, uart_tx_buffer[uart_tx_buffer_out]);
-
-        //handle out pointer
-        uart_tx_buffer_out = (uart_tx_buffer_out+1) & UART_TX_BUFFER_AND_OPERAND;
-    }
-}
 
 static void hal_uart_init_mode(void) {
     USART_InitTypeDef uart_init;

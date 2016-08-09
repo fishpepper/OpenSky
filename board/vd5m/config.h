@@ -11,7 +11,8 @@
 #define SERVO_4 4 //P0_4 = PPM or SBUS OUT
 #define SERVO_5 3 //P0_3 = debug UART
 
-#define PPM_OUT SERVO_1
+#define PPM_OUT_PIN SERVO_4
+
 //note: change of adc ch require change in adc.c!
 #define ADC_PORT P0
 #define ADC0 SERVO_3
@@ -54,6 +55,6 @@
 
 //hub telemetry input NOTE: this has to be a timer io
 #define SOFT_SERIAL_PORT          P0
-#define SOFT_SERIAL_PIN           7
+#define SOFT_SERIAL_PIN           SERVO_1
 
 

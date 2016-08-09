@@ -39,7 +39,7 @@ void ppm_init(void){
 
     //initialise
     for(i = 0; i<8; i++){
-        ppm_data_ticks[i] = PPM_US_TO_TICKCOUNT(1000);
+        ppm_data_ticks[i] = HAL_PPM_US_TO_TICKCOUNT(1000);
     }
 
     hal_ppm_init();
@@ -62,8 +62,8 @@ void ppm_update(EXTERNAL_MEMORY uint16_t *data){
         val = PPM_FRSKY_TO_TICKCOUNT(val);
 
         //make sure we end up with valid values:
-        val = max(PPM_US_TO_TICKCOUNT( 900), val);
-        val = min(PPM_US_TO_TICKCOUNT(2100), val);
+        val = max(HAL_PPM_US_TO_TICKCOUNT( 900), val);
+        val = min(HAL_PPM_US_TO_TICKCOUNT(2100), val);
 
         //subtract from sum:
         eof_frame_duration -= val;
@@ -98,33 +98,38 @@ void ppm_enter_failsafe(void){
 
 //this handles the reloading of the
 //channel data to the timer cmp register
-void ppm_isr(void) {
-    uint16_t pulse_len = PPM_US_TO_TICKCOUNT(1000);
+void PPM_TIMER_ISR(void) {
+    if (HAL_PPM_ISR_FLAG_SET()) {
+        uint16_t pulse_len = HAL_PPM_US_TO_TICKCOUNT(1000);
 
-    //failsafe mode?
-    if (failsafe_active){
-        //failsafe_enter() will set pin levels
-        return;
+        //clear flag
+        HAL_UART_ISR_CLEAR_FLAG(); //THIS SHOULD NEVER BE THE LAST LINE IN AN ISR!
+
+
+        //failsafe mode?
+        if (failsafe_active){
+            //failsafe_enter() will set pin levels
+            return;
+        }
+
+        //handle failsafe
+        failsafe_tick();
+
+        if (ppm_output_index < 9){
+            //load data
+            pulse_len = ppm_data_ticks[ppm_output_index];
+        }
+
+        //manage index:
+        ppm_output_index++;
+        if (ppm_output_index >= 9){
+            ppm_output_index = 0;
+        }
+
+        //set overflow cmp value
+        HAL_PPM_UPDATE_CCVALUE(pulse_len);
     }
-
-    //handle failsafe
-    failsafe_tick();
-
-    if (ppm_output_index < 9){
-        //load data
-        pulse_len = ppm_data_ticks[ppm_output_index];
-    }
-
-    //manage index:
-    ppm_output_index++;
-    if (ppm_output_index >= 9){
-        ppm_output_index = 0;
-    }
-
-    //set overflow cmp value
-    HAL_PPM_UPDATE_CCVALUE(pulse_len);
 }
-
 
 #endif
 

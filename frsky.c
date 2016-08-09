@@ -19,6 +19,7 @@
 #include <string.h>
 #include <stdio.h>
 #include "frsky.h"
+#include "telemetry.h"
 #include "debug.h"
 #include "timeout.h"
 #include "led.h"
@@ -498,8 +499,10 @@ void frsky_fetch_txid_and_hoptable(void){
 
             //re-prepare for next packet:
             cc25xx_strobe(RFST_SIDLE);
-            delay_ms(1);
+            //TESTME: moved to rx_sleep....
+            //delay_ms(1);
             frsky_packet_received = 0;
+            cc25xx_rx_sleep();
             cc25xx_enable_receive();
             cc25xx_strobe(RFST_SRX);
         }
@@ -696,8 +699,11 @@ void frsky_main(void){
                 cc25xx_switch_antenna();
             }
 
-            //go back to rx mode
+            // this is mandatory, no idea why (pll stabilizing?)
+            cc25xx_rx_sleep();
             frsky_packet_received = 0;
+
+            //go back to rx mode
             cc25xx_enable_receive();
             cc25xx_enter_rxmode();
             cc25xx_strobe(RFST_SRX);
@@ -814,7 +820,7 @@ void frsky_main(void){
             frsky_increment_channel(1);
 
             //DO NOT go to SRX here
-            delay_us(1250); //vd5m 900us??
+            hal_cc25xx_tx_sleep();
 
             //build & send packet
             frsky_send_telemetry(requested_telemetry_id);
@@ -833,7 +839,6 @@ void frsky_main(void){
 
 void frsky_set_channel(uint8_t hop_index){
     uint8_t ch = storage.frsky_hop_table[hop_index];
-
     //debug_putc('S'); debug_put_hex8(ch);
 
     //go to idle
@@ -925,12 +930,8 @@ void frsky_update_ppm(void){
 
 
 void frsky_send_telemetry(uint8_t telemetry_id){
-    uint8_t i;
-    static uint8_t test;
-
-    //uint16_t tmp16;
-    uint8_t bytes_used = 0;
-    test = 0;
+    //static uint8_t test;
+    //test = 0;
 
     //Stop RX DMA
     cc25xx_strobe(RFST_SFRX);
@@ -949,36 +950,8 @@ void frsky_send_telemetry(uint8_t telemetry_id){
     //RSSI
     frsky_packet_buffer[5] = frsky_rssi;
 
-    //send ampere and voltage as hub telemetry data as well
-#if FRSKY_SEND_HUB_TELEMETRY
-    //use telemetry id to decide which packet to send:
-    if (telemetry_id & 1){
-        //send voltage packet (undocumented sensor 0x39 = volts in 0.1 steps)
-        tmp16 = test++; //123; //12.3V
-        //convert adc to voltage:
-        //float v = (vraw * 3.3/1024.0) * (ADC0_DIVIDER_A + ADC0_DIVIDER_B)) / (ADC0_DIVIDER_B);
-        //continue here
-        bytes_used = frsky_append_hub_data(FRSKY_HUB_TELEMETRY_VOLTAGE, tmp16, &frsky_packet_buffer[8]);
-    }else{
-        //send current
-        tmp16 = 456; //45.6A
-        bytes_used = frsky_append_hub_data(FRSKY_HUB_TELEMETRY_CURRENT, tmp16, &frsky_packet_buffer[8]);
-    }
-
-    //number of valid data bytes:
-    frsky_packet_buffer[6] = bytes_used;
-    //set up frame id
-    frsky_packet_buffer[7] = telemetry_id;
-
-    //do not use rest of frame, use only one hub frame per packet
-    //in order not to have to handle the datastream splitting operation
-#else
-    //no telemetry -> at least[6]+[7] should be zero
-    //bytes 6-17 are zero
-    for(i=6; i<FRSKY_PACKET_BUFFER_SIZE; i++){
-        frsky_packet_buffer[i] = 0x00;
-    }
-#endif
+    //append any received hub telemetry data
+    telemetry_fill_buffer(&frsky_packet_buffer[6], telemetry_id);
 
     //re arm adc dma etc
     //it is important to call this after reading the values...
@@ -986,20 +959,12 @@ void frsky_send_telemetry(uint8_t telemetry_id){
 
     //arm dma channel
     cc25xx_transmit_packet(frsky_packet_buffer, FRSKY_PACKET_BUFFER_SIZE);
-    // 	cc25xx_setup_rf_dma(FRSKY_MODE_RX);
-    // 	cc25xx_enable_receive();
-    // 	cc25xx_strobe(RFST_SRX);
+    cc25xx_setup_rf_dma(CC25XX_MODE_RX);
+    cc25xx_enable_receive();
+
+    //FIXME: still working on d4rii??
+    cc25xx_strobe(RFST_SRX);
 }
-
-
-#if 0
-
-
-
-
-
-
-
 
 
 //useful for debugging/sniffing packets from anothe tx or rx
@@ -1033,7 +998,7 @@ void frsky_frame_sniffer(void){
     //start main loop
     while(1){
         if (timeout_timed_out()){
-            LED_RED_ON();
+            led_red_on();
 
             //next hop in 9ms
             if (!conn_lost){
@@ -1046,12 +1011,13 @@ void frsky_frame_sniffer(void){
 
             //strange delay
             //_delay_us(1000);
-            delay_us(1000);
+            cc25xx_rx_sleep();
 
             //go back to rx mode
             frsky_packet_received = 0;
             cc25xx_enable_receive();
-            RFST = RFST_SRX;
+
+            cc25xx_strobe(RFST_SRX);
 
             //check for packets
             if (!packet_received){
@@ -1077,16 +1043,20 @@ void frsky_frame_sniffer(void){
                 stat_rxcount = 0;
             }
 
-            LED_RED_OFF();
+            led_red_off();
         }
 
         //handle ovfs
         frsky_handle_overflows();
 
+        //process incoming data
+        cc25xx_process_packet(&frsky_packet_received, (volatile uint8_t *)&frsky_packet_buffer, FRSKY_PACKET_BUFFER_SIZE);
+
+
         if (frsky_packet_received){
             if (FRSKY_VALID_PACKET(frsky_packet_buffer)){
                 //ok, valid packet for us
-                LED_GREEN_ON();
+                led_green_on();
 
                 //dump all packets!
                 if (send_telemetry){
@@ -1128,15 +1098,16 @@ void frsky_frame_sniffer(void){
                 //make sure we never read the same packet twice by crc flag
                 frsky_packet_buffer[FRSKY_PACKET_BUFFER_SIZE-1] = 0x00;
 
-                LED_GREEN_OFF();
+                led_green_off();
             }
         }
 
     }
-
-    debug("frsky: sniffer loop ended. THIS SHOULD NEVER HAPPEN!\n");
-    while(1);
 }
+
+
+#if 0
+
 
 
 

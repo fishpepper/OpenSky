@@ -16,7 +16,6 @@
 */
 
 #include "led.h"
-#include "uart.h"
 #include "debug.h"
 #include "clocksource.h"
 #include "timeout.h"

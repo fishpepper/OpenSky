@@ -16,6 +16,7 @@
 */
 
 #include "hal_cc25xx.h"
+#include "cc25xx.h"
 #include "hal_defines.h"
 #include "hal_dma.h"
 #include "delay.h"
@@ -27,15 +28,12 @@
 EXTERNAL_MEMORY volatile uint8_t hal_cc25xx_mode;
 
 void hal_cc25xx_init(void) {
+    hal_cc25xx_mode = CC25XX_MODE_RX;
 }
 
 void hal_cc25xx_set_gdo_mode(void) {
     //not necessary here IOCFG0 = 0x01
     //not necessary here IOCFG2 = 0x0E
-}
-
-void hal_cc25xx_process_packet(volatile uint8_t *packet_received, volatile uint8_t *buffer, uint8_t maxlen){
-    //nothing to do, for vd5m we set the flag in the rf interrupt
 }
 
 void hal_cc25xx_disable_rf_interrupt(void) {
@@ -45,7 +43,7 @@ void hal_cc25xx_disable_rf_interrupt(void) {
 
 void hal_cc25xx_enter_rxmode(void) {
     //set up dma for radio--->buffer
-    hal_cc25xx_setup_rf_dma(HAL_CC25XX_MODE_RX);
+    hal_cc25xx_setup_rf_dma(CC25XX_MODE_RX);
 
     //configure interrupt for every received packet
     IEN2 |= (IEN2_RFIE);
@@ -63,7 +61,7 @@ void hal_cc25xx_enter_rxmode(void) {
 void hal_cc25xx_enter_txmode(void) {
     //abort ch0
     DMAARM = DMA_ARM_ABORT | DMA_ARM_CH0;
-    hal_cc25xx_setup_rf_dma(HAL_CC25XX_MODE_TX);
+    hal_cc25xx_setup_rf_dma(CC25XX_MODE_TX);
 }
 
 void hal_cc25xx_setup_rf_dma(uint8_t mode){
@@ -84,7 +82,7 @@ void hal_cc25xx_setup_rf_dma(uint8_t mode){
     //store mode
     hal_cc25xx_mode = mode;
 
-    if (hal_cc25xx_mode == HAL_CC25XX_MODE_TX) {
+    if (hal_cc25xx_mode == CC25XX_MODE_TX) {
         // Transmitter specific DMA settings
         // Source: radioPktBuffer
         // Destination: RFD register
@@ -121,12 +119,7 @@ void hal_cc25xx_setup_rf_dma(uint8_t mode){
     frsky_packet_received = 0;
 }
 
-
-
 void hal_cc25xx_enable_receive(void) {
-    //strange delay from spi dumps
-        delay_us(1000); //d4r uses 300?!
-
     //start receiving on dma channel 0
     DMAARM = DMA_ARM_CH0;
 }
@@ -141,7 +134,7 @@ void hal_cc25xx_rf_interrupt(void) __interrupt RF_VECTOR{
     S1CON &= ~0x03;
 
 
-    if (hal_cc25xx_mode == HAL_CC25XX_MODE_RX){
+    if (hal_cc25xx_mode == CC25XX_MODE_RX){
         //mark as received:
         frsky_packet_received = 1;
         //re arm DMA channel 0
@@ -154,6 +147,8 @@ void hal_cc25xx_rf_interrupt(void) __interrupt RF_VECTOR{
 
 
 void hal_cc25xx_transmit_packet(volatile uint8_t *buffer, uint8_t len) {
+    RFST = RFST_STX;
+
     //start transmitting on dma channel 0
     DMAARM = DMA_ARM_CH0;
 
