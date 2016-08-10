@@ -18,6 +18,7 @@
 #include "telemetry.h"
 #include "soft_serial.h"
 #include "debug.h"
+#include "wdt.h"
 
 volatile EXTERNAL_MEMORY telemetry_buffer_t telemetry_buffer;
 
@@ -32,7 +33,23 @@ void telemetry_init(void) {
 
     // attach callback
     soft_serial_set_rx_callback(&telemetry_rx_callback);
+
+    //telemetry_rx_echo_test();
 }
+
+
+static void telemetry_rx_echo_test(void){
+    //just for testing purposes...
+    uint8_t data;
+
+    while(1){
+        wdt_reset();
+        if (telemetry_pop(&data)){
+            debug_putc(data);
+        }
+    }
+}
+
 
 // hub telemetry input will be forwarded in frsky frames
 // see http://www.rcgroups.com/forums/showthread.php?t=2547257 for a documentation
@@ -64,7 +81,6 @@ void telemetry_fill_buffer(volatile EXTERNAL_MEMORY uint8_t *buffer, uint8_t tel
     //set up header
     buffer[0] = telemetry_bytecount;
     buffer[1] = telemetry_id;
-
 }
 
 
@@ -84,10 +100,6 @@ uint8_t telemetry_pop(volatile EXTERNAL_MEMORY uint8_t *byte) {
 
 void telemetry_rx_callback(uint8_t data) {
     uint8_t next;
-
-    //debug("telemetry rx 0x");
-    //debug_put_hex8(data);
-    //debug_put_newline();
 
     //push 1 byte into fifo:
     next = (telemetry_buffer.write + 1) & (TELEMETRY_BUFFER_SIZE-1);

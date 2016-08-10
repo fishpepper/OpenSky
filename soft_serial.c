@@ -35,24 +35,11 @@ void soft_serial_init(void) {
     hal_soft_serial_init();
 }
 
-
 void soft_serial_set_rx_callback(soft_serial_rx_callback_t callback){
-    /*debug("soft_serial: stored callback 0x");
-    debug_put_hex32((uint32_t)callback);
-    debug_put_newline();
-    debug_flush();*/
-
     soft_serial_rx_callback = callback;
 }
 
 void soft_serial_process_startbit(void) {
-    // debugging
-    //debug_putc('>');
-
-    // this is the startbit -> re synchronize the timer to this
-    // by setting the next cc interrupt to 1/2 bit length:
-    HAL_SOFT_SERIAL_UPDATE_TOP_VALUE(HAL_SOFTSERIAL_BIT_DURATION_TICKS / 2);
-
     // reset incoming bit data:
     soft_serial_databits = 0;
     // sample 8N1 -> 1 start-, 8 data-, and 1 stop-bit

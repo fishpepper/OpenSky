@@ -13,11 +13,7 @@ void failsafe_tick(void);
 extern EXTERNAL_MEMORY volatile uint8_t failsafe_active;
 extern EXTERNAL_MEMORY volatile uint16_t failsafe_tick_counter;
 
-#if SBUS_ENABLED
-#define failsafe_enter(){ debug("failsafe: enter (sbus)\n"); sbus_enter_failsafe(); failsafe_active = 1; }
-#else
-#define failsafe_enter(){ debug("failsafe: enter (ppm)\n"); ppm_enter_failsafe(); failsafe_active = 1; }
-#endif
+
 
 
 #endif

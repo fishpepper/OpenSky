@@ -67,7 +67,7 @@ void sbus_start_transmission(uint8_t frame_lost){
     }
 
     //copy flags to buffer
-    sbus_data[23] = HAL_SBUS_PREPARE_DATA( tmp );
+    sbus_data[23] = HAL_SBUS_PREPARE_DATA(tmp);
 
     //send data!
     hal_sbus_start_transmission(sbus_data, SBUS_DATA_LEN-1);
@@ -127,23 +127,22 @@ void sbus_update(EXTERNAL_MEMORY uint16_t *data){
     sbus_data[11] = HAL_SBUS_PREPARE_DATA( (rescaled_data[7]>>3) & 0xFF );
     //ch8-ch15 = zero
     for(i=12; i<23; i++){
-        sbus_data[i] = HAL_SBUS_PREPARE_DATA( 0x00 );
+        sbus_data[i] = HAL_SBUS_PREPARE_DATA(0x00);
     }
     //sbus flags, will be set by start transmission...
-    sbus_data[23] = HAL_SBUS_PREPARE_DATA( 0x00 );
+    sbus_data[23] = HAL_SBUS_PREPARE_DATA(0x00);
 
     //EOF frame:
-    sbus_data[24] = HAL_SBUS_PREPARE_DATA( SBUS_ENDBYTE );
+    sbus_data[24] = HAL_SBUS_PREPARE_DATA(SBUS_ENDBYTE);
 }
 
 void sbus_exit_failsafe(void){
-    debug("sbus: exit FS\n");
-
+    //debug("sbus: exit FS\n");
 }
 
 void sbus_enter_failsafe(void){
     //failsafe is active
-    debug("sbus: entered FS\n");
+    //debug("sbus: entered FS\n");
 }
 
 #endif

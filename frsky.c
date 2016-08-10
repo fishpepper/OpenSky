@@ -709,7 +709,6 @@ void frsky_main(void){
             cc25xx_strobe(RFST_SRX);
 
             //if enabled, send a sbus frame in case we lost that frame:
-#if SBUS_ENABLED
             if (!packet_received){
                 //frame was lost, so there was no channel value update
                 //and no transmission for the last frame slot.
@@ -717,7 +716,6 @@ void frsky_main(void){
                 //(frame lost packet flag will be set)
                 sbus_start_transmission(SBUS_FRAME_LOST);
             }
-#endif
 
             //check for packets
             if (packet_received){
@@ -900,7 +898,7 @@ void frsky_update_ppm(void){
     debug("]\n"); debug_flush();
     */
 
-    //extract channel data from packet:
+    // extract channel data from packet:
     channel_data[0] = (uint16_t)(((frsky_packet_buffer[10] & 0x0F)<<8 | frsky_packet_buffer[6]));
     channel_data[1] = (uint16_t)(((frsky_packet_buffer[10] & 0xF0)<<4 | frsky_packet_buffer[7]));
     channel_data[2] = (uint16_t)(((frsky_packet_buffer[11] & 0x0F)<<8 | frsky_packet_buffer[8]));
@@ -910,20 +908,19 @@ void frsky_update_ppm(void){
     channel_data[6] = (uint16_t)(((frsky_packet_buffer[17] & 0x0F)<<8 | frsky_packet_buffer[14]));
     channel_data[7] = (uint16_t)(((frsky_packet_buffer[17] & 0xF0)<<4 | frsky_packet_buffer[15]));
 
-    //set apa leds:
+    // set apa leds:
     apa102_update_leds(channel_data, frsky_link_quality);
     apa102_start_transmission();
 
-    //exit failsafe mode
+    // exit failsafe mode
     failsafe_exit();
 
-    //copy to output module:
-#if SBUS_ENABLED
+    // copy to output modules:
     sbus_update(channel_data);
     sbus_start_transmission(SBUS_FRAME_NOT_LOST);
-#else
+    // and to ppm
     ppm_update(channel_data);
-#endif
+
 }
 
 
@@ -949,6 +946,7 @@ void frsky_send_telemetry(uint8_t telemetry_id){
     frsky_packet_buffer[4] = adc_get_scaled(1);
     //RSSI
     frsky_packet_buffer[5] = frsky_rssi;
+
     //append any received hub telemetry data
     telemetry_fill_buffer(&frsky_packet_buffer[6], telemetry_id);
 

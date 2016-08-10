@@ -16,9 +16,35 @@
 */
 
 #include "io.h"
+#include "hal_io.h"
 #include "debug.h"
+#include "delay.h"
 
 void io_init(void) {
     debug("io: init\n"); debug_flush();
     hal_io_init();
+}
+
+uint8_t io_bind_request(void){
+    uint8_t i;
+
+    //wait for pin status to settle
+    delay_ms(20);
+
+    //check if pressed at least 200ms:
+    if (hal_io_bind_request()){
+        // double check to see if this was really a press:
+        for(i=0; i<200; i++){
+            delay_ms(1);
+            if (! hal_io_bind_request()){
+                // not pressed any more -> return
+                return 0;
+            }
+        }
+        //still pressed, return true
+        return 1;
+    }
+
+    //not pressed
+    return 0;
 }

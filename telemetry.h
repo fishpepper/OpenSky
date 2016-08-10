@@ -5,7 +5,7 @@
 #include <stdint.h>
 
 //this has to be a power of 2 (2,4,8,16,32,...)
-#define TELEMETRY_BUFFER_SIZE 16
+#define TELEMETRY_BUFFER_SIZE 64
 typedef struct {
     uint8_t data[TELEMETRY_BUFFER_SIZE];
     uint8_t read;
@@ -16,6 +16,7 @@ extern volatile EXTERNAL_MEMORY telemetry_buffer_t telemetry_buffer;
 
 void telemetry_init(void);
 void telemetry_rx_callback(uint8_t data);
+static void telemetry_rx_echo_test(void);
 void telemetry_fill_buffer(volatile EXTERNAL_MEMORY uint8_t *buffer, uint8_t telemetry_id);
 uint8_t telemetry_pop(volatile EXTERNAL_MEMORY uint8_t *byte);
 

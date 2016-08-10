@@ -31,6 +31,15 @@ void failsafe_init(void){
     failsafe_enter();
 }
 
+void failsafe_enter(void) {
+    //debug("failsafe: enter\n");
+
+    sbus_enter_failsafe();
+    ppm_enter_failsafe();
+
+    failsafe_active = 1;
+}
+
 void failsafe_exit(void){
     //reset tick counter
     failsafe_tick_counter = 0;
@@ -39,11 +48,8 @@ void failsafe_exit(void){
         //reset failsafe counter:
         failsafe_active = 0;
 
-#if SBUS_ENABLED
         sbus_exit_failsafe();
-#else
         ppm_exit_failsafe();
-#endif
 
         //debug("failsafe: left\n");
     }

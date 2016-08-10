@@ -4,9 +4,17 @@
 #include "main.h"
 #include "hal_ppm.h"
 
-#if (SBUS_ENABLED == 0)
-void ppm_init(void);
+#if SBUS_ENABLED
 
+//ppm is not used then
+#define ppm_init() {}
+#define ppm_update(a) {}
+#define ppm_exit_failsafe() {}
+#define ppm_enter_failsafe() {}
+
+
+#else
+void ppm_init(void);
 void ppm_update(EXTERNAL_MEMORY uint16_t *data);
 void ppm_exit_failsafe(void);
 void ppm_enter_failsafe(void);
