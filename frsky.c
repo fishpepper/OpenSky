@@ -947,6 +947,13 @@ void frsky_send_telemetry(uint8_t telemetry_id){
     //RSSI
     frsky_packet_buffer[5] = frsky_rssi;
 
+    {
+        uint8_t i;
+        for(i=6; i<FRSKY_PACKET_BUFFER_SIZE; i++){
+            frsky_packet_buffer[i] = 0;
+        }
+    }
+
     //append any received hub telemetry data
     telemetry_fill_buffer(&frsky_packet_buffer[6], telemetry_id);
 

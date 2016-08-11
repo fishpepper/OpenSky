@@ -23,7 +23,7 @@
 
 volatile EXTERNAL_MEMORY uint16_t soft_serial_databits;
 volatile EXTERNAL_MEMORY uint16_t soft_serial_databit_count;
-soft_serial_rx_callback_t soft_serial_rx_callback;
+volatile soft_serial_rx_callback_t soft_serial_rx_callback;
 
 void soft_serial_init(void) {
     debug("soft_serial: init\n"); debug_flush();

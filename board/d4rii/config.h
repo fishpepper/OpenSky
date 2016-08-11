@@ -166,13 +166,15 @@
 
 // THIS CONFIGURES IRQ PRIORITIES - DO NOT MESS THIS UP!
 // this is the most critical stuff:
-#define NVIC_PRIO_PPM 0
+#define NVIC_PRIO_PPM 1
 // sbus is a tx interrupt, this can be delayed at no cost
-#define NVIC_PRIO_SBUS 5
+#define NVIC_PRIO_SBUS 6
 // this is very time critical, but as telemetry data is not that important
 // we allow this to be interrupted (=corrupted) occasionally
-#define NVIC_PRIO_SOFT_SERIAL 1
+#define NVIC_PRIO_SOFT_SERIAL 2
 // debugging data is not critical
-#define NVIC_PRIO_DEBUG_UART 6
+#define NVIC_PRIO_DEBUG_UART 7
+// systick prio
+#define NVIC_PRIO_SYSTICK 0
 
 #endif //__PIN_CONFIG_H__

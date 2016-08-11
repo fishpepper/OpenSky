@@ -28,6 +28,9 @@ void hal_timeout_init(void) {
         debug("hal_timeout: failed to set systick timeout\n");
     }
 
+    // set prio
+    NVIC_SetPriority(SysTick_IRQn, NVIC_PRIO_SYSTICK);
+
     hal_timeout_100us = 0;
     hal_timeout_100us_delay = 0;
 }

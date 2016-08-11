@@ -45,7 +45,10 @@ static void telemetry_rx_echo_test(void){
     while(1){
         wdt_reset();
         if (telemetry_pop(&data)){
-            debug_putc(data);
+            //debug_putc(data);
+            debug_putc(' ');
+            debug_put_hex8(data);
+            if (data == 0x5E) debug_put_newline();
         }
     }
 }
