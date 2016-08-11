@@ -40,7 +40,7 @@ void telemetry_init(void) {
 
 static void telemetry_rx_echo_test(void){
     //just for testing purposes...
-    uint8_t data;
+    volatile EXTERNAL_MEMORY uint8_t data;
 
     while(1){
         wdt_reset();

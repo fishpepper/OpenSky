@@ -4,7 +4,7 @@ TARGET ?= D4RII
 
 CFLAGS  = -O1 -g
 ASFLAGS = -g
-GENERIC_SRCS  = main.c debug.c assert.c uart.c clocksource.c timeout.c wdt.c delay.c frsky.c spi.c cc25xx.c 
+GENERIC_SRCS  = main.c debug.c assert.c clocksource.c timeout.c wdt.c delay.c frsky.c spi.c cc25xx.c 
 GENERIC_SRCS += io.c storage.c failsafe.c ppm.c adc.c sbus.c apa102.c soft_spi.c soft_serial.c telemetry.c
 
 ifeq ($(TARGET),D4RII)
