@@ -72,6 +72,7 @@ uint8_t soft_serial_process_databit(void) {
         }else if ((soft_serial_databits & (1<<9)) == 0){
             // FRAME ERROR: stop bit invalid
             debug_putc('s');
+            debug_put_hex16(soft_serial_databits); debug_put_newline();
         }else{
             // fine, data byte received
             // process data

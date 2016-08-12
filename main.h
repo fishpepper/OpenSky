@@ -16,9 +16,6 @@
 //is frsky hub telemerty inverted?
 #define HUB_TELEMETRY_INVERTED 0
 
-//send ADC data as hub telemetry as well:
-#define FRSKY_SEND_HUB_TELEMETRY 0
-
 //debugging data
 #define DEBUG 1
 

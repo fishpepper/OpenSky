@@ -64,7 +64,7 @@ static void hal_soft_serial_init_timer(void) {
     // the finer the better -> go for 24mhz counter = prescaler = 0 (:1)
     tim_init.TIM_Prescaler      = (uint16_t) (0);
     // timer period = bit duration
-    tim_init.TIM_Period         = HAL_SOFTSERIAL_BIT_DURATION_TICKS;
+    tim_init.TIM_Period         = 0xFFFF;
     tim_init.TIM_ClockDivision  = 0;
     tim_init.TIM_CounterMode    = TIM_CounterMode_Up;
 
@@ -135,16 +135,10 @@ void SOFT_SERIAL_TIMER_IC_IRQHandler(void) {
     // handle startbit:
     if (HAL_SOFT_SERIAL_IC_ISR_FLAG_SET()){
         // reset counter
-#if 0
         TIM_SetCounter(SOFT_SERIAL_TIMER, 0);
         // this is the startbit -> re synchronize the timer to this
         // by setting the next cc interrupt to 1/2 bit length:
         HAL_SOFT_SERIAL_UPDATE_TOP_VALUE(HAL_SOFTSERIAL_BIT_DURATION_TICKS / 2);
-#else
-        // better: use the cc value + 1/2bit offset as new top value
-        // this is safe as the HAL_SOFTSERIAL_BIT_DURATION_TICKS is way smaller than the 16bit counter
-        HAL_SOFT_SERIAL_UPDATE_TOP_VALUE(SOFT_SERIAL_TIMER_GET_CAPTURE() + HAL_SOFTSERIAL_BIT_DURATION_TICKS/2);
-#endif
 
         // disable IC interrupt (only compare match interrupts will trigger this isr)
         HAL_SOFT_SERIAL_IC_ISR_DISABLE();

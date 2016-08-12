@@ -20,6 +20,7 @@
 #include "wdt.h"
 
 volatile static __IO uint32_t hal_timeout_100us;
+volatile static __IO uint32_t hal_timeout2_100us;
 volatile static __IO uint32_t hal_timeout_100us_delay;
 
 void hal_timeout_init(void) {
@@ -32,11 +33,16 @@ void hal_timeout_init(void) {
     NVIC_SetPriority(SysTick_IRQn, NVIC_PRIO_SYSTICK);
 
     hal_timeout_100us = 0;
+    hal_timeout2_100us = 0;
     hal_timeout_100us_delay = 0;
 }
 
 void hal_timeout_set_100us(__IO uint32_t hus) {
     hal_timeout_100us = hus;
+}
+
+void hal_timeout2_set_100us(__IO uint32_t hus) {
+    hal_timeout2_100us = hus;
 }
 
 void hal_timeout_set(__IO uint32_t ms){
@@ -47,6 +53,12 @@ uint8_t hal_timeout_timed_out(void) {
     //debug_put_uint16(hal_timeout_ms); debug("\n"); debug_flush();
     return (hal_timeout_100us == 0);
 }
+
+uint8_t hal_timeout2_timed_out(void) {
+    //debug_put_uint16(hal_timeout_ms); debug("\n"); debug_flush();
+    return (hal_timeout2_100us == 0);
+}
+
 
 // seperate ms delay function
 void hal_timeout_delay_ms(uint32_t timeout){
@@ -70,6 +82,9 @@ void SysTick_Handler(void){
     }
     if (hal_timeout_100us_delay != 0){
         hal_timeout_100us_delay--;
+    }
+    if (hal_timeout2_100us != 0){
+        hal_timeout2_100us--;
     }
 }
 

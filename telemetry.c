@@ -21,12 +21,18 @@
 #include "wdt.h"
 
 volatile EXTERNAL_MEMORY telemetry_buffer_t telemetry_buffer;
+volatile EXTERNAL_MEMORY uint8_t telemetry_expected_id;
 
 void telemetry_init(void) {
     debug("telemetry: init\n"); debug_flush();
 
-    telemetry_buffer.write = 0;
-    telemetry_buffer.read  = 0;
+    // mark as invalid
+    telemetry_expected_id = 0;
+
+    // setup buffer
+    telemetry_buffer.write    = 0;
+    telemetry_buffer.read     = 0;
+    telemetry_buffer.read_ok  = 0;
 
     // init software serial port:
     soft_serial_init();
@@ -39,13 +45,13 @@ void telemetry_init(void) {
 
 
 static void telemetry_rx_echo_test(void){
-    //just for testing purposes...
+    // just for testing purposes...
     volatile EXTERNAL_MEMORY uint8_t data;
 
     while(1){
         wdt_reset();
         if (telemetry_pop(&data)){
-            //debug_putc(data);
+            // debug_putc(data);
             debug_putc(' ');
             debug_put_hex8(data);
             if (data == 0x5E) debug_put_newline();
@@ -73,7 +79,18 @@ void telemetry_fill_buffer(volatile EXTERNAL_MEMORY uint8_t *buffer, uint8_t tel
     uint8_t telemetry_bytecount = 0;
     uint8_t i;
 
-    //fetch all stored bytes (max 10)
+    if (telemetry_id == telemetry_expected_id) {
+        // fine, last packet was received by rx
+        // update read buffer:
+        telemetry_buffer.read_ok = telemetry_buffer.read;
+    } else {
+        // rx re-requests last packet
+        // update read pointer to last ack'ed packet
+        telemetry_buffer.read = telemetry_buffer.read_ok;
+    }
+
+
+    // fetch all stored bytes (max 10)
     for(i=2; i<2+10; i++){
         if (!telemetry_pop(&buffer[i])){
             break;
@@ -81,9 +98,12 @@ void telemetry_fill_buffer(volatile EXTERNAL_MEMORY uint8_t *buffer, uint8_t tel
         telemetry_bytecount++;
     }
 
-    //set up header
+    // set up header
     buffer[0] = telemetry_bytecount;
     buffer[1] = telemetry_id;
+
+    // next expected id = next id:
+    telemetry_expected_id = (telemetry_id + 1) & 0x1F;
 }
 
 
@@ -104,15 +124,15 @@ uint8_t telemetry_pop(volatile EXTERNAL_MEMORY uint8_t *byte) {
 void telemetry_rx_callback(uint8_t data) {
     uint8_t next;
 
-    //push 1 byte into fifo:
+    // push 1 byte into fifo:
     next = (telemetry_buffer.write + 1) & (TELEMETRY_BUFFER_SIZE-1);
 
     if (telemetry_buffer.read == next){
-        //no more space in buffer - byte is discarded!
+        // no more space in buffer - byte is discarded!
         return;
     }
 
-    //space available -> add data byte
+    // space available -> add data byte
     telemetry_buffer.data[telemetry_buffer.write] = data;
     telemetry_buffer.write = next;
 }

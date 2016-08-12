@@ -727,8 +727,11 @@ void frsky_main(void){
             packet_received = 0;
 
             if (hopcount++ >= FRSKY_COUNT_RXSTATS){
-                debug("STAT: ");
-                debug_put_uint8(stat_rxcount);
+                uint16_t percent_ok;
+                debug(" STATS: ");
+                percent_ok = (((uint16_t)stat_rxcount) * 100) / 50;
+                debug_put_uint8(percent_ok);
+                debug_putc('%');
                 debug_put_newline();
 
                 //link quality
@@ -763,6 +766,10 @@ void frsky_main(void){
             if (FRSKY_VALID_PACKET(frsky_packet_buffer)){
                 //ok, valid packet for us
                 led_green_on();
+
+                // start send timeout, in case we want to tx data,
+                // this has to be done after 2000us:
+                hal_timeout2_set_100us(20);
 
                 //we hop to the next channel in 0.5ms
                 //afterwards hops are in 9ms grid again
@@ -805,26 +812,29 @@ void frsky_main(void){
 
                 led_green_off();
             }
+
+            if (send_telemetry){
+                //set timeout to 9ms grid
+                timeout_set(9);
+
+                //change channel:
+                frsky_increment_channel(1);
+
+                while(!timeout2_timed_out()){
+                    //wait for tx timeslot, do something useful here:
+                    apa102_statemachine();
+                }
+
+                //build & send packet
+                frsky_send_telemetry(requested_telemetry_id);
+
+                //mark as done
+                send_telemetry = 0;
+            }
+
         }else{
             //invalid packet -> mark as not received
             frsky_packet_received = 0;
-        }
-
-        if (send_telemetry){
-            //set timeout to 9ms grid
-            timeout_set(9);
-
-            //change channel:
-            frsky_increment_channel(1);
-
-            //DO NOT go to SRX here
-            hal_cc25xx_tx_sleep();
-
-            //build & send packet
-            frsky_send_telemetry(requested_telemetry_id);
-
-            //mark as done
-            send_telemetry = 0;
         }
 
         //process leds:
@@ -927,8 +937,7 @@ void frsky_update_ppm(void){
 
 
 void frsky_send_telemetry(uint8_t telemetry_id){
-    //static uint8_t test;
-    //test = 0;
+    static uint8_t test = 0;
 
     //Stop RX DMA
     cc25xx_strobe(RFST_SFRX);
@@ -956,6 +965,7 @@ void frsky_send_telemetry(uint8_t telemetry_id){
 
     //append any received hub telemetry data
     telemetry_fill_buffer(&frsky_packet_buffer[6], telemetry_id);
+
 
     //re arm adc dma etc
     //it is important to call this after reading the values...

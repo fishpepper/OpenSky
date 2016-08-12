@@ -9,10 +9,12 @@
 typedef struct {
     uint8_t data[TELEMETRY_BUFFER_SIZE];
     uint8_t read;
+    uint8_t read_ok;
     uint8_t write;
 } telemetry_buffer_t;
 
 extern volatile EXTERNAL_MEMORY telemetry_buffer_t telemetry_buffer;
+extern volatile EXTERNAL_MEMORY uint8_t telemetry_expected_id;
 
 void telemetry_init(void);
 void telemetry_rx_callback(uint8_t data);

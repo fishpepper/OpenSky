@@ -280,3 +280,5 @@ soft_serial.h
 board/d4rii/peripheral_lib/src/stm32f10x_tim.c
 telemetry.c
 telemetry.h
+timeout.h
+timeout.c

@@ -29,7 +29,7 @@ uint8_t io_bind_request(void){
     uint8_t i;
 
     //wait for pin status to settle
-    delay_ms(20);
+    delay_ms(100);
 
     //check if pressed at least 200ms:
     if (hal_io_bind_request()){
