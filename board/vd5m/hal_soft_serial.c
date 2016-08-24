@@ -63,21 +63,21 @@ void hal_soft_serial_init_interrupts(void) {
 
 
     //clear pending port ints
-    P2IFG    = 0x00;
+    P0IFG    = 0x00;
 
-    //enable interrupts on P2 0..3 //P0 4...7
-    PICTL   |= PICTL_P2IEN;
+    //enable interrupts on P0 4...7
+    PICTL   |= PICTL_P0IENH;
     //set edge:
     #if HUB_TELEMETRY_INVERTED
     //rising edge triggers isr
-    PICTL   &= ~PICTL_P2ICON;
+    PICTL   &= ~PICTL_P0ICON;
     #else
     //falling edge triggers isr
-    PICTL   |= PICTL_P2ICON;
+    PICTL   |= PICTL_P0ICON;
     #endif
 
     //enable interrupts from P0
-    //IEN2 |= IEN2_P2IE;
+    IEN1 |= IEN1_P0IE;
 }
 
 
@@ -88,22 +88,22 @@ void hal_soft_serial_update_interrupt(void) __interrupt T4_VECTOR{
 
         if (soft_serial_process_databit()) {
             // finished transmission, disable UP and enable IC isr
-            IEN2 |= IEN2_P2IE;
+            IEN1 |= IEN1_P0IE;
             IEN1 &= ~IEN1_T4IE;
         }
 
         // clear pending interrupt flags (IRCON is reset by hw)
         T4OVFIF = 0;
-        P2IF  = 0;
+        P0IF  = 0;
     }
 }
 
-void hal_soft_serial_startbit_interrupt(void) __interrupt P2INT_VECTOR{
-    if(P2IFG & (1<<SOFT_SERIAL_PIN)){
+void hal_soft_serial_startbit_interrupt(void) __interrupt P0INT_VECTOR{
+    if(P0IFG & (1<<SOFT_SERIAL_PIN)){
         // reset t3 counter:
         T4CTL |= T4CTL_CLR;
         // disable IC interrupt (only compare match interrupts will follow)
-        IEN2 &= ~IEN2_P2IE;
+        IEN1 &= ~IEN1_P0IE;
         // enable overflow isr
         IEN1 |= IEN1_T4IE;
 
@@ -112,7 +112,7 @@ void hal_soft_serial_startbit_interrupt(void) __interrupt P2INT_VECTOR{
         HAL_SOFT_SERIAL_UPDATE_TOP_VALUE(HAL_SOFTSERIAL_BIT_DURATION_TICKS / 2);
 
         //clear pending int flags
-        P2IF    = 0;
+        P0IF    = 0;
         T4OVFIF = 0;
 
         //process
