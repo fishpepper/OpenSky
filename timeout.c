@@ -37,3 +37,9 @@ void timeout_init(void) {
     debug("ms...\n");
 #endif
 }
+
+//caution: do not use large timeouts, they will trigger the wdt!
+void timeout2_delay_100us(uint16_t us){
+    timeout2_set_100us(us);
+    while(!timeout2_timed_out()){}
+}

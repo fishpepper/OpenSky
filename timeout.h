@@ -10,6 +10,7 @@ void timeout_init(void);
 
 #define timeout2_set_100us(x) hal_timeout2_set_100us(x)
 #define timeout2_timed_out() hal_timeout2_timed_out()
+void timeout2_delay_100us(uint16_t us);
 
 
 

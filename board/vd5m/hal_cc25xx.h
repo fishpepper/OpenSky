@@ -1,13 +1,16 @@
 #ifndef __HAL_CC25XX_H__
 #define __HAL_CC25XX_H__
-#include <cc2510fx.h>
 #include <stdint.h>
 #include "hal_defines.h"
+#include <cc2510fx.h>
 
 
 #define CC25XX_FIFO FIFO
+
 #define hal_cc25xx_set_register(reg, val) { reg = val; }
+// debug("REG(");debug(DEFINE_TO_STR(reg)); debug(")="); debug_put_hex8(val); debug_put_newline(); debug_flush();}
 #define hal_cc25xx_strobe(val) { RFST = val; }
+//debug("RFST="); debug_put_hex8(val); debug_put_newline(); debug_flush();}
 #define hal_cc25xx_get_register(r) (r)
 #define hal_cc25xx_get_register_burst(r) (r)
 
@@ -16,7 +19,7 @@
 #define hal_cc25xx_process_packet(packet_received, buffer, maxlen) {}
 
 void hal_cc25xx_init(void);
-void hal_cc25xx_set_gdo_mode(void);
+#define hal_cc25xx_set_gdo_mode() {}
 void hal_cc25xx_disable_rf_interrupt(void);
 
 #define hal_cc25xx_rx_sleep() { delay_us(1000); }
@@ -27,6 +30,11 @@ void hal_cc25xx_enter_txmode(void);
 void hal_cc25xx_setup_rf_dma(uint8_t mode);
 void hal_cc25xx_enable_receive(void);
 void hal_cc25xx_transmit_packet(volatile uint8_t *buffer, uint8_t len);
+
+
+void hal_cc25xx_rf_interrupt(void) __interrupt RF_VECTOR;
+
+#define hal_cc25xx_partnum_valid(p, v) ((p == 0x81) && (v = 0x04))
 
 #define PERCFG_U0CFG (1<<0)
 #define PERCFG_U1CFG (1<<1)

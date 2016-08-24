@@ -57,21 +57,25 @@ void storage_read_from_flash(void){
     len = sizeof(storage);
 
     hal_storage_read(storage_ptr, len);
-/*
-    storage.version = 0xAB;
-    //hard coded config for debugging:
-    storage.frsky_txid[0] = 0x16;
-    storage.frsky_txid[1] = 0x68;
-    storage.frsky_freq_offset = -20;
-    static const uint8_t tmp[] = { 0x01, 0x42, 0x83, 0xC4, 0x1A, 0x5B, 0x9C, 0xDD, 0x33, 0x74, 0xB5, 0x0B,
+
+    if (1){
+        uint8_t i;
+        static const uint8_t tmp[] = { 0x01, 0x42, 0x83, 0xC4, 0x1A, 0x5B, 0x9C, 0xDD, 0x33, 0x74, 0xB5, 0x0B,
                                    0x4C, 0x8D, 0xCE, 0x24, 0x65, 0xA6, 0xE7, 0x3D, 0x7E, 0xBF, 0x15, 0x56,
                                    0x97, 0xD8, 0x2E, 0x6F, 0xB0, 0x06, 0x47, 0x88, 0xC9, 0x1F, 0x60, 0xA1,
                                    0xE2, 0x38, 0x79, 0xBA, 0x10, 0x51, 0x92, 0xD3, 0x29, 0x6A, 0xAB };
-    uint8_t i;
-    for(i=0; i<FRSKY_HOPTABLE_SIZE; i++){
-        storage.frsky_hop_table[i] = tmp[i];
+
+        storage.version = 0xAB;
+        //hard coded config for debugging:
+        storage.frsky_txid[0] = 0x16;
+        storage.frsky_txid[1] = 0x68;
+        storage.frsky_freq_offset = -20;
+
+        for(i=0; i<FRSKY_HOPTABLE_SIZE; i++){
+            storage.frsky_hop_table[i] = tmp[i];
+        }
     }
-*/
+
 }
 
 void storage_write_to_flash(void){

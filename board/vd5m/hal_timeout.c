@@ -23,6 +23,7 @@
 
 //do not place this in xdata (faster this way)
 volatile uint16_t hal_timeout_countdown;
+volatile uint16_t hal_timeout2_countdown;
 
 void hal_timeout_init(void){
     debug("hal_timeout: init\n"); debug_flush();
@@ -30,7 +31,7 @@ void hal_timeout_init(void){
     //timer clock
     CLKCON = (CLKCON & ~CLKCON_TICKSPD_111) | CLKCON_TICKSPD_011;
 
-    //prepare timer3 for 0.01ms steps:
+    //prepare timer3 for 1/25th ms steps:
     //TICKSPD 011 -> /8 = 3250 kHz timer clock input
     T3CTL = T3CTL_DIV_2 | // /2
             T3CTL_START |   //start
@@ -76,20 +77,16 @@ void hal_timeout_set(uint16_t timeout_ms){
     IEN1 &= ~(IEN1_T3IE);
 
     //clear counter
-    T3CTL |= (1<<2);
+//    T3CTL |= (1<<2);
 
     //clear pending ints
-    T3IF = 0;
+//    T3IF = 0;
 
     //prepare timeout val:
-    hal_timeout_countdown = timeout_ms * 25;
-
-    if (hal_timeout_countdown == 0){
-        return;
-    }
+    hal_timeout_countdown = (timeout_ms * 25);
 
     //clear pending ints
-    T3IF = 0;
+//    T3IF = 0;
 
     //re enable interrupts
     IEN1 |= IEN1_T3IE;
@@ -103,15 +100,35 @@ uint8_t hal_timeout_timed_out(void){
     }
 }
 
+//prepare a new timeout
+void hal_timeout2_set_100us(uint16_t timeout_100us){
+    hal_timeout2_countdown = (timeout_100us * 25) / 10;
+}
+
+//prepare a new timeout
+void hal_timeout2_set(uint16_t timeout_ms){
+    hal_timeout2_countdown = (timeout_ms * 25);
+}
+
+
+uint8_t hal_timeout2_timed_out(void){
+    if (hal_timeout2_countdown == 0){
+        return 1;
+    }else{
+        return 0;
+    }
+}
+
+
 void hal_timeout_interrupt(void) __interrupt T3_VECTOR{
     //clear flag
-    //T3IF = 0;
+    T3IF = 0;
 
-    if (hal_timeout_countdown == 0){
-        //disable interrupts
-        IEN1 &= ~(IEN1_T3IE);
-        return;
+    if (hal_timeout_countdown != 0){
+        hal_timeout_countdown--;
     }
 
-    hal_timeout_countdown--;
+    if (hal_timeout2_countdown != 0){
+        hal_timeout2_countdown--;
+    }
 }

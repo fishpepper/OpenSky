@@ -119,6 +119,8 @@ void hal_sbus_uart_set_mode(EXTERNAL_MEMORY union hal_uart_config_t *cfg){
 }
 
 void hal_sbus_start_transmission(uint8_t *data, uint8_t len){
+    UNUSED(len);
+
     //time to send this frame!
     //re-arm dma:
     DMAARM |= DMA_ARM_CH3;

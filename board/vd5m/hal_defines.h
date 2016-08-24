@@ -16,4 +16,6 @@
 //necessary for timer registers. todo: check if necessary for others as well...
 #define SET_WORD_LO_FIRST(H, L, val) {(L) = LO(val); (H) = HI(val);  }
 
+#define UNUSED(x) (void)(x);
+
 #endif // __HAL_DEFINES_H__

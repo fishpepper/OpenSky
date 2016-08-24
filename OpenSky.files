@@ -282,3 +282,10 @@ telemetry.c
 telemetry.h
 timeout.h
 timeout.c
+board/vd5m/hal_soft_serial.h
+board/vd5m/hal_soft_serial.c
+debug.c
+board/vd5m/hal_uart.c
+board/vd5m/config.h
+board/vd5m/hal_clocksource.c
+board/vd5m/hal_clocksource.h

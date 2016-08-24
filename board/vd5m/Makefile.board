@@ -43,3 +43,5 @@ $(OUTPUT): $(REL) Makefile
 clean:
 	rm -f $(ADB) $(ASM) $(LNK) $(LST) $(REL) $(RST) $(SYM)
 	rm -f $(PROGS) $(PCDB) $(PLNK) $(PMAP) $(PMEM) $(PAOM)
+flash: $(RESULT).hex
+	cc-tool -e -w $(RESULT).hex

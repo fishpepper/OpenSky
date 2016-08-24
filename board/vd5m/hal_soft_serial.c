@@ -22,6 +22,7 @@
 #include "portmacros.h"
 #include "hal_cc25xx.h"
 
+
 void hal_soft_serial_init(void) {
     debug("hal_soft_serial: FIXME: UNTESTED!!!!!\n"); debug_flush();
     hal_soft_serial_init_gpio();

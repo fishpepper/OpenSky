@@ -76,19 +76,18 @@ void frsky_store_config(void);
 //NORMAL: [11 16 68 ... ]
 //TX:                 11 16 68 7A 1B 0B CA CB CF C4 88 85 CB CB CB 92 8B 78 21 AF
 //TELEMETRY WITH HUB: 11 16 68 60 64 5B 00 00 5E 3B 09 00 5E 5E 3B 09 00 5E 48 B1
-//-> hub telemetry dat:
 #define FRSKY_VALID_FRAMELENGTH(_b) (_b[0] == 0x11)
 #define FRSKY_VALID_CRC(_b)     (_b[19] & 0x80)
 #define FRSKY_VALID_TXID(_b) ((_b[1] == storage.frsky_txid[0]) && (_b[2] == storage.frsky_txid[1]))
 #define FRSKY_VALID_PACKET_BIND(_b) (FRSKY_VALID_FRAMELENGTH(_b) && FRSKY_VALID_CRC(_b) && (_b[2] == 0x01))
 #define FRSKY_VALID_PACKET(_b)      (FRSKY_VALID_FRAMELENGTH(_b) && FRSKY_VALID_CRC(_b) && FRSKY_VALID_TXID(_b) )
 
-
+/*
 #define FRSKY_HUB_TELEMETRY_HEADER 0x5E
 #define FRSKY_HUB_TELEMETRY_VOLTAGE 0x39 //not really documented, seems to be volt in 0.1V steps...
 #define FRSKY_HUB_TELEMETRY_VOLTAGE_BEFORE 0x3A
 #define FRSKY_HUB_TELEMETRY_VOLTAGE_AFTER  0x3B
 #define FRSKY_HUB_TELEMETRY_CURRENT        0x28
-
+*/
 
 #endif

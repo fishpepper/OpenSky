@@ -18,6 +18,7 @@
 #include <stdint.h>
 #include "debug.h"
 #include "led.h"
+#include "delay.h"
 
 void assert_failed(uint8_t* filename, uint32_t line){
     //todo: add own implementation to report the file name and line number,
@@ -33,7 +34,15 @@ void assert_failed(uint8_t* filename, uint32_t line){
     }
 
     //infinite loop
-    led_red_on();
-    while (1){}
+    while (1){
+        led_red_on();
+        delay_ms(100);
+        led_green_on();
+        delay_ms(100);
+        led_green_off();
+        delay_ms(100);
+        led_red_off();
+        delay_ms(100);
+    }
 }
 

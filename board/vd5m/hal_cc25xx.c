@@ -22,18 +22,18 @@
 #include "delay.h"
 #include "timeout.h"
 #include "debug.h"
+#include "led.h"
 #include "frsky.h"
 #include <cc2510fx.h>
 
 EXTERNAL_MEMORY volatile uint8_t hal_cc25xx_mode;
 
 void hal_cc25xx_init(void) {
-    hal_cc25xx_mode = CC25XX_MODE_RX;
-}
+    //set highest prio for ch0 (RF)
+    IP0 |= (1<<0);
+    IP1 |= (1<<0);
 
-void hal_cc25xx_set_gdo_mode(void) {
-    //not necessary here IOCFG0 = 0x01
-    //not necessary here IOCFG2 = 0x0E
+    hal_cc25xx_mode = CC25XX_MODE_RX;
 }
 
 void hal_cc25xx_disable_rf_interrupt(void) {
@@ -47,10 +47,6 @@ void hal_cc25xx_enter_rxmode(void) {
 
     //configure interrupt for every received packet
     IEN2 |= (IEN2_RFIE);
-
-    //set highest prio for ch0 (RF)
-    IP0 |= (1<<0);
-    IP1 |= (1<<0);
 
     //mask done irq
     RFIM = (1<<4);
@@ -116,14 +112,12 @@ void hal_cc25xx_setup_rf_dma(uint8_t mode){
     // configuration registers
     SET_WORD(DMA0CFGH, DMA0CFGL, &hal_dma_config[0]);
 
-    frsky_packet_received = 0;
+    //frsky_packet_received = 0;
 }
 
 void hal_cc25xx_enable_receive(void) {
     //start receiving on dma channel 0
     DMAARM = DMA_ARM_CH0;
-    //FIXME: test this
-    cc25xx_strobe(RFST_SRX);
 }
 
 
@@ -134,7 +128,6 @@ void hal_cc25xx_rf_interrupt(void) __interrupt RF_VECTOR{
 
     //clear general statistics reg
     S1CON &= ~0x03;
-
 
     if (hal_cc25xx_mode == CC25XX_MODE_RX){
         //mark as received:
@@ -149,6 +142,9 @@ void hal_cc25xx_rf_interrupt(void) __interrupt RF_VECTOR{
 
 
 void hal_cc25xx_transmit_packet(volatile uint8_t *buffer, uint8_t len) {
+    UNUSED(buffer);
+    UNUSED(len);
+
     RFST = RFST_STX;
 
     //start transmitting on dma channel 0
@@ -157,7 +153,6 @@ void hal_cc25xx_transmit_packet(volatile uint8_t *buffer, uint8_t len) {
     //tricky: this will force an int request and
     //        initiate the actual transmission
     S1CON |= 0x03;
-
 
     //wait some time here. packet should be sent within our 9ms
     //frame (actually within 5-6ms). if not print an error...

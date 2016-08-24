@@ -1,6 +1,6 @@
 #select target. supported: {VD5M, D4RII}
-#TARGET ?= VD5M
-TARGET ?= D4RII
+TARGET ?= VD5M
+#TARGET ?= D4RII
 
 CFLAGS  = -O1 -g
 ASFLAGS = -g

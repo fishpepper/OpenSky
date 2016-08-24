@@ -21,6 +21,8 @@
 #include "main.h"
 #include "config.h"
 
+#define SOFTSERIAL_DEBUG_RX 1
+
 volatile EXTERNAL_MEMORY uint16_t soft_serial_databits;
 volatile EXTERNAL_MEMORY uint16_t soft_serial_databit_count;
 volatile soft_serial_rx_callback_t soft_serial_rx_callback;
@@ -81,7 +83,9 @@ uint8_t soft_serial_process_databit(void) {
                 soft_serial_rx_callback(data_byte);
             }
         }
-        //debug("RX: 0x"); debug_put_hex8(data_byte); debug_put_newline();
+#if SOFTSERIAL_DEBUG_RX
+        debug("RX: 0x"); debug_put_hex8(data_byte); debug_put_newline();
+#endif
 
         // finished data byte
         return 1;

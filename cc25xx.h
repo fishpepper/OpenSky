@@ -24,8 +24,9 @@ void cc25xx_switch_antenna(void);
 #define cc25xx_transmit_packet(buffer, len) hal_cc25xx_transmit_packet(buffer, len)
 
 #define cc25xx_get_current_antenna() (cc25xx_current_antenna)
-
+#define cc25xx_partnum_valid(p, v) hal_cc25xx_partnum_valid(p,v)
 #define CC25XX_MODE_RX 0
 #define CC25XX_MODE_TX 1
 
 #endif // __CC25XX_H__
+

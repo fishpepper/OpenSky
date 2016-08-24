@@ -165,6 +165,7 @@ inline void hal_cc25xx_enter_txmode(void) {
 
 inline void hal_cc25xx_enable_receive(void){
     //nothing to do
+    hal_cc25xx_enter_rxmode?
 }
 
 

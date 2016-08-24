@@ -19,6 +19,8 @@
 #include "debug.h"
 #include "sbus.h"
 #include "ppm.h"
+#include "led.h"
+
 
 EXTERNAL_MEMORY volatile uint8_t failsafe_active;
 EXTERNAL_MEMORY volatile uint16_t failsafe_tick_counter;
@@ -34,6 +36,9 @@ void failsafe_init(void){
 void failsafe_enter(void) {
     //debug("failsafe: enter\n");
 
+    led_red_on();
+    led_green_off();
+
     sbus_enter_failsafe();
     ppm_enter_failsafe();
 
@@ -47,6 +52,8 @@ void failsafe_exit(void){
     if (failsafe_active){
         //reset failsafe counter:
         failsafe_active = 0;
+
+        led_red_off();
 
         sbus_exit_failsafe();
         ppm_exit_failsafe();

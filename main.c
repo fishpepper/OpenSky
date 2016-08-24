@@ -40,7 +40,7 @@ int main(void){
     debug_init();
 
     //init wdt timer
-    ///wdt_init();
+    wdt_init();
 
     //enable timeout routines
     timeout_init();

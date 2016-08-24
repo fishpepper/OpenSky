@@ -31,7 +31,7 @@ void debug_init(void) {
 
     debug_put_newline();
     debug("### OpenSky - ");
-    debug(DEFINE_TO_STR_VAL(BUILD_TARGET));
+    debug(DEFINE_TO_STR(BUILD_TARGET));
     debug(" - (c) by github.com/fishpepper ###\n"); debug_flush();
     debug("uart: init done\n");
 }
