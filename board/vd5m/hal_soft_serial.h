@@ -17,6 +17,6 @@ void hal_soft_serial_init_interrupts(void);
 #define HAL_SOFT_SERIAL_UPDATE_TOP_VALUE(x)   { T4CC0 = x; }
 
 void hal_soft_serial_update_interrupt(void) __interrupt T4_VECTOR;
-void hal_soft_serial_startbit_interrupt(void) __interrupt P0INT_VECTOR;
+void hal_soft_serial_startbit_interrupt(void) __interrupt P2INT_VECTOR;
 
 #endif // __HAL_SOFT_SERIAL_H__

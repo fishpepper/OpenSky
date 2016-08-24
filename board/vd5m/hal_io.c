@@ -23,6 +23,8 @@
 void hal_io_init(void) {
     //set bind pin as input
     PORT2DIR(BIND_PORT) &= ~(1<<BIND_PIN);
+    //set pullup/down
+    PORT2INP(BIND_PORT) &= ~(1<<BIND_PIN);
 }
 
 uint8_t hal_io_bind_request(void){

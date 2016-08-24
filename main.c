@@ -36,6 +36,9 @@ int main(void){
     //init clock sources:
     clocksource_init();
 
+    //init ios
+    io_init();
+
     //init debug
     debug_init();
 

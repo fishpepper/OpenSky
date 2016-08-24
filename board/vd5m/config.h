@@ -54,7 +54,7 @@
 #define LED_RED_PIN  3
 
 //hub telemetry input NOTE: this has to be a timer io
-#define SOFT_SERIAL_PORT          P0
-#define SOFT_SERIAL_PIN           SERVO_1
+#define SOFT_SERIAL_PORT          P2
+#define SOFT_SERIAL_PIN           1
 
 
