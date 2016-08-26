@@ -77,6 +77,7 @@ void hal_soft_serial_init_interrupts(void) {
     #endif
 
     //enable interrupts from P0
+    //THIS BREAKS RXTX:
     IEN1 |= IEN1_P0IE;
 }
 
@@ -99,6 +100,10 @@ void hal_soft_serial_update_interrupt(void) __interrupt T4_VECTOR{
 }
 
 void hal_soft_serial_startbit_interrupt(void) __interrupt P0INT_VECTOR{
+    //clear P0 int flags (important: several P0 pins can cause the isr, clean all of them!)
+    TEST THIS
+    P0IF = 0;
+
     if(P0IFG & (1<<SOFT_SERIAL_PIN)){
         // reset t3 counter:
         T4CTL |= T4CTL_CLR;
