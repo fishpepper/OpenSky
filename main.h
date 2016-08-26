@@ -14,7 +14,7 @@
 #define PPM_INVERTED 0
 
 //is frsky hub telemerty inverted?
-#define HUB_TELEMETRY_INVERTED 0
+#define HUB_TELEMETRY_INVERTED 1
 
 //debugging data
 #define DEBUG 1

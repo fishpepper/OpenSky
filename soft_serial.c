@@ -21,7 +21,7 @@
 #include "main.h"
 #include "config.h"
 
-#define SOFTSERIAL_DEBUG_RX 1
+#define SOFTSERIAL_DEBUG_RX 0
 
 volatile EXTERNAL_MEMORY uint16_t soft_serial_databits;
 volatile EXTERNAL_MEMORY uint16_t soft_serial_databit_count;
@@ -74,7 +74,7 @@ uint8_t soft_serial_process_databit(void) {
         }else if ((soft_serial_databits & (1<<9)) == 0){
             // FRAME ERROR: stop bit invalid
             debug_putc('s');
-            debug_put_hex16(soft_serial_databits); debug_put_newline();
+            //debug_put_hex16(soft_serial_databits); debug_put_newline();
         }else{
             // fine, data byte received
             // process data
@@ -85,6 +85,7 @@ uint8_t soft_serial_process_databit(void) {
         }
 #if SOFTSERIAL_DEBUG_RX
         debug("RX: 0x"); debug_put_hex8(data_byte); debug_put_newline();
+        //debug_putc(data_byte);
 #endif
 
         // finished data byte

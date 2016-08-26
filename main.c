@@ -16,6 +16,7 @@
 */
 
 #include "led.h"
+#include "io.h"
 #include "debug.h"
 #include "clocksource.h"
 #include "timeout.h"
@@ -28,6 +29,7 @@
 #include "failsafe.h"
 #include "apa102.h"
 #include "telemetry.h"
+#include "soft_serial.h"
 
 int main(void){
     //leds:

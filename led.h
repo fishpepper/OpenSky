@@ -14,7 +14,7 @@
 #define led_red_toggle() hal_led_red_toggle()
 
 //led init routines
-#define led_init() {  hal_led_red_init(); hal_led_green_init(); led_red_off(); led_green_off(); }
+#define led_init() {  hal_led_red_init(); hal_led_green_init(); led_red_off(); led_green_off();}
 
 #endif
 

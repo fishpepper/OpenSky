@@ -10,6 +10,9 @@ ifdef DEBUG
 CFLAGS += --debug
 endif
 
+#programmer binary
+CC_TOOL ?= cc-tool
+
 RESULT ?= opensky_$(notdir $(TARGET))
 
 # fetch this dir during include
@@ -43,5 +46,6 @@ $(OUTPUT): $(REL) Makefile
 clean:
 	rm -f $(ADB) $(ASM) $(LNK) $(LST) $(REL) $(RST) $(SYM)
 	rm -f $(PROGS) $(PCDB) $(PLNK) $(PMAP) $(PMEM) $(PAOM)
+
 flash: $(RESULT).hex
-	cc-tool -e -w $(RESULT).hex
+	$(CC_TOOL) -f -e -w $(RESULT).hex
