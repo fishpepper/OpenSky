@@ -302,7 +302,6 @@ void frsky_autotune(void){
         //set freq offset
         cc25xx_set_register(FSCTRL0, storage.frsky_freq_offset);
 
-        FSCTRL0 = storage.frsky_freq_offset;
         led_red_off();
 
         //go back to RX:
