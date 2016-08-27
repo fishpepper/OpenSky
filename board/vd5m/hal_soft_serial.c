@@ -25,45 +25,11 @@
 #include "portmacros.h"
 #include "hal_cc25xx.h"
 
-#define DEBUG_PIN_INIT() {PORT2DIR(P0) |= (1<<6); ADCCFG &= ~((1<<ADC1) | (1<<ADC0));}
-#define DEBUG_PIN_BIT PORT2BIT(P0, 6)
-#define DEBUG_PIN_TOGGLE() { DEBUG_PIN_BIT = !DEBUG_PIN_BIT; }
-#define DEBUG_PIN_HI() { DEBUG_PIN_BIT = 1; }
-#define DEBUG_PIN_LO() { DEBUG_PIN_BIT = 0; }
 
 void hal_soft_serial_init(void) {
-    debug("hal_soft_serial: FIXME: UNTESTED!!!!!\n"); debug_flush();
+    debug("hal_soft_serial: init\n"); debug_flush();
     hal_soft_serial_init_gpio();
-
-    //DEBUG:
-    DEBUG_PIN_INIT();
-    /*
-    while(1){
-        if (P0 & (1<<7)){
-            debug_putc('1');
-            DEBUG_PIN_HI();
-        }else{
-            DEBUG_PIN_LO();
-            debug_putc('0');
-        }
-        wdt_reset();
-        delay_ms(10);
-    }*/
-
     hal_soft_serial_init_interrupts();
-
-    /*while(1){
-        if (P0 & (1<<7)){
-            debug_putc('1');
-            DEBUG_PIN_HI();
-        }else{
-            DEBUG_PIN_LO();
-            debug_putc('0');
-        }
-        wdt_reset();
-        delay_ms(10);
-        debug_put_hex8(P0IF); debug_put_newline();
-    }*/
 }
 
 void hal_soft_serial_init_gpio(void) {
@@ -131,7 +97,7 @@ void hal_soft_serial_init_interrupts(void) {
 
 void hal_soft_serial_update_interrupt(void) __interrupt T4_VECTOR{
     if (T4OVFIF) {
-        DEBUG_PIN_TOGGLE();
+        //DEBUG_PIN_TOGGLE();
 
         // re-arm for the next bit
         HAL_SOFT_SERIAL_UPDATE_TOP_VALUE(HAL_SOFTSERIAL_BIT_DURATION_TICKS-1);
@@ -158,7 +124,7 @@ void hal_soft_serial_startbit_interrupt(void) __interrupt P0INT_VECTOR{
     P0IF = 0;
 
     if(isr_cause & (1<<SOFT_SERIAL_PIN)){
-        DEBUG_PIN_TOGGLE();
+        //DEBUG_PIN_TOGGLE();
         // reset t3 counter:
         T4CTL |= T4CTL_CLR;
         // disable IC interrupt (only compare match interrupts will follow)
