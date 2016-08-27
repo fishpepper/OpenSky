@@ -10,7 +10,7 @@ void hal_soft_serial_init_interrupts(void);
 // at 9600 baud a bit duration is 1/9600s = 104.166667us
 // the counter counts in 1/1.625th of us -> 104.1667us * 1.625
 // = 169,27... -> 169 -> 0.16% error (thats ok..)
-#define HAL_SOFTSERIAL_BIT_DURATION_TICKS  169
+#define HAL_SOFTSERIAL_BIT_DURATION_TICKS  (169+1)
 
 #define HAL_SOFT_SERIAL_PIN_HI() (SOFT_SERIAL_PORT & (1<<SOFT_SERIAL_PIN))
 #define HAL_SOFT_SERIAL_PIN_LO() (! HAL_SOFT_SERIAL_PIN_HI())
