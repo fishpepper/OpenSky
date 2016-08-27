@@ -788,7 +788,7 @@ void frsky_main(void){
                     send_telemetry = 1;
                 }
 
-                //hal_timeout_delay_100us(5);
+                //hal_timeout_delay_100us(15);
                 if (send_telemetry){
                     timeout_set(9);
                 }else{

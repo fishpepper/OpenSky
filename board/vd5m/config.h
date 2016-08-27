@@ -1,5 +1,14 @@
 #include "portmacros.h"
 
+/*
+#define DEBUG_PIN_INIT() {PORT2DIR(P0) |= (1<<6); ADCCFG &= ~((1<<ADC1) | (1<<ADC0));}
+#define DEBUG_PIN_BIT PORT2BIT(P0, 6)
+#define DEBUG_PIN_TOGGLE() { DEBUG_PIN_BIT = !DEBUG_PIN_BIT; }
+#define DEBUG_PIN_HI() { DEBUG_PIN_BIT = 1; }
+#define DEBUG_PIN_LO() { DEBUG_PIN_BIT = 0; }
+*/
+
+
 //pin layout ISP header
 #define ISP_DATA  P2_1
 #define ISP_CLOCK P2_2
