@@ -115,6 +115,13 @@ void hal_soft_serial_init_interrupts(void) {
     PICTL   |= PICTL_P0ICON;
     #endif
 
+    //T4 highest int prio (group4)
+    IP0 |= (1<<4);
+    IP1 |= (1<<4);
+    //P0 highest int prio (group5)
+    IP0 |= (1<<5);
+    IP1 |= (1<<5);
+
     //enable interrupts from P0
     P0IF = 0;
     P0IFG = 0;
@@ -127,7 +134,7 @@ void hal_soft_serial_update_interrupt(void) __interrupt T4_VECTOR{
         DEBUG_PIN_TOGGLE();
 
         // re-arm for the next bit
-        HAL_SOFT_SERIAL_UPDATE_TOP_VALUE(HAL_SOFTSERIAL_BIT_DURATION_TICKS);
+        HAL_SOFT_SERIAL_UPDATE_TOP_VALUE(HAL_SOFTSERIAL_BIT_DURATION_TICKS-1);
 
         if (soft_serial_process_databit()) {
             // finished transmission, disable UP and enable IC isr
@@ -161,7 +168,7 @@ void hal_soft_serial_startbit_interrupt(void) __interrupt P0INT_VECTOR{
 
         // this is the startbit -> re synchronize the timer to this
         // by setting the next cc interrupt to 1/2 bit length:
-        HAL_SOFT_SERIAL_UPDATE_TOP_VALUE(HAL_SOFTSERIAL_BIT_DURATION_TICKS / 2);
+        HAL_SOFT_SERIAL_UPDATE_TOP_VALUE((HAL_SOFTSERIAL_BIT_DURATION_TICKS / 2)-1);
 
         //clear pending int flags
         P0IF    = 0;

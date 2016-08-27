@@ -345,8 +345,8 @@ void frsky_autotune(void){
                     fscal0_min = min(fscal0_min, storage.frsky_freq_offset);
                     fscal0_max = max(fscal0_max, storage.frsky_freq_offset);
 
-                    //make sure we never read the same packet twice by crc flag
-                    frsky_packet_buffer[FRSKY_PACKET_BUFFER_SIZE-1] = 0x00;
+                    //make sure we never read the same packet twice by invalidating packet
+                    frsky_packet_buffer[0] = 0x00;
                 }
 
                 /*debug("[");debug_flush();
