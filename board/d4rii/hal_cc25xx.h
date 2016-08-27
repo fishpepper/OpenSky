@@ -119,7 +119,7 @@ void hal_cc25xx_register_read_multi(uint8_t address, uint8_t *buffer, uint8_t le
 #define PKTCTRL1 0x07
 #define PKTCTRL0 0x08
 #define ADDR     0x09
-#define REG_CHANNR   0x0A
+#define CHANNR   0x0A
 #define FSCTRL1  0x0B
 #define FSCTRL0  0x0C
 #define FREQ2    0x0D
