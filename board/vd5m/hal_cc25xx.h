@@ -30,7 +30,7 @@ void hal_cc25xx_enter_txmode(void);
 void hal_cc25xx_setup_rf_dma(uint8_t mode);
 void hal_cc25xx_enable_receive(void);
 void hal_cc25xx_transmit_packet(volatile uint8_t *buffer, uint8_t len);
-
+uint8_t hal_cc25xx_transmission_completed(void);
 
 void hal_cc25xx_rf_interrupt(void) __interrupt RF_VECTOR;
 
