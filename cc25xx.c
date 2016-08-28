@@ -17,6 +17,7 @@
 
 #include "cc25xx.h"
 #include "debug.h"
+#include "timeout.h"
 
 uint8_t cc25xx_current_antenna;
 
@@ -36,3 +37,18 @@ void cc25xx_switch_antenna(void) {
     }
 }
 
+void cc25xx_wait_for_transmission_complete(void) {
+    //after STX we go back to RX state (see MCSM1 register)
+    //so wait a maximum of 9ms for completion
+    timeout2_set_100us(90);
+
+    while(!timeout2_timed_out()){
+        if (hal_cc25xx_transmission_completed()){
+            //done with tx, return
+            return;
+        }
+    }
+
+    //if we reach this point, tx timed out:
+    debug("!TX");
+}

@@ -139,6 +139,10 @@ void hal_cc25xx_rf_interrupt(void) __interrupt RF_VECTOR{
     }
 }
 
+uint8_t hal_cc25xx_transmission_completed(void) {
+    //this flag is set in the RF isr
+    return (frsky_packet_sent);
+}
 
 
 void hal_cc25xx_transmit_packet(volatile uint8_t *buffer, uint8_t len) {
@@ -150,21 +154,11 @@ void hal_cc25xx_transmit_packet(volatile uint8_t *buffer, uint8_t len) {
     //start transmitting on dma channel 0
     DMAARM = DMA_ARM_CH0;
 
+    //mark packet as not sent (will be modified in RF isr):
+    frsky_packet_sent = 0;
+
     //tricky: this will force an int request and
     //        initiate the actual transmission
     S1CON |= 0x03;
-
-    //wait some time here. packet should be sent within our 9ms
-    //frame (actually within 5-6ms). if not print an error...
-    frsky_packet_sent = 0;
-    while(!frsky_packet_sent){
-        if (timeout_timed_out()){
-            break;
-        }
-    }
-    if (timeout_timed_out()){
-        debug("\nfrsky: ERROR tx timed out\n");
-    }
-
-    frsky_packet_sent = 0;
 }
+

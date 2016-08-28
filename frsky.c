@@ -706,7 +706,7 @@ void frsky_main(void){
             //go back to rx mode
             cc25xx_enable_receive();
             //cc25xx_enter_rxmode(); THIS BREAKS VD5M!
-            cc25xx_strobe(RFST_SRX);
+            //SHOULD NOT BE NECESSARY//cc25xx_strobe(RFST_SRX);
 
             //if enabled, send a sbus frame in case we lost that frame:
             if (!packet_received){
@@ -978,13 +978,16 @@ void frsky_send_telemetry(uint8_t telemetry_id){
     //it is important to call this after reading the values...
     adc_process();
 
-    //arm dma channel
+    //send packet
     cc25xx_transmit_packet(frsky_packet_buffer, FRSKY_PACKET_BUFFER_SIZE);
+
+    //wait for transmission complete:
+    cc25xx_wait_for_transmission_complete();
 
     //prepare for rx:
     cc25xx_setup_rf_dma(CC25XX_MODE_RX);
     cc25xx_enable_receive();
-    cc25xx_strobe(RFST_SRX);
+    //SHOULD NOT BE NECESSARY, DEFAULT IS BACK TO RX//cc25xx_strobe(RFST_SRX);
 }
 
 

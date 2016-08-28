@@ -145,6 +145,18 @@ inline void hal_cc25xx_strobe(uint8_t address){
     hal_spi_csn_hi();
 }
 
+inline uint8_t hal_cc25xx_get_status(void) {
+    hal_spi_csn_lo();
+    uint8_t status = hal_spi_tx(0xFF);
+    hal_spi_csn_hi();
+    return status;
+}
+
+uint8_t hal_cc25xx_transmission_completed(void) {
+    //after tx cc25xx goes back to RX (configured by mcsm1 register)
+    return ((hal_cc25xx_get_status() & (0x70)) == CC2500_STATUS_STATE_RX);
+}
+
 inline void hal_cc25xx_enter_rxmode(void) {
     //add pa/lna config bit setting here
     CC25XX_LNA_SW_CRX_GPIO->BSRR = (CC25XX_LNA_SW_CRX_PIN); //1
@@ -164,8 +176,8 @@ inline void hal_cc25xx_enter_txmode(void) {
 
 
 inline void hal_cc25xx_enable_receive(void){
-    //nothing to do
-   // hal_cc25xx_enter_rxmode?
+    //switch on rx again
+    hal_cc25xx_enter_rxmode();
 }
 
 
