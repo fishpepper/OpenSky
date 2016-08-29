@@ -75,7 +75,7 @@ void storage_read_from_flash(void){
         storage.frsky_freq_offset = -20;
 
         for(i=0; i<FRSKY_HOPTABLE_SIZE; i++){
-            storage.frsky_hop_table[i] = tmp[i];a
+            storage.frsky_hop_table[i] = tmp[i];
         }
     }
 #endif
