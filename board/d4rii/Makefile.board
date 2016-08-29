@@ -15,6 +15,9 @@ RESULT ?= opensky_$(notdir $(TARGET))
 #faster build
 MAKEFLAGS+="-j6 "
 
+#opt
+CFLAGS += -O1 -g
+
 # include path
 CFLAGS += -I$(SELF_DIR)
 
@@ -29,14 +32,15 @@ AS=$(TOOLROOT)/arm-none-eabi-as
 OBJ=$(TOOLROOT)/arm-none-eabi-objcopy
 
 # Code Paths
-DEVICE=$(SELF_DIR)/device
-CORE  =$(SELF_DIR)/core
-LINK  =$(SELF_DIR)/linker
-PERIPH=$(SELF_DIR)/peripheral_lib
+ARCH_DIR=arch/stm32f1
+DEVICE=$(ARCH_DIR)/device
+CORE  =$(ARCH_DIR)/core
+LINK  =$(ARCH_DIR)/linker
+PERIPH=$(ARCH_DIR)/peripheral_lib
 
 # Search path for standard files
 vpath %.c ./
-vpath %.c $(SELF_DIR)
+vpath %.c $(ARCH_DIR)
 
 # Search path for perpheral library
 vpath %.c $(CORE)
@@ -55,15 +59,15 @@ FULLASSERT = -DUSE_FULL_ASSERT
 LDFLAGS+= -T$(LDSCRIPT) -mthumb -mcpu=cortex-m3
 CFLAGS+= -mcpu=cortex-m3 -mthumb
 CFLAGS+= -DHSE_VALUE=$(CRYSTAL_FREQ)
-CFLAGS+= -I$(DEVICE) -I$(CORE) -I$(PERIPH)/inc -I.
+CFLAGS+= -I$(DEVICE) -I$(CORE) -I$(PERIPH)/inc -I. -I$(ARCH_DIR)
 CFLAGS+= -D$(PTYPE) -DUSE_STDPERIPH_DRIVER $(FULLASSERT) -DBUILD_TARGET=$(TARGET)
 
 OPENOCD_PIDFILE = /tmp/openocd_opensky.pid
 
 LINK_OBJS=$(BOARD_SRCS:%.c=%.o)
 
-HEADER_FILES  = $(wildcard $(SELF_DIR)/*.h)
-HEADER_FILES += $(wildcard ./*.h)
+HEADER_FILES  = $(wildcard $(ARCH_DIR)/*.h)
+HEADER_FILES += config.h 
 
 # Build executable
 board: $(RESULT).elf 
