@@ -706,7 +706,7 @@ void frsky_main(void){
             //go back to rx mode
             cc25xx_enable_receive();
             //cc25xx_enter_rxmode(); THIS BREAKS VD5M!
-            //SHOULD NOT BE NECESSARY//cc25xx_strobe(RFST_SRX);
+            cc25xx_strobe(RFST_SRX);
 
             //if enabled, send a sbus frame in case we lost that frame:
             if (!packet_received){
