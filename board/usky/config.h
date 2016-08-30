@@ -41,7 +41,7 @@
 
 
 //hub telemetry input (will run a soft serial port)
-#define SOFT_SERIAL_PORT          P2
-#define SOFT_SERIAL_PIN           3
+#define SOFT_SERIAL_PORT          P0
+#define SOFT_SERIAL_PIN           7
 
 
