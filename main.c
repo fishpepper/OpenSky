@@ -34,7 +34,7 @@
 int main(void){
     //leds:
     led_init();
-
+    
     //init clock sources:
     clocksource_init();
 
@@ -43,7 +43,7 @@ int main(void){
 
     //init debug
     debug_init();
-
+    
     //init wdt timer
     wdt_init();
 
