@@ -177,4 +177,6 @@
 // systick prio
 #define NVIC_PRIO_SYSTICK 0
 
+#define DEFAULT_FSCAL_VALUE -62
+
 #endif //__PIN_CONFIG_H__

@@ -59,3 +59,5 @@
 #define SOFT_SERIAL_PIN           7
 
 
+
+#define DEFAULT_FSCAL_VALUE -20
