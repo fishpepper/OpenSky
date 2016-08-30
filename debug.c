@@ -116,6 +116,9 @@ void debug_putc(uint8_t ch){
 }
 
 void debug_flush(void){
+    if (!debug_init_done) {
+        return;
+    }
     //wait until uart buffer is empty
     //once TX INT is disabled our buffer is empty again
     while(hal_uart_int_enabled()) {}
