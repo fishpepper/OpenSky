@@ -22,6 +22,7 @@
 
 //useful for debugging. DO NOT USE!
 #define ADC_DO_TEST 0
+#define TELEMETRY_DO_TEST 0
 
 
 #define min(a,b) (((a)<(b))?(a):(b))

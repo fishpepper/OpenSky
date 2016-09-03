@@ -40,7 +40,9 @@ void telemetry_init(void) {
     // attach callback
     soft_serial_set_rx_callback(&telemetry_rx_callback);
 
-    //telemetry_rx_echo_test();
+    #if TELEMETRY_DO_TEST
+    telemetry_rx_echo_test();
+    #endif
 }
 
 

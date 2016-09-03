@@ -49,8 +49,8 @@ void hal_adc_init(void) {
     ADCCON1 = ADCCON1_ST | ADCCON1_STSEL_FULL_SPEED | 0b11;
 
     //configure DMA1 + DMA2:
-    hal_adc_dma_init(1, &hal_adc_data[0], DMA_TRIG_ADC_CH5);
-    hal_adc_dma_init(2, &hal_adc_data[1], DMA_TRIG_ADC_CH6);
+    hal_adc_dma_init(1, &hal_adc_data[0], DMA_TRIG_ADC_CH0 + ADC0);
+    hal_adc_dma_init(2, &hal_adc_data[1], DMA_TRIG_ADC_CH0 + ADC1);
 
     //set pointer to the DMA configuration struct into DMA-channel 1-4
     //configuration

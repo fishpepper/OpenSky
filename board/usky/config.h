@@ -8,8 +8,8 @@
 
 //note: change of adc ch require change in adc.c!
 #define ADC_PORT P0
-#define ADC0 5
-#define ADC1 6
+#define ADC0 5 //ADC0 is actually Pin 6, but we use this for telemetry on uSKY -> hack to disable it
+#define ADC1 5 
 //acs712 in inverted mode on adc1?
 //when powered by 5V we can use a trick
 //to get a good resolution: use inverted power inputs
@@ -42,8 +42,8 @@
 
 //hub telemetry input (will run a soft serial port)
 #define SOFT_SERIAL_PORT          P0
-#define SOFT_SERIAL_PIN           7
+#define SOFT_SERIAL_PIN           6
 
 
-#define DEFAULT_FSCAL_VALUE -20
+#define DEFAULT_FSCAL_VALUE -69
 
