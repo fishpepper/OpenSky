@@ -632,7 +632,9 @@ void frsky_calib_pll(void){
     //return to idle
     cc25xx_strobe(RFST_SIDLE);
 
-    debug("frsky: calib fscal1 = ");
+    debug("frsky: calib fscal0 = ");
+    debug_put_int8(storage.frsky_freq_offset);
+    debug("\nfrsky: calib fscal1 = ");
     for(i=0; i<FRSKY_HOPTABLE_SIZE; i++){
         debug_put_hex8(frsky_calib_fscal1_table[i]);
         debug_putc(' ');

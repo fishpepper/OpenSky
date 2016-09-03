@@ -291,3 +291,7 @@ board/vd5m/hal_clocksource.c
 board/vd5m/hal_clocksource.h
 board/vd5m/hal_uart.c
 board/vd5m/hal_uart.h
+arch/cc251x/hal_adc.c
+arch/cc251x/hal_adc.h
+arch/cc251x/hal_soft_serial.c
+arch/cc251x/hal_soft_serial.h
