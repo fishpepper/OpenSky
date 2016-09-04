@@ -95,6 +95,9 @@ You will need a CC debugger or an arduino flashed with this code in order to pro
 https://github.com/fishpepper/CC2510Lib
 (theres a python script to flash the cc2510 in that repo as well)
 
+Alternatively, you can use a raspberry pi to flash. This does not require any voltage dividers:
+https://github.com/jimmyw/CC2510Lib
+
 Connections:
 
 It is handy to mount a 5pin Molex Picoblade connector to the
