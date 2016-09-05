@@ -1,1 +1,9 @@
-.
+board/d4rii
+board/vd5m
+driver/stm32f10x/core
+driver/stm32f10x/device
+driver/stm32f10x/peripheral_lib/inc
+old
+old/stm32/STM32-Template
+old/stm32/STM32-Template/Library
+old/stm32/STM32-Template/Library/ff9/src

@@ -15,10 +15,6 @@
    author: fishpepper <AT> gmail.com
 */
 
-#include "main.h"
 #include "dma.h"
 
-//dma config
-//dma0 can be given independently but 1-4 has
-//to be given in one consequent array...
-__xdata DMA_DESC dma_config[5];
+// nothing to do here

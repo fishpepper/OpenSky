@@ -1,34 +1,22 @@
 #ifndef __SOFT_SPI__
 #define __SOFT_SPI__
-#include <cc2510fx.h>
 #include <stdint.h>
 #include "config.h"
 #include "main.h"
+#include "hal_defines.h"
 
 //SPI MODE:
 #define SOFT_SPI_CPHA 1
 #define SOFT_SPI_CPOL 1
 
-//extern __data uint8_t __at 0x0020 soft_spi_tx_byte;
-//#define SOFT_SPI_CLOCK_HI()  { SOFT_SPI_CLOCK_BIT = 1; NOP(); NOP(); NOP(); NOP(); NOP();}
-
-extern __data uint8_t soft_spi_tx_byte;
+extern EXTERNAL_DATA uint8_t soft_spi_tx_byte;
 
 void soft_spi_init(void);
 void soft_spi_tx_do(void);
+
 #define soft_spi_tx(data) {soft_spi_tx_byte=data;  soft_spi_tx_do(); }
 
-
-//SOFTSPI
-#define SOFT_SPI_CLOCK_DIR PORT2DIR(SOFT_SPI_CLOCK_PORT)
-#define SOFT_SPI_CLOCK_BIT PORT2BIT(SOFT_SPI_CLOCK_PORT, SOFT_SPI_CLOCK_PIN)
-#define SOFT_SPI_MOSI_DIR PORT2DIR(SOFT_SPI_MOSI_PORT)
-#define SOFT_SPI_MOSI_BIT PORT2BIT(SOFT_SPI_MOSI_PORT, SOFT_SPI_MOSI_PIN)
-
-
-#define SOFT_SPI_CLOCK_HI()  { SOFT_SPI_CLOCK_BIT = 1; }
-#define SOFT_SPI_CLOCK_LO()  { SOFT_SPI_CLOCK_BIT = 0; }
-#define SOFT_SPI_DATA_TO_MOSI() {if (soft_spi_tx_byte & 0x80){ SOFT_SPI_MOSI_BIT=1; }else{ SOFT_SPI_MOSI_BIT = 0; };}
+#define SOFT_SPI_DATA_TO_MOSI() {if (soft_spi_tx_byte & 0x80){ SOFT_SPI_MOSI_HI(); }else{ SOFT_SPI_MOSI_LO(); };}
 
 #if SOFT_SPI_CPHA
    #define SOFT_SPI_SCK_POST

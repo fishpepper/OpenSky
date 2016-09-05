@@ -1,5 +1,9 @@
+*.user
+*~
+old/
 # Object files
 *.o
+*.d
 *.ko
 *.obj
 *.elf
@@ -23,6 +27,8 @@
 # Executables
 *.exe
 *.out
+*.elf
+*.bin
 *.app
 *.i*86
 *.x86_64
@@ -37,3 +43,7 @@
 
 # Debug files
 *.dSYM/
+
+# misc
+dump*
+*.swp

@@ -14,29 +14,8 @@
 
    author: fishpepper <AT> gmail.com
 */
+
 #include "clocksource.h"
-#include <cc2510fx.h>
-#include "led.h"
 
-void clocksource_init(void){
-    //for debugging clocksource problems
-    LED_RED_ON();
-    LED_GREEN_ON();
-
-    //power up osc (?)
-    SLEEP &= ~CLOCKSOURCE_OSC_PD_BIT;
-    //wait for XOSC stable
-    while(!CLOCKSOURCE_XOSC_STABLE()){}
-    NOP();
-    //start crystal osc as HS clocksource, OSC32 is int rc osc
-    CLKCON = 0x80;
-
-    //power down the unused oscillator
-    SLEEP |= CLOCKSOURCE_OSC_PD_BIT;
-
-
-    //for debugging clocksource problems
-    LED_RED_OFF();
-    LED_GREEN_OFF();
-}
+// nothing to do here
 
