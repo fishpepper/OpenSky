@@ -1,0 +1,112 @@
+# object files
+DRIVER_SRCS   = stm32f10x_rcc.c stm32f10x_gpio.c stm32f10x_usart.c misc.c stm32f10x_iwdg.c  stm32f10x_spi.c stm32f10x_dma.c stm32f10x_adc.c stm32f10x_i2c.c stm32f10x_tim.c
+HAL_SRCS      = hal_led.c hal_uart.c hal_timeout.c hal_wdt.c hal_delay.c hal_clocksource.c hal_spi.c hal_cc25xx.c hal_io.c hal_adc.c hal_storage.c hal_sbus.c hal_ppm.c hal_soft_spi.c hal_soft_serial.c
+BOARD_SRCS    = $(STARTUP) $(DRIVER_SRCS) $(HAL_SRCS) $(GENERIC_SRCS)
+
+#crystal frequency
+CRYSTAL_FREQ = 12000000
+
+# fetch this dir during include
+SELF_DIR := $(dir $(lastword $(MAKEFILE_LIST)))
+
+#name of executable
+RESULT ?= opensky_$(notdir $(TARGET))
+
+#faster build
+MAKEFLAGS+="-j6 "
+
+#opt
+CFLAGS += -O1 -g
+
+# include path
+CFLAGS += -I$(SELF_DIR)
+
+# Tool path, only override if not set
+TOOLROOT ?= /usr/bin
+
+# Tools
+CC=$(TOOLROOT)/arm-none-eabi-gcc
+LD=$(TOOLROOT)/arm-none-eabi-gcc
+AR=$(TOOLROOT)/arm-none-eabi-ar
+AS=$(TOOLROOT)/arm-none-eabi-as
+OBJ=$(TOOLROOT)/arm-none-eabi-objcopy
+
+# Code Paths
+ARCH_DIR=arch/stm32f1
+DEVICE=$(ARCH_DIR)/device
+CORE  =$(ARCH_DIR)/core
+LINK  =$(ARCH_DIR)/linker
+PERIPH=$(ARCH_DIR)/peripheral_lib
+
+# Search path for standard files
+vpath %.c ./
+vpath %.c $(ARCH_DIR)
+
+# Search path for perpheral library
+vpath %.c $(CORE)
+vpath %.c $(PERIPH)/src
+vpath %.c $(DEVICE)
+
+# Processor specific
+PTYPE = STM32F10X_MD
+LDSCRIPT = $(LINK)/stm32f103c8.ld
+STARTUP = startup_stm32f10x.c system_stm32f10x.c
+
+# Compilation Flags
+
+FULLASSERT = -DUSE_FULL_ASSERT
+
+LDFLAGS+= -T$(LDSCRIPT) -mthumb -mcpu=cortex-m3
+CFLAGS+= -mcpu=cortex-m3 -mthumb
+CFLAGS+= -DHSE_VALUE=$(CRYSTAL_FREQ)
+CFLAGS+= -I$(DEVICE) -I$(CORE) -I$(PERIPH)/inc -I. -I$(ARCH_DIR)
+CFLAGS+= -D$(PTYPE) -DUSE_STDPERIPH_DRIVER $(FULLASSERT) -DBUILD_TARGET=$(TARGET)
+
+OPENOCD_PIDFILE = /tmp/openocd_opensky.pid
+
+LINK_OBJS=$(BOARD_SRCS:%.c=%.o)
+
+HEADER_FILES  = $(wildcard $(ARCH_DIR)/*.h)
+HEADER_FILES += config.h 
+
+# Build executable
+board: $(RESULT).elf 
+
+$(RESULT).elf: $(LINK_OBJS)
+	exit
+	@echo $(LINK_OBJS)
+	@echo prereqs that are newer than test: $?
+	$(LD) $(LDFLAGS) -o $@ $(LINK_OBJS) $(LDLIBS)
+
+%.bin: %.elf
+	$(OBJ) -O binary $< $@
+
+# pull in dependencies
+# this includes all .d files produced along when building .o.
+# On the first build there are not going to be any .d files.
+# Hence, ignore include errors with -.
+ALL_DEPS := $(patsubst %.c,%.d,$(BOARD_SRCS))
+-include $(ALL_DEPS)
+
+# compile and generate dependency info
+%.o: %.c $(HEADER_FILES)
+	$(CC) -c $(CFLAGS) $< -o $@
+	$(CC) -MM -MP $(CFLAGS) $< > $@.d
+
+%.o: %.s
+	$(CC) -c $(CFLAGS) $(DEPFLAGS) $< -o $@
+
+clean:
+	rm -f *.o *.d *.elf *.bin
+
+debug: $(RESULT).elf
+	openocd -f /usr/share/openocd/scripts/interface/stlink-v2.cfg -f /usr/share/openocd/scripts/target/stm32f1x.cfg & echo $$! > $(OPENOCD_PIDFILE)
+	sleep 1
+	arm-none-eabi-gdb --eval-command="target remote localhost:3333" $(RESULT).elf
+	if [ -a $(OPENOCD_PIDFILE) ]; then kill `cat $(OPENOCD_PIDFILE)`; fi;
+
+flash : $(RESULT).bin
+	if [ -a $(OPENOCD_PIDFILE) ]; then kill `cat $(OPENOCD_PIDFILE)`; fi;
+	st-flash write $(RESULT).bin 0x8000000
+
+.PHONY: board clean flash debug

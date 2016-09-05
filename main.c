@@ -14,48 +14,47 @@
 
    author: fishpepper <AT> gmail.com
 */
-//
-// CC251x datasheet: http://www.ti.com/lit/ds/symlink/cc2510.pdf
-//
-#include <cc2510fx.h>
-#include "main.h"
+
 #include "led.h"
-#include "delay.h"
-#include "uart.h"
-#include "clocksource.h"
+#include "io.h"
 #include "debug.h"
-#include "frsky.h"
+#include "clocksource.h"
 #include "timeout.h"
-#include "adc.h"
+#include "delay.h"
 #include "wdt.h"
+#include "frsky.h"
+#include "adc.h"
 #include "storage.h"
 #include "sbus.h"
-#include "ppm.h"
-#include "apa102.h"
 #include "failsafe.h"
+#include "apa102.h"
+#include "telemetry.h"
+#include "soft_serial.h"
 
-void main(void) {
+int main(void){
     //leds:
-    LED_INIT();
-
-    //init clock source XOSC:
+    led_init();
+    
+    //init clock sources:
     clocksource_init();
 
-    //init uart
-    uart_init();
+    //init ios
+    io_init();
 
+    //init debug
+    debug_init();
+    
     //init wdt timer
     wdt_init();
-
-    apa102_init();
-
-    //init storage
-    storage_init();
 
     //enable timeout routines
     timeout_init();
 
-    //apa102_init();
+    //init storage
+    storage_init();
+
+    //init apa led bar
+    apa102_init();
 
     //init frsky core
     frsky_init();
@@ -64,28 +63,24 @@ void main(void) {
     adc_init();
 
     //init output
-    #if SBUS_ENABLED
+#if SBUS_ENABLED
     sbus_init();
-    #else
+#else
     ppm_init();
-    #endif
+#endif
 
     //init failsafe
     failsafe_init();
 
-    debug("main: init done\n");
+    //init telemetry
+    telemetry_init();
 
     //run main
+    debug("main: init done\n");
+
     //frsky_frame_sniffer();
     frsky_main();
 
-    LED_RED_ON();
-    while (1) {
-        LED_RED_ON();
-        delay_ms(200);
-        LED_RED_OFF();
-        delay_ms(200);
-    }
+    debug("main: frsky main ended?! THIS SHOULD NOT HAPPEN!");
+    while(1);
 }
-
-

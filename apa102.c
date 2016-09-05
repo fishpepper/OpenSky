@@ -14,6 +14,7 @@
 
    author: fishpepper <AT> gmail.com
 */
+
 #include "apa102.h"
 #include "debug.h"
 #include "delay.h"
@@ -21,8 +22,8 @@
 #include "soft_spi.h"
 
 //led data
-__xdata uint8_t apa102_txdata[APA102_TXDATA_LEN];
-__xdata uint8_t apa102_txdata_index;
+EXTERNAL_MEMORY uint8_t apa102_txdata[APA102_TXDATA_LEN];
+EXTERNAL_MEMORY uint8_t apa102_txdata_index;
 
 
 #define APA102_DEBUG_STATEMACHINE 0
@@ -66,7 +67,7 @@ void apa102_show_no_connection(void){
     apa102_flush();
 }
 
-void apa102_update_leds(__xdata uint16_t *data, uint8_t link_qual){
+void apa102_update_leds(EXTERNAL_MEMORY uint16_t *data, uint8_t link_qual){
     uint8_t i;
     uint8_t led[3] = {0,0,0};
     uint16_t throttle;

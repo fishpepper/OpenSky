@@ -14,42 +14,7 @@
 
    author: fishpepper <AT> gmail.com
 */
+
 #include "delay.h"
 
-//busy wait delay loop. not 100% accurate
-void delay_ms(uint16_t ms) {
-    #define DELAY_MS_LOOP_A 86
-    #define DELAY_MS_LOOP_B 30
-
-    while(ms--){
-        //this asm snippet gives us roughly 1ms delay:
-        __asm
-                mov     r1, #DELAY_MS_LOOP_A
-            00000$: //delay_ms_loop_outer
-                dec     r1
-                mov     a, r1
-                jz      00002$
-                mov     r2, #DELAY_MS_LOOP_B
-            00001$: //delay_ms_loop_inner
-                dec     r2
-                mov     a, r2
-                jz      00000$
-                sjmp    00001$
-            00002$: //delay_ms_done
-        __endasm;
-    }
-}
-
-//busy wait delay loop
-//this is more or less accurate
-void delay_us(uint16_t us) {
-    #define DELAY_US_LOOP 1
-
-    while(us--){
-        __asm
-            nop
-            nop
-            nop
-        __endasm;
-    }
-}
+// nothing to do here
