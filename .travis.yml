@@ -1,5 +1,6 @@
 env:
     - TARGET=D4RII
+    - TARGET=VD5M
 
 addons:
   apt_packages:
