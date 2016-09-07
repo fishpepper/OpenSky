@@ -22,4 +22,4 @@ install:
 language: c
 compiler: gcc
 
-script: .travis.sh
+script: ./.travis.sh
