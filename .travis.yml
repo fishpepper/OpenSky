@@ -8,6 +8,7 @@ addons:
     - lib32bz2-1.0
     - lib32ncurses5
     - lib32stdc++6
+    - libstdc++6
 #    - sdcc
 #    - sdcc-libraries
 
