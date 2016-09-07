@@ -13,8 +13,9 @@ before-install:
   - tar -xf gcc-arm-none-eabi-5_4-2016q2-20160622-linux.tar.bz2
 
 install:
-- export PATH=$PATH:$PWD/gcc-arm-none-eabi-5_4-2016q2/bin
-- export TOOLROOT=$PWD/gcc-arm-none-eabi-5_4-2016q2/bin
+  - export PATH=$PATH:$PWD/gcc-arm-none-eabi-5_4-2016q2/bin
+  - export TOOLROOT=$PWD/gcc-arm-none-eabi-5_4-2016q2/bin
+  - cd $TRAVIS_BUILD_DIR
 
 language: c
 compiler: gcc
