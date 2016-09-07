@@ -18,6 +18,7 @@ install:
   - export PATH=$PATH:$PWD/gcc-arm-none-eabi-5_4-2016q2/bin
   - export TOOLROOT=$PWD/gcc-arm-none-eabi-5_4-2016q2/bin
   - cd $TRAVIS_BUILD_DIR
+  - chmod +x .travis.sh
 
 language: c
 compiler: gcc
