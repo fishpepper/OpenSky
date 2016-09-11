@@ -22,6 +22,7 @@ CFLAGS += -I$(SELF_DIR) -I ./ -I$(ARCH_DIR)
 HAL_SRC  = hal_led.c hal_uart.c hal_clocksource.c hal_timeout.c hal_wdt.c hal_delay.c hal_dma.c hal_spi.c 
 HAL_SRC += hal_cc25xx.c hal_io.c hal_adc.c hal_storage.c hal_sbus.c hal_ppm.c hal_soft_spi.c hal_soft_serial.c
 SRC = $(GENERIC_SRCS) $(HAL_SRC:%.c=$(ARCH_DIR)/%.c)
+HEADERS := $(SRC:.c=.h)
 ADB=$(SRC:.c=.adb)
 ASM=$(SRC:.c=.asm)
 LNK=$(SRC:.c=.lnk)
@@ -37,7 +38,7 @@ PLNK=$(PROGS:.hex=.lnk)
 PMAP=$(PROGS:.hex=.map)
 PMEM=$(PROGS:.hex=.mem)
 PAOM=$(PROGS:.hex=)
-%.rel : %.c
+%.rel : %.c $(HEADERS)
 	$(CC) -c $(CFLAGS) -o$*.rel $<
 
 board: $(OUTPUT)
