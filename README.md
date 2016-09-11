@@ -1,5 +1,8 @@
 # OpenSky
 
+
+[![Build Status](https://travis-ci.org/fishpepper/OpenSky.svg?branch=master)](https://travis-ci.org/fishpepper/OpenSky)
+
 This is an open source implementation for the pololar frsky protocol using
 a cc25xx transceiver chip. This software can be flashed on a DIY RX,
 a FrSky VD5M, or a FrSky D4R-ii receiver.
@@ -94,6 +97,9 @@ Depending on your target you will need a programmer or a serial converter to fla
 You will need a CC debugger or an arduino flashed with this code in order to program the cc2510:
 https://github.com/fishpepper/CC2510Lib
 (theres a python script to flash the cc2510 in that repo as well)
+
+Alternatively, you can use a raspberry pi to flash. This does not require any voltage dividers:
+https://github.com/jimmyw/CC2510Lib
 
 Connections:
 

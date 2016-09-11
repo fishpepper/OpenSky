@@ -1,0 +1,38 @@
+env:
+    - TARGET=D4RII
+    - TARGET=VD5M
+    - TARGET=USKY
+
+addons:
+  apt_packages:
+    - lib32bz2-1.0
+    - lib32ncurses5
+    - lib32stdc++6
+#    - sdcc
+#    - sdcc-libraries
+
+cache:
+  directories:
+    - $HOME/gcc-arm-none-eabi-5_4-2016q2
+    - $HOME/sdcc-3.3.0
+
+before_install:
+  - export GCC_DIR=$HOME/gcc-arm-none-eabi-5_4-2016q2
+  - export GCC_ARCHIVE=$HOME/gcc-arm-none-eabi-5_4-2016q2-20160622-linux.tar.bz2
+  - export GCC_URL=https://launchpad.net/gcc-arm-embedded/5.0/5-2016-q2-update/+download/gcc-arm-none-eabi-5_4-2016q2-20160622-linux.tar.bz2
+  - if [ ! -e $GCC_DIR/bin/arm-none-eabi-g++ ]; then wget $GCC_URL -O $GCC_ARCHIVE; tar xfj $GCC_ARCHIVE -C $HOME; fi
+  - export PATH=$PATH:$GCC_DIR/bin
+  - export TOOLROOT=$GCC_DIR/bin
+  - export SDCC_ARCHIVE=sdcc-3.3.0-i386-unknown-linux2.5.tar.bz2
+  - export SDCC_URL=http://downloads.sourceforge.net/project/sdcc/sdcc-linux-x86/3.3.0/$SDCC_ARCHIVE
+  - if [ ! -e $HOME/sdcc-3.3.0/bin ]; then wget $SDCC_URL -O $SDCC_ARCHIVE; tar xjf $SDCC_ARCHIVE -C $HOME; fi
+  - export PATH=$PATH:$HOME/sdcc-3.3.0/bin
+
+install:
+  - cd $TRAVIS_BUILD_DIR
+  - chmod +x .travis.sh
+
+language: c
+compiler: gcc
+
+script: ./.travis.sh
