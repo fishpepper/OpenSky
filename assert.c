@@ -15,7 +15,7 @@
    author: fishpepper <AT> gmail.com
 */
 
-#include <stdint.h>
+#include "assert.h"
 #include "debug.h"
 #include "led.h"
 #include "delay.h"
