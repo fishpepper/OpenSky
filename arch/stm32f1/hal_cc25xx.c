@@ -161,7 +161,7 @@ inline void hal_cc25xx_enter_rxmode(void) {
     //add pa/lna config bit setting here
     CC25XX_LNA_SW_CRX_GPIO->BSRR = (CC25XX_LNA_SW_CRX_PIN); //1
     delay_us(20);
-    CC25XX_LNA_SW_CTX_GPIO->BRR  = (CC25XX_ANT_SW_CTX_PIN); //0
+    CC25XX_LNA_SW_CTX_GPIO->BRR  = (CC25XX_LNA_SW_CTX_PIN); //0
     delay_us(5);
 
 }
@@ -170,7 +170,7 @@ inline void hal_cc25xx_enter_txmode(void) {
     //add pa/lna config bit setting here
     CC25XX_LNA_SW_CRX_GPIO->BRR  = (CC25XX_LNA_SW_CRX_PIN); //0
     delay_us(20);
-    CC25XX_LNA_SW_CTX_GPIO->BSRR = (CC25XX_ANT_SW_CTX_PIN); //1
+    CC25XX_LNA_SW_CTX_GPIO->BSRR = (CC25XX_LNA_SW_CTX_PIN); //1
     delay_us(5);
 }
 
