@@ -28,16 +28,15 @@
 #define SOFT_SPI_MOSI_PORT P2
 #define SOFT_SPI_MOSI_PIN  2
 
-//P0.2 is NC! change this to P0.3 (debug tx)
-#define BIND_PORT P0
-#define BIND_PIN  2
+//DBG DATA
+#define BIND_PORT P2
+#define BIND_PIN  1
 
 //leds
 #define LED_GREEN_PORT P1
 #define LED_GREEN_PIN  1
-//re led is NC!
-#define LED_RED_PORT P1
-#define LED_RED_PIN  2
+#define LED_RED_PORT P2
+#define LED_RED_PIN  3
 
 
 //hub telemetry input (will run a soft serial port)
