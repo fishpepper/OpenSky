@@ -54,7 +54,7 @@ static void hal_cc25xx_init_gpio(void) {
     //PA/LNA:
     // periph clock enable for port
     RCC_APBxPeriphClockCmd(CC25XX_LNA_SW_CTX_GPIO_CLK_RCC, CC25XX_LNA_SW_CTX_GPIO_CLK, ENABLE);
-    RCC_APBxPeriphClockCmd(CC25XX_LNA_SW_CTX_GPIO_CLK_RCC, CC25XX_LNA_SW_CRX_GPIO_CLK, ENABLE);
+    RCC_APBxPeriphClockCmd(CC25XX_LNA_SW_CRX_GPIO_CLK_RCC, CC25XX_LNA_SW_CRX_GPIO_CLK, ENABLE);
 
 
     //CTX:
