@@ -28,3 +28,8 @@ else
 endif
 
 all  : board
+
+git_version:
+	git log -n 1 --format=format:"#define GIT_COMMIT \"%h\"%n" HEAD > $@.h
+
+.PHONY: git_version
