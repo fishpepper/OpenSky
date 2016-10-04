@@ -25,6 +25,14 @@ extern EXTERNAL_MEMORY uint8_t sbus_data[SBUS_DATA_LEN];
 #define SBUS_FRAME_LOST 1
 #define SBUS_FRAME_NOT_LOST 0
 
+#else
+
+#define sbus_init() {}
+#define sbus_update(a) {}
+#define sbus_start_transmission(a) {}
+#define sbus_exit_failsafe() {}
+#define sbus_enter_failsafe() {}
+
 #endif
 
 #endif
