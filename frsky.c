@@ -1023,6 +1023,8 @@ void frsky_frame_sniffer(void){
 
     //start main loop
     while(1){
+        wdt_reset();
+
         if (timeout_timed_out()){
             led_red_on();
 
@@ -1080,6 +1082,9 @@ void frsky_frame_sniffer(void){
 
 
         if (frsky_packet_received){
+            cc25xx_enable_receive();
+            cc25xx_strobe(RFST_SRX);
+
             if (FRSKY_VALID_PACKET(frsky_packet_buffer)){
                 //ok, valid packet for us
                 led_green_on();
@@ -1125,7 +1130,18 @@ void frsky_frame_sniffer(void){
                 frsky_packet_buffer[FRSKY_PACKET_BUFFER_SIZE-1] = 0x00;
 
                 led_green_off();
+            } else {
+		if (frsky_packet_buffer[0] != 0) {
+                    debug("RX NON FRSKY PACKET: ");
+    		    for(i=0; i<FRSKY_PACKET_BUFFER_SIZE; i++){
+                        debug_put_hex8(frsky_packet_buffer[i]);
+                        debug_putc(' ');
+                    }
+		    debug_put_newline();
+		    frsky_packet_received = 0;
+                }
             }
+	
         }
 
     }
