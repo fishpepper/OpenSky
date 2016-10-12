@@ -90,6 +90,7 @@ void sbus_update(EXTERNAL_MEMORY uint16_t *data){
     for(i=0; i<8; i++){
         tmp = data[i] - 1290;
         tmp = tmp + (tmp>>4);
+        tmp = tmp - 22;  // move center to 1500
         if (tmp < 0){
             rescaled_data[i] = 0;
         }else if(tmp > 2047){
