@@ -52,11 +52,19 @@ uint8_t soft_serial_process_databit(void) {
     // handle data
     if (soft_serial_databit_count != 0){
         // sample bits
-        #if HUB_TELEMETRY_INVERTED
-        if (HAL_SOFT_SERIAL_PIN_LO()){
-        #else
+#if HUB_TELEMETRY_INVERTED
+  #if SOFT_SERIAL_INVERTED
         if (HAL_SOFT_SERIAL_PIN_HI()){
-        #endif
+  #else
+        if (HAL_SOFT_SERIAL_PIN_LO()){
+  #endif
+#else
+  #if SOFT_SERIAL_INVERTED
+        if (HAL_SOFT_SERIAL_PIN_LO()){
+  #else
+        if (HAL_SOFT_SERIAL_PIN_HI()){
+  #endif
+#endif
             soft_serial_databits |= (1<<10);
         }
         soft_serial_databit_count--;

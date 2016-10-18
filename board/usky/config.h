@@ -42,7 +42,7 @@
 //hub telemetry input (will run a soft serial port)
 #define SOFT_SERIAL_PORT          P0
 #define SOFT_SERIAL_PIN           6
-
+#define SOFT_SERIAL_INVERTED 0
 
 #define DEFAULT_FSCAL_VALUE -69
 
