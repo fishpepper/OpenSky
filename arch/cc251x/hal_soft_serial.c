@@ -73,13 +73,23 @@ void hal_soft_serial_init_interrupts(void) {
     P0SEL &= ~(1<<6);
 
     //set edge:
-    #if HUB_TELEMETRY_INVERTED
-    //rising edge triggers isr
-    PICTL   &= ~PICTL_P0ICON;
-    #else
+#if HUB_TELEMETRY_INVERTED
+  #if SOFT_SERIAL_INVERTED
     //falling edge triggers isr
     PICTL   |= PICTL_P0ICON;
-    #endif
+  #else
+    //rising edge triggers isr
+    PICTL   &= ~PICTL_P0ICON;
+  #endif
+#else
+  #if SOFT_SERIAL_INVERTED
+    //rising edge triggers isr
+    PICTL   &= ~PICTL_P0ICON;
+  #else
+    //falling edge triggers isr
+    PICTL   |= PICTL_P0ICON;
+  #endif
+#endif
 
     //T4 highest int prio (group4)
     IP0 |= (1<<4);

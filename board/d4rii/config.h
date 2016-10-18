@@ -164,6 +164,9 @@
 #define SOFT_SERIAL_TIMER_IC_IRQn TIM1_CC_IRQn
 #define SOFT_SERIAL_TIMER_UP_IRQn TIM1_UP_IRQn
 
+//there is an inverter on GPIOA.10
+#define SOFT_SERIAL_INVERTED 1
+
 // THIS CONFIGURES IRQ PRIORITIES - DO NOT MESS THIS UP!
 // this is the most critical stuff:
 #define NVIC_PRIO_PPM 1
