@@ -22,12 +22,12 @@ else
     ifeq ($(TARGET),USKY)
       include board/usky/Makefile.board
     else
-			ifeq ($(TARGET),RASP)
-				include board/rasp/Makefile.board
-			else
-				$(error UNSUPPORTED Target ($(TARGET)) given. aborting)
-			endif
-		endif
+        ifeq ($(TARGET),RASP)
+            include board/rasp/Makefile.board
+        else
+            $(error UNSUPPORTED Target ($(TARGET)) given. aborting)
+        endif
+    endif
   endif
 endif
 

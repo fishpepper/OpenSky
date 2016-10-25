@@ -2,6 +2,7 @@ env:
     - TARGET=D4RII
     - TARGET=VD5M
     - TARGET=USKY
+    - TARGET=rasp
 
 addons:
   apt_packages:
