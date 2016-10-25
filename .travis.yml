@@ -9,7 +9,7 @@ addons:
     - lib32bz2-1.0
     - lib32ncurses5
     - lib32stdc++6
-    - gcc-4.7-arm-linux-gnueabi
+    - gcc-arm-linux-gnueabi
 #    - sdcc
 #    - sdcc-libraries
 
