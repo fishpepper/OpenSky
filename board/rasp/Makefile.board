@@ -22,11 +22,11 @@ CFLAGS += -I$(SELF_DIR)
 TOOLROOT ?= /usr/bin
 
 # Tools
-CC=gcc
-LD=gcc
-AR=ar
-AS=as
-OBJ=objcopy
+CC=arm-linux-gnueabi-gcc-4.7
+LD=arm-linux-gnueabi-ld
+AR=arm-linux-gnueabi-ar
+AS=arm-linux-gnueabi-as
+OBJ=arm-linux-gnueabi-objcopy
 
 # Code Paths
 ARCH_DIR=arch/rasp

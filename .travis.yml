@@ -2,13 +2,14 @@ env:
     - TARGET=D4RII
     - TARGET=VD5M
     - TARGET=USKY
-    - TARGET=rasp
+    - TARGET=RASP
 
 addons:
   apt_packages:
     - lib32bz2-1.0
     - lib32ncurses5
     - lib32stdc++6
+    - gcc-4.7-arm-linux-gnueabi
 #    - sdcc
 #    - sdcc-libraries
 
