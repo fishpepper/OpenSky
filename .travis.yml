@@ -1,3 +1,5 @@
+sudo: required
+dist: trusty
 env:
     - TARGET=D4RII
     - TARGET=VD5M
