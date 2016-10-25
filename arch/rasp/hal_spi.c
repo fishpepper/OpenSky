@@ -54,11 +54,11 @@ void hal_spi_init(void){
     /*
      * spi mode
      */
-    ret = ioctl(fd, SPI_IOC_WR_MODE32, &mode);
+    ret = ioctl(fd, SPI_IOC_WR_MODE, &mode);
     if (ret == -1)
         pabort("can't set spi mode");
 
-    ret = ioctl(fd, SPI_IOC_RD_MODE32, &mode);
+    ret = ioctl(fd, SPI_IOC_RD_MODE, &mode);
     if (ret == -1)
         pabort("can't get spi mode");
 

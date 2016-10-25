@@ -21,11 +21,11 @@ CFLAGS += -I$(SELF_DIR)
 # Tool path, only override if not set
 TOOLROOT ?= /usr/bin
 
-# Tools
+# Tools (note: for cross compiling we use gcc as linker!)
 CC=arm-linux-gnueabi-gcc
-LD=arm-linux-gnueabi-ld
+LD=arm-linux-gnueabi-gcc
 AR=arm-linux-gnueabi-ar
-AS=arm-linux-gnueabi-as
+AS=arm-linux-gnueabi-gcc
 OBJ=arm-linux-gnueabi-objcopy
 
 # Code Paths
