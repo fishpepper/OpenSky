@@ -13,7 +13,7 @@ addons:
     - lib32stdc++6
     - gcc-arm-linux-gnueabi
     - gcc-multilib
-    - libc0.1-dev
+    - libc-dev
 #    - sdcc
 #    - sdcc-libraries
 
