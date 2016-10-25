@@ -14,6 +14,7 @@ addons:
     - gcc-arm-linux-gnueabi
     - gcc-multilib
     - libc-dev
+    - linux-libc-dev-armel-cross 
 #    - sdcc
 #    - sdcc-libraries
 
