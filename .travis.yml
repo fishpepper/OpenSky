@@ -4,7 +4,7 @@ env:
     - TARGET=D4RII
     - TARGET=VD5M
     - TARGET=USKY
-    - TARGET=RASP
+#    - TARGET=RASP #does not build due to an outdated /include/uapi/linux/spi/spidev.h file
 
 addons:
   apt_packages:
