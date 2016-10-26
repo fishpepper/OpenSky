@@ -22,11 +22,11 @@ CFLAGS += -I$(SELF_DIR)
 TOOLROOT ?= /usr/bin
 
 # Tools (note: for cross compiling we use gcc as linker!)
-CC=arm-linux-gnueabi-gcc
-LD=arm-linux-gnueabi-gcc
-AR=arm-linux-gnueabi-ar
-AS=arm-linux-gnueabi-gcc
-OBJ=arm-linux-gnueabi-objcopy
+CC=gcc
+LD=gcc
+AR=ar
+AS=gcc
+OBJ=objcopy
 
 # Code Paths
 ARCH_DIR=arch/rasp
