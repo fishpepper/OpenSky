@@ -8,7 +8,9 @@
 #define sei() { IEN0 |= IEN0_EA; }
 #define cli() { IEN0 &= ~IEN0_EA; }
 
-#define NOP() { __asm nop __endasm; }
+#ifndef NOP
+    #define NOP() { __asm nop __endasm; }
+#endif
 
 #define HI(a)     (uint8_t) ((uint16_t)(a) >> 8 )
 #define LO(a)     (uint8_t)  (uint16_t)(a)
