@@ -4,6 +4,7 @@ env:
     - TARGET=D4RII
     - TARGET=VD5M
     - TARGET=USKY
+    - TARGET=TINYFISH
     - TARGET=RASP
 
 addons:
