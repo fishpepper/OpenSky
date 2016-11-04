@@ -33,6 +33,9 @@
 #define LED_RED_PORT   P0
 #define LED_RED_PIN    1
 
+//DEBUG
+#define DEBUG_UART USART0_P1
+
 //SBUS
 #define SBUS_UART USART1_P1
 
