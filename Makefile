@@ -13,22 +13,15 @@ ifneq ($(wildcard .use_fixed_id),)
 CFLAGS += -DFRSKY_USE_FIXED_ID
 endif
 
-ifeq ($(TARGET),D4RII)
-  include board/d4rii/Makefile.board
+TARGET_LC = $(shell echo $(TARGET) | tr '[:upper:]' '[:lower:]')
+TARGET_MAKEFILE = board/$(TARGET_LC)/Makefile.board
+
+ifneq ($(wildcard $(TARGET_MAKEFILE)),)
+  #fine, target exists
+  include  $(TARGET_MAKEFILE)
 else
-  ifeq ($(TARGET),VD5M)
-    include board/vd5m/Makefile.board
-  else
-    ifeq ($(TARGET),USKY)
-      include board/usky/Makefile.board
-    else
-        ifeq ($(TARGET),RASP)
-            include board/rasp/Makefile.board
-        else
-            $(error UNSUPPORTED Target ($(TARGET)) given. aborting)
-        endif
-    endif
-  endif
+  #does not exist
+  $(error UNSUPPORTED Target ($(TARGET)) given. could not find makefile at $(TARGET_MAKEFILE). aborting)
 endif
 
 all  : board
