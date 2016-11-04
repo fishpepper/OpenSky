@@ -1,4 +1,4 @@
-#select target. supported: {VD5M, D4RII}
+#select target. supported: {VD5M, D4RII, USKY, TINYFISH, RASP}
 TARGET ?= USKY
 #TARGET ?= VD5M
 #TARGET ?= D4RII
