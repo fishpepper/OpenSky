@@ -20,6 +20,7 @@
 #include "debug.h"
 #include "delay.h"
 #include "sbus.h"
+#include "config.h"
 
 #if SBUS_ENABLED
 
@@ -27,16 +28,26 @@ void hal_sbus_init(EXTERNAL_MEMORY uint8_t *sbus_data_ptr) {
 
     EXTERNAL_MEMORY union hal_uart_config_t sbus_uart_config;
 
-    //we will use SERVO_4 as sbus output:
-    //therefore we configure
+#if SBUS_UART == USART1_P0
     //USART1 use ALT1 -> Clear flag -> Port P0_4 = TX
     PERCFG &= ~(PERCFG_U1CFG);
-
     //configure pin P0_4 (TX) as output:
     P0SEL |= (1<<4);
 
     //make tx pin output:
     P0DIR |= (1<<4);
+#elif SBUS_UART == USART1_P1
+    //USART1 use ALT2 -> SET flag -> Port P1_6 = TX
+    PERCFG |= (PERCFG_U1CFG);
+    
+    //configure pin P1_6 (TX) as output:
+    P1SEL |= (1<<6);
+
+    //make tx pin output:
+    P1DIR |= (1<<6);
+#else
+ #error "UNSUPPORTED UART"
+#endif
 
     //this assumes cpu runs from XOSC (26mhz) !
     //see sbus.h for calc and defines

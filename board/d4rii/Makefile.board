@@ -10,7 +10,7 @@ CRYSTAL_FREQ = 12000000
 SELF_DIR := $(dir $(lastword $(MAKEFILE_LIST)))
 
 #name of executable
-RESULT ?= opensky_$(notdir $(TARGET))
+RESULT ?= opensky_$(notdir $(TARGET_LC))
 
 #faster build
 MAKEFLAGS+="-j6 "
@@ -60,7 +60,7 @@ LDFLAGS+= -T$(LDSCRIPT) -mthumb -mcpu=cortex-m3
 CFLAGS+= -mcpu=cortex-m3 -mthumb
 CFLAGS+= -DHSE_VALUE=$(CRYSTAL_FREQ)
 CFLAGS+= -I$(DEVICE) -I$(CORE) -I$(PERIPH)/inc -I. -I$(ARCH_DIR)
-CFLAGS+= -D$(PTYPE) -DUSE_STDPERIPH_DRIVER $(FULLASSERT) -DBUILD_TARGET=$(TARGET)
+CFLAGS+= -D$(PTYPE) -DUSE_STDPERIPH_DRIVER $(FULLASSERT) -DBUILD_TARGET=$(TARGET_LC)
 
 OPENOCD_PIDFILE = /tmp/openocd_opensky.pid
 

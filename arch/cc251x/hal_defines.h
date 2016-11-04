@@ -20,4 +20,9 @@
 
 #define UNUSED(x) (void)(x);
 
+#define USART0_P0 0
+#define USART0_P1 1
+#define USART1_P0 2
+#define USART1_P1 3
+
 #endif // __HAL_DEFINES_H__

@@ -13,7 +13,7 @@ endif
 #programmer binary
 CC_TOOL ?= cc-tool
 
-RESULT ?= opensky_$(notdir $(TARGET))
+RESULT ?= opensky_$(notdir $(TARGET_LC))
 
 # fetch this dir during include
 SELF_DIR := $(dir $(lastword $(MAKEFILE_LIST)))

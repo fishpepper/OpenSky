@@ -38,6 +38,8 @@
 #define LED_RED_PORT P2
 #define LED_RED_PIN  3
 
+//SBUS
+#define SBUS_UART USART1_P0
 
 //hub telemetry input (will run a soft serial port)
 #define SOFT_SERIAL_PORT          P0
