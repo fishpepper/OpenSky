@@ -61,9 +61,9 @@ The connection depends on the receiver and the firmware configuration (main.h)
 ## VD5M:
 <pre>
 (CH1 is at the same side as the LEDs)
-CH1 = BIND MODE (short to GND on startup to enter bind mode) / hub telemetry input (9600)
-CH2 = ADC0
-CH3 = ADC1
+CH1 = hub telemetry input (9600 baud)
+CH2 = BIND MODE (short to GND on startup to enter bind mode)
+CH3 = ADC0
 CH4 = CPPM OUT or SBUS (inverted or non-inverted, see main.h)
 CH5 = Debug UART @115200 8N1 (if compiled with debug enabled)
 </pre>
@@ -107,8 +107,6 @@ Raspberry Pi V2        CC2500
 08 TXD                 SBUS (output using hardware uart)
 40 GPIO21              PPM  (software bit banged, low quality)
 </pre>
-
-
 
 
 # BUGS
