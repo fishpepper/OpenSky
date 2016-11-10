@@ -64,4 +64,8 @@
 #define SOFT_SERIAL_PIN           7
 #define SOFT_SERIAL_INVERTED 0
 
+//device supports LNA/PA chip
+#define RF_LNA_PA_AVAILABLE  0
+#define RF_HIGH_GAIN_MODE_AVAILABLE 0
+
 #define DEFAULT_FSCAL_VALUE -20

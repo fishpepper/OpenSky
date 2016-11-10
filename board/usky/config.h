@@ -49,5 +49,25 @@
 #define SOFT_SERIAL_PIN           6
 #define SOFT_SERIAL_INVERTED 0
 
+//device supports LNA/PA chip
+#define RF_LNA_PA_AVAILABLE         0
+//LNA control pin
+//#define RF_LNA_PORT                 P0
+//#define RF_LNA_PIN                  0 
+//#define RF_LNA_ON_LEVEL             1
+//PA control pin
+//#define RF_PA_PORT                  P0
+//#define RF_PA_PIN                   1
+//#define RF_PA_ON_LEVEL              1
+//device supports high and low gain mode?
+#define RF_HIGH_GAIN_MODE_AVAILABLE 0
+//enable high gain?
+//#define RF_HIGH_GAIN_MODE_ENABLED   1
+//gain control pin
+//#define RF_HIGH_GAIN_MODE_PORT      P1
+//#define RF_HIGH_GAIN_MODE_PIN       0
+//#define RF_HIGH_GAIN_MODE_ON_LEVEL  1
+
+
 #define DEFAULT_FSCAL_VALUE -69
 

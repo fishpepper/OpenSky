@@ -34,6 +34,26 @@ void hal_cc25xx_init(void) {
     IP1 |=  (1<<0);
 
     hal_cc25xx_mode = CC25XX_MODE_RX;
+
+    //if we support LNA/PA make sure to config the pin as output:
+    #if RF_LNA_PA_AVAILABLE
+      PORT2DIR(RF_LNA_PORT) |= (1<<RF_LNA_PIN);
+      PORT2DIR(RF_PA_PORT) |= (1<<RF_PA_PIN);
+      //set default to LNA active
+      RF_PA_DISABLE();
+      RF_LNA_ENABLE();
+    #endif
+
+    //if we support HIGH GAIN mode config in as output:
+    #if RF_HIGH_GAIN_MODE_AVAILABLE
+      PORT2DIR(RF_HIGH_GAIN_MODE_PORT) |= (1<<RF_HIGH_GAIN_MODE_PIN);
+      //enable high gain mode?
+      #if RF_HIGH_GAIN_MODE_ENABLED
+        RF_HIGH_GAIN_MODE_ENABLE();
+      #else
+        RF_HIGH_GAIN_MODE_DISABLE();
+      #endif
+   #endif
 }
 
 void hal_cc25xx_disable_rf_interrupt(void) {
@@ -42,6 +62,13 @@ void hal_cc25xx_disable_rf_interrupt(void) {
 }
 
 void hal_cc25xx_enter_rxmode(void) {
+#if RF_LNA_PA_AVAILABLE
+    RF_LNA_ENABLE();
+    delay_us(20);
+    RF_PA_DISABLE();
+    delay_us(5);
+#endif
+
     //set up dma for radio--->buffer
     hal_cc25xx_setup_rf_dma(CC25XX_MODE_RX);
 
@@ -55,6 +82,13 @@ void hal_cc25xx_enter_rxmode(void) {
 }
 
 void hal_cc25xx_enter_txmode(void) {
+#if RF_LNA_PA_AVAILABLE
+    RF_LNA_DISABLE();
+    delay_us(20);
+    RF_PA_ENABLE();
+    delay_us(5);
+#endif
+
     //abort ch0
     DMAARM = DMA_ARM_ABORT | DMA_ARM_CH0;
     hal_cc25xx_setup_rf_dma(CC25XX_MODE_TX);

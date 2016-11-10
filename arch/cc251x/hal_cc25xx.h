@@ -2,6 +2,7 @@
 #define __HAL_CC25XX_H__
 #include <stdint.h>
 #include "hal_defines.h"
+#include "config.h"
 #include <cc2510fx.h>
 
 
@@ -12,7 +13,19 @@
 #define hal_cc25xx_get_register(r) (r)
 #define hal_cc25xx_get_register_burst(r) (r)
 
-//not used on vd5m
+
+#if RF_LNA_PA_AVAILABLE
+  #define RF_LNA_ENABLE()  { PORT2BIT(RF_LNA_PORT, RF_LNA_PIN) = RF_LNA_ON_LEVEL; }
+  #define RF_LNA_DISABLE() { PORT2BIT(RF_LNA_PORT, RF_LNA_PIN) = ~RF_LNA_ON_LEVEL; }
+  #define RF_PA_ENABLE()   { PORT2BIT(RF_PA_PORT, RF_PA_PIN) = RF_PA_ON_LEVEL; }
+  #define RF_PA_DISABLE()  { PORT2BIT(RF_PA_PORT, RF_PA_PIN) = ~RF_PA_ON_LEVEL; }
+#endif
+
+#if RF_HIGH_GAIN_MODE_AVAILABLE
+  #define RF_HIGH_GAIN_MODE_ENABLE()  { PORT2BIT(RF_HIGH_GAIN_MODE_PORT, RF_HIGH_GAIN_MODE_PIN) = RF_HIGH_GAIN_MODE_ON_LEVEL; }
+  #define RF_HIGH_GAIN_MODE_DISBALE() { PORT2BIT(RF_HIGH_GAIN_MODE_PORT, RF_HIGH_GAIN_MODE_PIN) = ~RF_HIGH_GAIN_MODE_ON_LEVEL; }
+#endif
+
 #define hal_cc25xx_set_antenna(x) (0)
 #define hal_cc25xx_process_packet(packet_received, buffer, maxlen) {}
 
