@@ -8,9 +8,7 @@
 #define CC25XX_FIFO FIFO
 
 #define hal_cc25xx_set_register(reg, val) { reg = val; }
-// debug("REG(");debug(DEFINE_TO_STR(reg)); debug(")="); debug_put_hex8(val); debug_put_newline(); debug_flush();}
 #define hal_cc25xx_strobe(val) { RFST = val; }
-//debug("RFST="); debug_put_hex8(val); debug_put_newline(); debug_flush();}
 #define hal_cc25xx_get_register(r) (r)
 #define hal_cc25xx_get_register_burst(r) (r)
 
