@@ -53,11 +53,19 @@
 #define LED_RED_PORT P2
 #define LED_RED_PIN  3
 
+//DEBUG
+#define DEBUG_UART USART0_P0
+
+//SBUS
+#define SBUS_UART USART1_P0
 
 //hub telemetry input (soft serial)
 #define SOFT_SERIAL_PORT          P0
 #define SOFT_SERIAL_PIN           7
 #define SOFT_SERIAL_INVERTED 0
 
+//device supports LNA/PA chip
+#define RF_LNA_PA_AVAILABLE  0
+#define RF_HIGH_GAIN_MODE_AVAILABLE 0
 
 #define DEFAULT_FSCAL_VALUE -20

@@ -15,34 +15,13 @@
    author: fishpepper <AT> gmail.com
 */
 
-#include "hal_clocksource.h"
-#include "hal_cc25xx.h"
-#include "led.h"
+#include "hal_wdt.h"
+#include "debug.h"
+#include "delay.h"
 
-void hal_clocksource_init(void){
-    //for debugging clocksource problems
-    led_red_on();
-    led_green_on();
+void hal_wdt_init(void) {
+}
 
-    //power up osc (?)
-    SLEEP &= ~CLOCKSOURCE_OSC_PD_BIT;
-    //wait for XOSC stable
-    while(!CLOCKSOURCE_XOSC_STABLE()){}
-    NOP();
-
-    //start crystal osc as HS clocksource, OSC32 is int rc osc
-    CLKCON = 0x80;
-
-    //wait for selection to be active
-    while(!CLOCKSOURCE_XOSC_STABLE()){}
-    NOP();
-
-    //power down the unused oscillator
-    SLEEP |= CLOCKSOURCE_OSC_PD_BIT;
-
-
-    //for debugging clocksource problems
-    led_red_off();
-    led_green_off();
+inline void hal_wdt_reset(void){
 }
 

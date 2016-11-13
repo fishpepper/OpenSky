@@ -1,13 +1,20 @@
+sudo: required
+dist: trusty
 env:
     - TARGET=D4RII
     - TARGET=VD5M
     - TARGET=USKY
+    - TARGET=TINYFISH
+    - TARGET=RASP
 
 addons:
   apt_packages:
     - lib32bz2-1.0
     - lib32ncurses5
     - lib32stdc++6
+    - gcc-arm-linux-gnueabi
+    - gcc-multilib
+    - libc-dev
 #    - sdcc
 #    - sdcc-libraries
 

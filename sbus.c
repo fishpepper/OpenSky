@@ -22,6 +22,7 @@
 #include "delay.h"
 #include "sbus.h"
 #include "ppm.h"
+#include "frsky.h"
 #include "failsafe.h"
 #include "hal_sbus.h"
 
@@ -78,6 +79,7 @@ void sbus_update(EXTERNAL_MEMORY uint16_t *data){
     uint8_t i;
     EXTERNAL_MEMORY uint16_t rescaled_data[8];
     int16_t tmp;
+    uint16_t rssi_scaled;
 
     //rescale input data:
     //frsky input is us*1.5
@@ -99,6 +101,9 @@ void sbus_update(EXTERNAL_MEMORY uint16_t *data){
             rescaled_data[i] = tmp;
         }
     }
+
+    //rescale frsky rssi to 0..2048 (TODO: find correct conversion)
+    rssi_scaled = frsky_rssi*20;
 
     //sbus transmits up to 16 channels with 11bit each.
     //build up channel data frame:
@@ -126,8 +131,12 @@ void sbus_update(EXTERNAL_MEMORY uint16_t *data){
     sbus_data[10] = HAL_SBUS_PREPARE_DATA( (rescaled_data[6]>>6) | (LO(rescaled_data[7])<<5) );
     //bits ch 7777 7777
     sbus_data[11] = HAL_SBUS_PREPARE_DATA( (rescaled_data[7]>>3) & 0xFF );
-    //ch8-ch15 = zero
-    for(i=12; i<23; i++){
+    //bits ch 8888 8888
+    sbus_data[12] = HAL_SBUS_PREPARE_DATA( rssi_scaled & 0xFF);
+    //bits ch 9999 9888
+    sbus_data[13] = HAL_SBUS_PREPARE_DATA( HI(rssi_scaled) );
+    //fill up to ch15 with zero
+    for(i=14; i<23; i++){
         sbus_data[i] = HAL_SBUS_PREPARE_DATA(0x00);
     }
     //sbus flags, will be set by start transmission...

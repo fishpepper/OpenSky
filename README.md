@@ -40,6 +40,13 @@ with my code.
 * RSSI telemetry
 * builtin APA102 Led control (maps to any a ppm channel)
 
+# Supported platforms
+
+* FrSky VD5M
+* FrSky D4r-ii
+* [DIY uSKY - a tiny 0.4g receiver](http://fishpepper.de/projects/usky/)
+* raspberry pi + cc2500 module (for easy development)
+
 # Debugging
 
 When debug is enabled during build (default for now) you will
@@ -54,7 +61,7 @@ The connection depends on the receiver and the firmware configuration (main.h)
 ## VD5M:
 <pre>
 (CH1 is at the same side as the LEDs)
-CH1 = BIND MODE (short to GND on startup to enter bind mode)
+CH1 = BIND MODE (short to GND on startup to enter bind mode) / hub telemetry input (9600)
 CH2 = ADC0
 CH3 = ADC1
 CH4 = CPPM OUT or SBUS (inverted or non-inverted, see main.h)
@@ -81,6 +88,27 @@ Serial Port:
 [3] = inverted SBUS (if enabled in main.h) or Debug UART 
 [4] = NC
 </pre>
+
+## rasp
+<pre>
+Raspberry Pi V2        CC2500
+
+16 GPIO23              GDO2
+17 VCC                 VCC
+19 MOSI                SI
+21 MISO                SO
+23 SCLK                SCLK
+25 GND                 GND
+
+03 GPIO02              LNA (Optional, if your chip have LNA)
+05 GPIO03              PA  (Optional, if your chip have PA)
+
+37 GPIO26              BIND (pull up to enter bind mode)
+08 TXD                 SBUS (output using hardware uart)
+40 GPIO21              PPM  (software bit banged, low quality)
+</pre>
+
+
 
 
 # BUGS

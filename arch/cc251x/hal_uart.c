@@ -21,9 +21,8 @@
 void hal_uart_init(void) {
     __xdata union hal_uart_config_t uart_config;
 
-    //we will use SERVO_5 as tx output:
-    //therefore we configure
-    //USART0 use ALT1 -> Clear flag -> Port P0 = TX
+#if DEBUG_UART == USART0_P0
+    //USART0 use ALT1 -> Clear flag -> Port P0_3 = TX
     PERCFG &= ~(PERCFG_U0CFG);
 
     //configure pin P0_3 (TX) as output:
@@ -34,6 +33,18 @@ void hal_uart_init(void) {
 
     //make tx pin output:
     P0DIR |= (1<<3);
+#elif DEBUG_UART == USART0_P1
+    //USART0 use ALT2 -> Set flag -> Port P1_5 = TX
+    PERCFG |= (PERCFG_U0CFG);
+
+    //configure pin P1_5 (TX) as output:
+    P1SEL |= (1<<5);
+
+    //make tx pin output:
+    P1DIR |= (1<<5);
+#else
+  #error "ERROR: UNSUPPORTED DEBUG UART"
+#endif
 
     //this assumes cpu runs from XOSC (26mhz) !
     //set baudrate
