@@ -295,3 +295,5 @@ arch/cc251x/hal_adc.c
 arch/cc251x/hal_adc.h
 arch/cc251x/hal_soft_serial.c
 arch/cc251x/hal_soft_serial.h
+arch/stm32f1/hal_storage.c
+arch/stm32f1/hal_storage.h

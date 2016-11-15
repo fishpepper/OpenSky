@@ -185,23 +185,17 @@ static void hal_storage_flash_write(uint16_t address, uint8_t *data, uint16_t le
     debug("hal_storage: write done");
 }
 
-//this has to be placed at a 2byte boundary, as sdcc does not support .align
-//pragmas this is done in this hacky way...
-BEGIN_CODE_ABS_LOCATION(FLASH_ENABLE_WRITE, 0x1000)  // NOTE:  No semicolon!
 void hal_storage_flash_enable_write(void){
     __asm
+    .even //IMPORTANT: PLACE THIS ON A 2BYTE BOUNDARY!
     ORL _FCTL, #0x02; //FCTL |=  FCTL_WRITE
     __endasm;
 }
-END_CODE_ABS_LOCATION(FLASH_ENABLE_WRITE)            // NOTE:  No semicolon!
 
-//this has to be placed at a 2byte boundary, as sdcc does not support .align
-//pragmas this is done in this hacky way...
-BEGIN_CODE_ABS_LOCATION(FLASH_ERASE_PAGE, 0x1010)  // NOTE:  No semicolon!
 void hal_storage_flash_erase_page(void){
     __asm
+    .even //IMPORTANT: PLACE THIS ON A 2BYTE BOUNDARY!
     ORL _FCTL, #0x01; //FCTL |= FCTL_ERASE
     NOP;            //required sequence!
     __endasm;
 }
-END_CODE_ABS_LOCATION(FLASH_ERASE_PAGE) // NOTE:  No semicolon!
