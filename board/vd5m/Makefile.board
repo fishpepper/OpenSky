@@ -1,9 +1,13 @@
-#
+#configuration of this board
+#cc2510..16 has 16k flash and -> 0x4000
+FLASH_SIZE=0x4000
+
+#no need to change stuff below this line...
 CC = sdcc
 CFLAGS += --model-small --opt-code-speed -I /usr/share/sdcc/include
 LDFLAGS_FLASH = \
 --out-fmt-ihx \
---code-loc 0x000 --code-size 0x4000 \
+--code-loc 0x0c00 --code-size $(FLASH_SIZE) \
 --xram-loc 0xf000 --xram-size 0x300 \
 --iram-size 0x100
 ifdef DEBUG
@@ -31,7 +35,13 @@ REL=$(SRC:.c=.rel)
 RST=$(SRC:.c=.rst)
 SYM=$(SRC:.c=.sym)
 
-OUTPUT=$(RESULT).hex
+#we build two flavours: 
+# _full  : includes the bootloader, use this for initial flashing
+# _update: just the opensky fw, relocated to be stored after the bootloader
+OUTPUT_FULL=$(RESULT)_full.hex
+OUTPUT_UPDATE=$(RESULT)_update.hex
+BL_DIR=arch/cc251x/bootloader
+BL_HEX=opensky_cc2510_bl.hex
 
 PCDB=$(PROGS:.hex=.cdb)
 PLNK=$(PROGS:.hex=.lnk)
@@ -41,13 +51,19 @@ PAOM=$(PROGS:.hex=)
 %.rel : %.c $(HEADERS)
 	$(CC) -c $(CFLAGS) -o$*.rel $<
 
-board: $(OUTPUT)
+board: $(OUTPUT_UPDATE) $(OUTPUT_FULL)
 
-$(OUTPUT): $(REL) Makefile
-	$(CC) $(LDFLAGS_FLASH) $(CFLAGS) -o $(OUTPUT) $(REL)
+$(OUTPUT_UPDATE): $(REL) Makefile
+	$(CC) $(LDFLAGS_FLASH) $(CFLAGS) -o $(OUTPUT_UPDATE) $(REL)
+
+$(OUTPUT_FULL): $(OUTPUT_UPDATE)
+	#build the bootloader
+	cd $(BL_DIR) && $(MAKE) STYLECHECKROOT=$(BL_DIR) FLASH_SIZE=$(FLASH_SIZE) clean $(BL_HEX)
+	srec_cat $(OUTPUT_UPDATE) -intel $(BL_DIR)/$(BL_HEX) -intel -o $(OUTPUT_FULL) -intel
+
 clean:
 	rm -f $(ADB) $(ASM) $(LNK) $(LST) $(REL) $(RST) $(SYM)
 	rm -f $(PROGS) $(PCDB) $(PLNK) $(PMAP) $(PMEM) $(PAOM)
 
-flash: $(RESULT).hex
-	$(CC_TOOL) -f -e -w $(RESULT).hex
+flash: $(OUTPUT_FULL)
+	$(CC_TOOL) -f -e -w $(OUTPUT_FULL)
