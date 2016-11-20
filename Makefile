@@ -11,10 +11,18 @@ ifneq ($(wildcard .use_fixed_id),)
 CFLAGS += -DFRSKY_USE_FIXED_ID
 endif
 
-TARGET_LC = $(shell echo $(TARGET) | tr '[:upper:]' '[:lower:]')
-TARGET_MAKEFILE = board/$(TARGET_LC)/Makefile.board
+TARGET_LC       = $(shell echo $(TARGET) | tr '[:upper:]' '[:lower:]')
+TARGET_DIR      = board/$(TARGET_LC)
+TARGET_MAKEFILE = $(TARGET_DIR)/Makefile.board
+CC251X_BL_DIR   = arch/cc251x/bootloader
 
-all  : ack_disclaimer board
+RESULT ?= opensky_$(notdir $(TARGET_LC))
+
+all  : git_submodule_init ack_disclaimer board
+
+# verifying that the git submodule for the cc2510 bootloader was initialized
+git_submodule_init : 
+	@if [ ! -f $(CC251X_BL_DIR)/Makefile ]; then git submodule init $(CC251X_BL_DIR) && git submodule update $(CC251X_BL_DIR); fi
 
 ifneq ($(wildcard $(TARGET_MAKEFILE)),)
   #fine, target exists
@@ -59,4 +67,4 @@ all  : board
 git_version:
 	git log -n 1 --format=format:"#define GIT_COMMIT \"%h\"%n" HEAD > $@.h
 
-.PHONY: git_version ack_disclaimer
+.PHONY: git_version ack_disclaimer git_submodule_init 
