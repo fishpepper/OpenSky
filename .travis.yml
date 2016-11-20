@@ -15,6 +15,7 @@ addons:
     - gcc-arm-linux-gnueabi
     - gcc-multilib
     - libc-dev
+    - srecord
 #    - sdcc
 #    - sdcc-libraries
 
