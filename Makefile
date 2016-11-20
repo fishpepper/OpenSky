@@ -12,7 +12,7 @@ CFLAGS += -DFRSKY_USE_FIXED_ID
 endif
 
 TARGET_LC       = $(shell echo $(TARGET) | tr '[:upper:]' '[:lower:]')
-TARGET_DIR      = board/$(TARGET_LC)
+TARGET_DIR      = $(abspath board/$(TARGET_LC))
 TARGET_MAKEFILE = $(TARGET_DIR)/Makefile.board
 CC251X_BL_DIR   = arch/cc251x/bootloader
 
