@@ -29,7 +29,7 @@ void hal_io_init(void) {
 
 uint8_t hal_io_bind_request(void){
     if (BIND_PORT & (1<<BIND_PIN)){
-    //HIGH -> button pressed
+    //HIGH -> button released
         return 0;
     }else{
     //LOW -> button pressed

@@ -49,7 +49,7 @@ board: $(OUTPUT_UPDATE) $(OUTPUT_FULL)
 
 bootloader:
 	@echo "building bootloader"
-	@cd $(BL_DIR) && \
+	cd $(BL_DIR) && \
 		$(MAKE) \
 			STYLECHECKROOT=$(BL_DIR) \
 			FLASH_SIZE=$(FLASH_SIZE) \
@@ -61,7 +61,7 @@ $(OUTPUT_UPDATE): $(REL) Makefile
 
 $(OUTPUT_FULL): $(OUTPUT_UPDATE) bootloader
 	@echo "merging bootloader and main code"
-	@srec_cat -disable_sequence_warnings \
+	srec_cat -disable_sequence_warnings \
 		$(OUTPUT_UPDATE) -intel \
 		$(BL_DIR)/$(BL_HEX) -intel \
 		-o $(OUTPUT_FULL) -intel 
