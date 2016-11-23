@@ -5,6 +5,7 @@ env:
     - TARGET=VD5M
     - TARGET=USKY
     - TARGET=TINYFISH
+    - TARGET=AFF4RX
     - TARGET=RASP
 
 addons:

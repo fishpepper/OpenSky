@@ -14,7 +14,7 @@ CC_TOOL ?= cc-tool
 
 # fetch this dir during include
 ARCH_DIR = arch/cc251x
-CFLAGS  +=  -I ./ -I$(ARCH_DIR)
+CFLAGS  +=  -I . -I$(ARCH_DIR)
 CFLAGS  += -I$(TARGET_DIR)
 HAL_SRC  = hal_led.c hal_uart.c hal_clocksource.c hal_timeout.c hal_wdt.c hal_delay.c hal_dma.c hal_spi.c 
 HAL_SRC += hal_cc25xx.c hal_io.c hal_adc.c hal_storage.c hal_sbus.c hal_ppm.c hal_soft_spi.c hal_soft_serial.c
