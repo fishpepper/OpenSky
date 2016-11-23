@@ -56,6 +56,9 @@
 //bootloader runs on UART1 P0
 #define BOOTLOADER_UART_NUM       1
 #define BOOTLOADER_UART_PORT      0
+#define BOOTLOADER_UART_INVERTED 0
+#define BOOTLOADER_UART_BAUDRATE 57600
+#define BOOTLOADER_UART_USE_PARITY 0
 // use ISP interface clock pin as bootloader enable pin
 // pull this low during startup to enter bootloader mode
 #define BOOTLOADER_ENABLE_PORT P2
