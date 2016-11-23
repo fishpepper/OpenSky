@@ -48,3 +48,11 @@ old/
 # misc
 dump*
 *.swp
+
+*.mem
+*.map
+*.lk
+
+.gitignore
+.project
+.cproject
