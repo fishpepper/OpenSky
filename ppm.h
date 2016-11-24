@@ -4,7 +4,7 @@
 #include "main.h"
 #include "hal_ppm.h"
 
-#if SBUS_ENABLED
+#ifdef SBUS_ENABLED
 
 //ppm is not used then
 #define ppm_init() {}

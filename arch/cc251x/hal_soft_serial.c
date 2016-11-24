@@ -25,6 +25,7 @@
 #include "portmacros.h"
 #include "hal_cc25xx.h"
 
+#ifndef HUB_TELEMETRY_ON_SBUS_UART
 
 void hal_soft_serial_init(void) {
     debug("hal_soft_serial: init\n"); debug_flush();
@@ -34,7 +35,7 @@ void hal_soft_serial_init(void) {
 
 void hal_soft_serial_init_gpio(void) {
     // set gpio as input
-    PORT2DIR(SOFT_SERIAL_PORT) &= ~(1<<SOFT_SERIAL_PIN);
+    PORT2DIR(HUB_TELEMETRY_PORT) &= ~(1<<HUB_TELEMETRY_PIN);
 }
 
 void hal_soft_serial_init_interrupts(void) {
@@ -73,22 +74,12 @@ void hal_soft_serial_init_interrupts(void) {
     P0SEL &= ~(1<<6);
 
     //set edge:
-#if HUB_TELEMETRY_INVERTED
-  #if SOFT_SERIAL_INVERTED
-    //falling edge triggers isr
-    PICTL   |= PICTL_P0ICON;
-  #else
+#ifdef HUB_TELEMETRY_INVERTED
     //rising edge triggers isr
     PICTL   &= ~PICTL_P0ICON;
-  #endif
 #else
-  #if SOFT_SERIAL_INVERTED
-    //rising edge triggers isr
-    PICTL   &= ~PICTL_P0ICON;
-  #else
     //falling edge triggers isr
     PICTL   |= PICTL_P0ICON;
-  #endif
 #endif
 
     //T4 highest int prio (group4)
@@ -133,7 +124,7 @@ void hal_soft_serial_startbit_interrupt(void) __interrupt P0INT_VECTOR{
     //clear P0 int flags (important: several P0 pins can cause the isr, clean all of them!)
     P0IF = 0;
 
-    if(isr_cause & (1<<SOFT_SERIAL_PIN)){
+    if(isr_cause & (1<<HUB_TELEMETRY_PIN)){
         //DEBUG_PIN_TOGGLE();
         // reset t3 counter:
         T4CTL |= T4CTL_CLR;
@@ -155,3 +146,4 @@ void hal_soft_serial_startbit_interrupt(void) __interrupt P0INT_VECTOR{
     }
 }
 
+#endif

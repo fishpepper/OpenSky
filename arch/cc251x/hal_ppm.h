@@ -5,7 +5,7 @@
 #include "hal_cc25xx.h"
 #include <stdint.h>
 
-#if SBUS_ENABLED
+#ifdef SBUS_ENABLED
 #define hal_ppm_init() {}
 #else
 void hal_ppm_init(void);

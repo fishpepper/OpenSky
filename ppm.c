@@ -21,7 +21,7 @@
 #include "wdt.h"
 #include "failsafe.h"
 
-#if (SBUS_ENABLED == 0)
+#ifndef SBUS_ENABLED
 
 //ppm signal:
 // s  CH1  s  CH2  s ... s   FILL_UP_TO_20.0ms
@@ -103,8 +103,7 @@ void PPM_TIMER_ISR(void) {
         uint16_t pulse_len = HAL_PPM_US_TO_TICKCOUNT(1000);
 
         //clear flag
-        HAL_UART_ISR_CLEAR_FLAG(); //THIS SHOULD NEVER BE THE LAST LINE IN AN ISR!
-
+        HAL_PPM_ISR_CLEAR_FLAG(); //THIS SHOULD NEVER BE THE LAST LINE IN AN ISR!
 
         //failsafe mode?
         if (failsafe_active){

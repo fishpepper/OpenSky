@@ -17,11 +17,18 @@
 
 #include "telemetry.h"
 #include "soft_serial.h"
+#include "uart.h"
 #include "debug.h"
 #include "wdt.h"
 
 volatile EXTERNAL_MEMORY telemetry_buffer_t telemetry_buffer;
 volatile EXTERNAL_MEMORY uint8_t telemetry_expected_id;
+
+#ifndef SBUS_ENABLED 
+  #ifdef HUB_TELEMETRY_ON_SBUS_UART
+    #error ERROR: SBUS is not enabled, can not use/share port with telemery
+  #endif
+#endif
 
 void telemetry_init(void) {
     debug("telemetry: init\n"); debug_flush();
@@ -34,11 +41,18 @@ void telemetry_init(void) {
     telemetry_buffer.read     = 0;
     telemetry_buffer.read_ok  = 0;
 
-    // init software serial port:
+#ifdef HUB_TELEMETRY_ON_SBUS_UART
+    // re-use sbus uart, no init necessary
+    debug("telemetry: using sbus uart\n"); debug_flush();
+    // attach callback
+    uart_set_rx_callback(&telemetry_rx_callback);
+#else
+    // init software serial port
     soft_serial_init();
 
     // attach callback
     soft_serial_set_rx_callback(&telemetry_rx_callback);
+#endif
 
     #if TELEMETRY_DO_TEST
     telemetry_rx_echo_test();
