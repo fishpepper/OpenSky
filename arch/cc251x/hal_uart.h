@@ -29,7 +29,7 @@ union hal_uart_config_t{
 };
 
 void hal_uart_init(void);
-void hal_uart_set_mode(EXTERNAL_MEMORY union hal_uart_config_t *cfg);
+static void hal_uart_set_mode(EXTERNAL_MEMORY union hal_uart_config_t *cfg);
 void hal_uart_start_transmission(uint8_t *data, uint8_t len);
 
 #ifdef HUB_TELEMETRY_ON_SBUS_UART

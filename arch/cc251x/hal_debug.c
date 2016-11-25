@@ -29,7 +29,7 @@ void hal_debug_init(void) {
     P0SEL |= (1<<3);
 
     //make sure all P1 pins switch to normal GPIO
-    P1SEL &= ~(0x3C);
+//    P1SEL &= ~(0x3C);
 
     //make tx pin output:
     P0DIR |= (1<<3);
@@ -60,11 +60,31 @@ void hal_debug_init(void) {
     uart_config.bit.D9     = 0; //8 Bits
     uart_config.bit.FLOW   = 0; //no hw flow control
     uart_config.bit.ORDER  = 0; //lsb first
-    hal_uart_set_mode(&uart_config);
+    hal_debug_set_mode(&uart_config);
 
     //enable interrupts:
     sei();
 }
+
+static void hal_debug_set_mode(EXTERNAL_MEMORY union hal_uart_config_t *cfg){
+    //enable uart mode
+    U0CSR |= 0x80;
+
+    //store config to UxUCR register
+    U0UCR = cfg->byte & (0x7F);
+
+    //store config to U1GCR: (msb/lsb)
+    if (cfg->bit.ORDER){
+        U0GCR |= U0GCR_ORDER;
+    }else{
+        U0GCR &= ~U0GCR_ORDER;
+    }
+
+    //interrupt prio to 1 (0..3=highest)
+    IP0 &= ~(1<<2);
+    IP1 &= ~(1<<2);
+}
+
 
 void hal_debug_start_transmission(uint8_t ch){
     //clear flags
@@ -78,23 +98,5 @@ void hal_debug_start_transmission(uint8_t ch){
     U0DBUF = ch;
 }
 
-static void hal_debug_set_mode(__xdata union hal_uart_config_t *cfg){
-    //enable uart mode
-    U0CSR |= 0x80;
-
-    //store config to U0UCR register
-    U0UCR = cfg->byte & (0x7F);
-
-    //store config to U0GCR: (msb/lsb)
-    if (cfg->bit.ORDER){
-        U0GCR |= U0GCR_ORDER;
-    }else{
-        U0GCR &= ~U0GCR_ORDER;
-    }
-
-    //interrupt prio to 01 (0..3=highest)
-    IP0 |=  (1<<2);
-    IP1 &= ~(1<<2);
-}
 
 

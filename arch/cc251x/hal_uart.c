@@ -23,6 +23,8 @@
 #include "config.h"
 #include "hal_dma.h"
 #include "uart.h"
+#include "debug.h"
+#include "led.h"
 
 void hal_uart_init(void) {
     EXTERNAL_MEMORY union hal_uart_config_t sbus_uart_config;
@@ -30,14 +32,24 @@ void hal_uart_init(void) {
 #if SBUS_UART == USART1_P0
     //USART1 use ALT1 -> Clear flag -> Port P0_4 = TX
     PERCFG &= ~(PERCFG_U1CFG);
+
+    // USART1 has priority when USART0 is also enabled
+    P2DIR = (P2DIR & 0x3F) | 0b01000000;
+
     //configure pin P0_4 (TX) and P0_5 (RX) as special function:
     P0SEL |= (1<<4) | (1<<5);
+
+    // make sure all P1 pins switch to normal GPIO
+    P1SEL &= ~(0xF0);
 
     //make tx pin output:
     P0DIR |= (1<<4);
 #elif SBUS_UART == USART1_P1
     //USART1 use ALT2 -> SET flag -> Port P1_6 = TX
     PERCFG |= (PERCFG_U1CFG);
+
+    // USART1 has priority when USART0 is also enabled
+    P2DIR = (P2DIR & 0x3F) | 0b01000000;
 
     //configure pin P1_6 (TX) and P1_7(RX) as special function:
     P1SEL |= (1<<6) | (1<<7);
@@ -118,6 +130,7 @@ void hal_uart_init(void) {
     U1CSR |= U1CSR_RX_ENABLE;
 
     // enable RX interrupt
+    STRANGE, URX1INT fires quite often?!
     URX1IE = 1;
 
     // enable global ints
@@ -125,7 +138,7 @@ void hal_uart_init(void) {
 #endif
 }
 
-void hal_uart_set_mode(EXTERNAL_MEMORY union hal_uart_config_t *cfg){
+static void hal_uart_set_mode(EXTERNAL_MEMORY union hal_uart_config_t *cfg){
     //enable uart mode
     U1CSR |= 0x80;
 
@@ -168,6 +181,8 @@ void HAL_UART_RX_ISR(void) {
 
     HAL_UART_RX_ISR_CLEAR_FLAG(); //THIS SHOULD NEVER BE THE LAST LINE IN AN ISR!
     rx = HAL_UART_RX_GETCH();
+
+    led_red_toggle();
 
     if (uart_rx_callback != 0) {
         // execute callback

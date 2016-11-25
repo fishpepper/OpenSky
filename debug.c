@@ -22,6 +22,8 @@
 #include <stdint.h>
 #include "hal_defines.h"
 
+#if DEBUG
+
 EXTERNAL_MEMORY debug_buffer_t debug_buffer;
 EXTERNAL_MEMORY uint8_t debug_init_done = 0;
 
@@ -282,3 +284,5 @@ void debug_put_uint16(uint16_t c){
 void debug_put_newline(void){
     debug_putc('\n');
 }
+
+#endif 
