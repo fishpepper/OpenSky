@@ -1,0 +1,83 @@
+CC = sdcc
+CFLAGS += --model-small --opt-code-speed -I /usr/share/sdcc/include
+LDFLAGS_FLASH = \
+--out-fmt-ihx \
+--code-loc 0x0c00 --code-size $(FLASH_SIZE) \
+--xram-loc 0xf000 --xram-size 0x300 \
+--iram-size 0x100
+ifdef DEBUG
+CFLAGS += --debug
+endif
+
+#programmer binary
+CC_TOOL ?= cc-tool
+
+# fetch this dir during include
+ARCH_DIR = arch/cc251x
+CFLAGS  +=  -I . -I$(ARCH_DIR)
+CFLAGS  += -I$(TARGET_DIR)
+HAL_SRC  = hal_led.c hal_debug.c hal_uart.c hal_clocksource.c hal_timeout.c hal_wdt.c hal_delay.c hal_dma.c hal_spi.c 
+HAL_SRC += hal_cc25xx.c hal_io.c hal_adc.c hal_storage.c hal_sbus.c hal_ppm.c hal_soft_spi.c hal_soft_serial.c
+SRC = $(GENERIC_SRCS) $(HAL_SRC:%.c=$(ARCH_DIR)/%.c)
+HEADERS := $(SRC:.c=.h)
+ADB=$(SRC:.c=.adb)
+ASM=$(SRC:.c=.asm)
+LNK=$(SRC:.c=.lnk)
+LST=$(SRC:.c=.lst)
+REL=$(SRC:.c=.rel)
+RST=$(SRC:.c=.rst)
+SYM=$(SRC:.c=.sym)
+
+#we build two flavours: 
+# _full  : includes the bootloader, use this for initial flashing
+# _update: just the opensky fw, relocated to be stored after the bootloader
+OUTPUT_FULL= $(RESULT)_full.hex
+OUTPUT_UPDATE= $(RESULT)_update.hex
+OUTPUT_NO_BL= $(RESULT)_no_bl.hex
+BL_DIR=arch/cc251x/bootloader
+BL_HEX=bootloader.hex
+
+PCDB=$(PROGS:.hex=.cdb)
+PLNK=$(PROGS:.hex=.lnk)
+PMAP=$(PROGS:.hex=.map)
+PMEM=$(PROGS:.hex=.mem)
+PAOM=$(PROGS:.hex=)
+
+%.rel : %.c $(HEADERS)
+	$(CC) -c $(CFLAGS) -o$*.rel $<
+
+board: $(OUTPUT_UPDATE) $(OUTPUT_FULL)
+
+bootloader:
+	@echo "building bootloader"
+	$(MAKE) -C $(BL_DIR) \
+		STYLECHECKROOT=$(BL_DIR) \
+		FLASH_SIZE=$(FLASH_SIZE) \
+		CONFIG_INCLUDE_DIR=$(TARGET_DIR) \
+		clean all
+
+$(OUTPUT_UPDATE): $(REL) Makefile
+	$(CC) $(LDFLAGS_FLASH) $(CFLAGS) -o $(OUTPUT_UPDATE) $(REL)
+
+$(OUTPUT_FULL): $(OUTPUT_UPDATE) bootloader
+	@echo "merging bootloader and main code"
+	srec_cat -disable_sequence_warnings \
+		$(OUTPUT_UPDATE) -intel \
+		$(BL_DIR)/$(BL_HEX) -intel \
+		-o $(OUTPUT_FULL) -intel 
+	@echo "done."
+
+# this is just for development, DO NOT flash this for production
+$(OUTPUT_NO_BL): $(REL) Makefile
+	$(CC) $(LDFLAGS_FLASH) $(CFLAGS) --code-loc 0x000 -o $(OUTPUT_NO_BL) $(REL)
+
+clean:
+	@rm -f $(ADB) $(ASM) $(LNK) $(LST) $(REL) $(RST) $(SYM)
+	@rm -f $(PROGS) $(PCDB) $(PLNK) $(PMAP) $(PMEM) $(PAOM)
+	@cd $(BL_DIR) && $(MAKE) clean
+
+flash: $(OUTPUT_FULL)
+	$(CC_TOOL) -f -e -w $(OUTPUT_FULL)
+
+flash_no_bl: $(OUTPUT_NO_BL)
+	$(CC_TOOL) -f -e -w $(OUTPUT_NO_BL)

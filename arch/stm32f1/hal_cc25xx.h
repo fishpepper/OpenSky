@@ -3,8 +3,6 @@
 
 #include <stdint.h>
 
-
-
 void hal_cc25xx_init(void);
 void hal_cc25xx_set_register(uint8_t reg, uint8_t val);
 uint8_t hal_cc25xx_get_register(uint8_t address);

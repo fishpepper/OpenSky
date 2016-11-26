@@ -29,8 +29,13 @@ void hal_clocksource_init(void){
     //wait for XOSC stable
     while(!CLOCKSOURCE_XOSC_STABLE()){}
     NOP();
+
     //start crystal osc as HS clocksource, OSC32 is int rc osc
     CLKCON = 0x80;
+
+    //wait for selection to be active
+    while(!CLOCKSOURCE_XOSC_STABLE()){}
+    NOP();
 
     //power down the unused oscillator
     SLEEP |= CLOCKSOURCE_OSC_PD_BIT;

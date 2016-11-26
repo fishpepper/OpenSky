@@ -2,7 +2,7 @@
 #define __DEBUG__H_
 #include "main.h"
 #include "hal_defines.h"
-#include "hal_uart.h"
+#include "hal_debug.h"
 #include <stdint.h>
 
 #define DEBUG_TX_BUFFER_SIZE 128

@@ -1,25 +1,18 @@
-#ifndef __HAL_UART_H__
-#define __HAL_UART_H__
+#ifndef __HAL_UART_H_
+#define __HAL_UART_H_
 
-#include "hal_cc25xx.h"
 #include <stdint.h>
+#include "hal_defines.h"
 
 //for a 26MHz Crystal:
-#define CC2510_BAUD_E_115200 12
-#define CC2510_BAUD_E_57600  11
-#define CC2510_BAUD_M_115200 34
-#define CC2510_BAUD_M_57600  34
-
-//use 155200 baud
-#define UART_BAUD_M CC2510_BAUD_M_115200
-#define UART_BAUD_E CC2510_BAUD_E_115200
-
-void hal_uart_init(void);
-void hal_uart_start_transmission(uint8_t ch);
-
-#define hal_uart_int_enabled() (IEN2 & IEN2_UTX0IE)
-#define hal_uart_int_enable() { sei(); }
-#define hal_uart_int_disable() { cli(); }
+#define CC2510_BAUD_E_115200  12
+#define CC2510_BAUD_M_115200  34
+//best match for 100kbit/s = 99975.5859375 bit/s
+//baudrate = (((256.0 + baud_m)*2.0**baud_e) / (2**28)) * 26000000.0
+#define CC2510_BAUD_E_100000  11
+#define CC2510_BAUD_M_100000 248
+#define CC2510_BAUD_E_57600   11
+#define CC2510_BAUD_M_57600   34
 
 union hal_uart_config_t{
   uint8_t byte;
@@ -35,14 +28,16 @@ union hal_uart_config_t{
   } bit;
 };
 
-static void hal_uart_set_mode(__xdata union hal_uart_config_t *cfg);
+void hal_uart_init(void);
+static void hal_uart_set_mode(EXTERNAL_MEMORY union hal_uart_config_t *cfg);
+void hal_uart_start_transmission(uint8_t *data, uint8_t len);
 
-#define DEBUG_ISR(void) hal_uart_tx_interrupt(void) __interrupt UTX0_VECTOR
-#define HAL_UART_ISR_FLAG_SET() (1)
-#define HAL_UART_ISR_CLEAR_FLAG() { UTX0IF = 0; }
-#define HAL_UART_ISR_DISABLE() { IEN2 &= ~(IEN2_UTX0IE); }
-#define HAL_UART_TX_DATA(data) { U0DBUF = data; }
+#ifdef HUB_TELEMETRY_ON_SBUS_UART
+  #define HAL_UART_RX_ISR(void) hal_uart_rx_interrupt(void) __interrupt URX1_VECTOR
+  #define HAL_UART_RX_ISR_CLEAR_FLAG() { URX1IF = 0; }
+  #define HAL_UART_RX_GETCH() (U1DBUF)
+  
+  void HAL_UART_RX_ISR(void);
+#endif
 
-
-
-#endif // __HAL_UART_H__
+#endif  // __HAL_UART_H_

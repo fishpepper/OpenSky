@@ -104,25 +104,32 @@ uint8_t hal_adc_dma_done(void){
 }
 
 uint8_t hal_adc_get_scaled(uint8_t ch){
+    uint16_t adc_data;
     //adc data is HHHHHHHHLLLL0000 -> shift >>6 to get 10bit
-    //shift by >>6 and shift by 2 to get 8 bit
-    //now comes the strange part! this seems to be wrong
-    //shifting by 6+1 does work and delivers the right values
-    //i have no clue whats wrong here... or is 10bit res not 10bit values?!
+    //the cc2510 is _ALWAYS_ outputting data in two's complement format
+    //thus we shift >>7 to get 9 bit two's complement
+    //NOTE: the chip seems to have a bug, in contrast to the datasheet
+    //      measuring a signal close to GND seems to deliver negative values (!)
+    //      therefore we have to check for negative numbers and set them to zero
     if (ch == 0){
         //convert to 8 bit (see above)
-        return hal_adc_data[1]>>7;
+        adc_data = hal_adc_data[1]>>7;
+        if (adc_data & (1<<8)) adc_data = 0; //bugfix: handle negative numbers
+        //return fixed value
+        return adc_data;
     }else{
-        #if ADC1_USE_ACS712
+        adc_data = hal_adc_data[0]>>7;
+        if (adc_data & (1<<8)) adc_data = 0; //bugfix: handle negative numbers
+        #ifdef ADC1_USE_ACS712
         //acs712 is connected to ADC1
         //when powered by 5V we can use a trick
         //to get a good resolution:
         //use inverted power inputs to get
         // 0A = 2.5V
         //30A = 0.0V
-        return 255-(hal_adc_data[0]>>7);
+        return 255-(adc_data);
         #else
-        return hal_adc_data[0]>>7;
+        return adc_data;
         #endif
     }
 }

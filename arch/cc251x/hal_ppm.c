@@ -18,12 +18,7 @@
 #include "hal_ppm.h"
 #include "ppm.h"
 
-#if SBUS_ENABLED == 1
-
-void hal_ppm_init(void){
-}
-
-#else
+#ifndef SBUS_ENABLED
 
 void hal_ppm_init(void) {
     //no int on overflow:

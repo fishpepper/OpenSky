@@ -16,91 +16,130 @@
 */
 
 #include "hal_uart.h"
-#include  "stm32f10x_rcc.h"
-#include  "stm32f10x_usart.h"
-#include  "misc.h" //this is actually a stm32 include (nvic stuff)
-#include  "debug.h"
-#include  "led.h"
+#include "debug.h"
+#include "main.h"
+#include "sbus.h"
+#include "delay.h"
+#include "config.h"
+#include "hal_defines.h"
+#include "stm32f10x_usart.h"
+#include "stm32f10x_gpio.h"
+#include "stm32f10x_rcc.h"
+#include "misc.h" // this defines stm32 nvic stuff
 
-volatile uint8_t hal_usart_txe_is_on;
+#ifdef SBUS_ENABLED
 
-void hal_uart_init(void) {
-    hal_usart_txe_is_on = 0;
+volatile uint8_t hal_uart_tx_pos;
+volatile uint8_t *hal_uart_tx_buffer;
 
-    hal_uart_init_nvic(0);
+void hal_uart_init(EXTERNAL_MEMORY uint8_t *data_ptr) {
     hal_uart_init_rcc();
     hal_uart_init_gpio();
+    hal_uart_init_nvic();
     hal_uart_init_mode();
-    hal_uart_enable();
 }
 
-void hal_uart_init_nvic(uint8_t enable) {
+void SBUS_USART_IRQHANDLER(void){
+    if(USART_GetITStatus(SBUS_USART, USART_IT_TXE) != RESET){
+        //TXE interrupt
+        //finished with sending?
+        if(hal_uart_tx_pos >= SBUS_DATA_LEN){
+            //no data in fifo -> disable tx int:
+            USART_ITConfig(SBUS_USART, USART_IT_TXE, DISABLE);
+            //debug_put_newline();
+        }else{
+            //else: data to tx
+            //debug_put_hex8(hal_uart_tx_buffer[hal_uart_tx_pos]);
+            USART_SendData(SBUS_USART, hal_uart_tx_buffer[hal_uart_tx_pos++]);
+        }
+    }
+
+#ifdef HUB_TELEMETRY_ON_SBUS_UART
+    if(USART_GetITStatus(SBUS_USART, USART_IT_RXE) != RESET){
+        //RXE interrupt
+        uint8_t rx = USART_ReceiveData(SBUS_USART);
+        
+        if (uart_rx_callback != 0) {
+            // execute callback
+            uart_rx_callback(rx);
+        }
+    }
+#endif
+    
+}
+
+
+static void hal_uart_init_nvic(void) {
     // enable interrupts
     NVIC_InitTypeDef nvic_init;
-
 
     // configure the NVIC Preemption Priority Bits
     NVIC_PriorityGroupConfig(NVIC_PriorityGroup_0);
 
     // enable the USART interrupt
-    nvic_init.NVIC_IRQChannel = DEBUG_USART_IRQn;
-    nvic_init.NVIC_IRQChannelPreemptionPriority = NVIC_PRIO_DEBUG_UART;
+    nvic_init.NVIC_IRQChannel = SBUS_USART_IRQn;
+    nvic_init.NVIC_IRQChannelPreemptionPriority = NVIC_PRIO_SBUS;
     nvic_init.NVIC_IRQChannelSubPriority = 0;
-    nvic_init.NVIC_IRQChannelCmd = enable ? ENABLE : DISABLE;
+    nvic_init.NVIC_IRQChannelCmd = ENABLE;
     NVIC_Init(&nvic_init);
 }
-
-
-static void hal_uart_init_mode(void) {
-    USART_InitTypeDef uart_init;
-
-    //USART configuration:
-    // 115200 baud, 8N1
-    // no hw flow control
-    uart_init.USART_BaudRate = 115200;
-    uart_init.USART_WordLength = USART_WordLength_8b;
-    uart_init.USART_StopBits = USART_StopBits_1;
-    uart_init.USART_Parity = USART_Parity_No;
-    uart_init.USART_HardwareFlowControl = USART_HardwareFlowControl_None;
-    uart_init.USART_Mode = USART_Mode_Tx;
-    USART_Init(DEBUG_USART, &uart_init);
-}
-
-static void hal_uart_enable(void) {
-    //enable uart
-    USART_Cmd(DEBUG_USART, ENABLE);
-}
-
-void hal_uart_start_transmission(uint8_t ch) {
-    //enable TXE int
-    USART_ITConfig(DEBUG_USART, USART_IT_TXE, ENABLE);
-    hal_usart_txe_is_on = 1;
-
-    //send first byte
-    USART_SendData(DEBUG_USART, ch);
-}
-
-uint8_t hal_uart_int_enabled(void) {
-    //is the txe int enabled?
-    return hal_usart_txe_is_on;
-}
-
 
 static void hal_uart_init_gpio(void){
     GPIO_InitTypeDef gpio_init;
 
     //Configure USART TX as alternate function push-pull
-    gpio_init.GPIO_Pin   = DEBUG_USART_TX_PIN;
+    gpio_init.GPIO_Pin   = SBUS_USART_TX_PIN;
     gpio_init.GPIO_Speed = GPIO_Speed_50MHz;
     gpio_init.GPIO_Mode  = GPIO_Mode_AF_PP;
-    GPIO_Init(DEBUG_USART_GPIO, &gpio_init);
+    GPIO_Init(SBUS_USART_GPIO, &gpio_init);
 }
 
 static void hal_uart_init_rcc(void){
     // configure clocks for uart:
     // enable GPIO clock
-    RCC_APBxPeriphClockCmd(DEBUG_USART_GPIO_CLK_RCC, DEBUG_USART_GPIO_CLK | RCC_APB2Periph_AFIO, ENABLE);
+    RCC_APBxPeriphClockCmd(SBUS_USART_GPIO_CLK_RCC, SBUS_USART_GPIO_CLK, ENABLE);
+    RCC_APBxPeriphClockCmd(2, RCC_APB2Periph_AFIO, ENABLE);
 
     // enable USART clock
-    RCC_APBxPeriphClockCmd(DEBUG_USART_CLK_RCC, DEBUG_USART_CLK, ENABLE);
+    RCC_APBxPeriphClockCmd(SBUS_USART_RCC, SBUS_USART_CLK, ENABLE);
 }
+
+static void hal_uart_init_mode(void) {
+    USART_InitTypeDef uart_init;
+
+    // USART configuration:
+    // 100000bps inverted serial stream, 8 bits, even parity, 2 stop bits
+    // no hw flow control
+    uart_init.USART_BaudRate            = 100000;
+    // THIS IS TRICKY! for parity bit we need to set uart to 9 bit mode !
+    uart_init.USART_WordLength          = USART_WordLength_9b;
+    uart_init.USART_StopBits            = USART_StopBits_2;
+    uart_init.USART_Parity              = USART_Parity_Even;
+    uart_init.USART_HardwareFlowControl = USART_HardwareFlowControl_None;
+    uart_init.USART_Mode                = USART_Mode_Tx;
+    
+#ifdef HUB_TELEMETRY_ON_SBUS_UART
+    uart_init.USART_Mode                |= USART_Mode_Rx;
+#endif
+    
+    USART_Init(SBUS_USART, &uart_init);
+
+    USART_Cmd(SBUS_USART, ENABLE);
+    
+#ifdef HUB_TELEMETRY_ON_SBUS_UART
+    USART_ITConfig(SBUS_USART, USART_IT_RXNE, ENABLE);
+#endif
+}
+
+void hal_uart_start_transmission(uint8_t *buffer, uint8_t len) {
+    //copy data ptr:
+    hal_uart_tx_buffer = buffer;
+
+    //set up counter:
+    hal_uart_tx_pos = 0;
+
+    //enable TXE int
+    USART_ITConfig(SBUS_USART, USART_IT_TXE, ENABLE);
+}
+
+#endif

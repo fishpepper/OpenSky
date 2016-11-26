@@ -4,6 +4,7 @@
 #include "config.h"
 #include "main.h"
 #include "hal_cc25xx.h"
+#include "portmacros.h"
 
 void hal_soft_spi_init(void);
 
