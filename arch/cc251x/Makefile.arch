@@ -31,8 +31,9 @@ SYM=$(SRC:.c=.sym)
 #we build two flavours: 
 # _full  : includes the bootloader, use this for initial flashing
 # _update: just the opensky fw, relocated to be stored after the bootloader
-OUTPUT_FULL=$(RESULT)_full.hex
-OUTPUT_UPDATE=$(RESULT)_update.hex
+OUTPUT_FULL= $(RESULT)_full.hex
+OUTPUT_UPDATE= $(RESULT)_update.hex
+OUTPUT_NO_BL= $(RESULT)_no_bl.hex
 BL_DIR=arch/cc251x/bootloader
 BL_HEX=bootloader.hex
 
@@ -67,6 +68,10 @@ $(OUTPUT_FULL): $(OUTPUT_UPDATE) bootloader
 		-o $(OUTPUT_FULL) -intel 
 	@echo "done."
 
+# this is just for development, DO NOT flash this for production
+$(OUTPUT_NO_BL): $(REL) Makefile
+	$(CC) $(LDFLAGS_FLASH) $(CFLAGS) --code-loc 0x000 -o $(OUTPUT_NO_BL) $(REL)
+
 clean:
 	@rm -f $(ADB) $(ASM) $(LNK) $(LST) $(REL) $(RST) $(SYM)
 	@rm -f $(PROGS) $(PCDB) $(PLNK) $(PMAP) $(PMEM) $(PAOM)
@@ -74,3 +79,6 @@ clean:
 
 flash: $(OUTPUT_FULL)
 	$(CC_TOOL) -f -e -w $(OUTPUT_FULL)
+
+flash_no_bl: $(OUTPUT_NO_BL)
+	$(CC_TOOL) -f -e -w $(OUTPUT_NO_BL)

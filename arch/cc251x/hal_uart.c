@@ -24,6 +24,8 @@
 #include "hal_dma.h"
 #include "uart.h"
 #include "debug.h"
+#include "wdt.h"
+#include "delay.h"
 #include "led.h"
 
 void hal_uart_init(void) {
@@ -130,7 +132,6 @@ void hal_uart_init(void) {
     U1CSR |= U1CSR_RX_ENABLE;
 
     // enable RX interrupt
-    STRANGE, URX1INT fires quite often?!
     URX1IE = 1;
 
     // enable global ints
@@ -181,8 +182,6 @@ void HAL_UART_RX_ISR(void) {
 
     HAL_UART_RX_ISR_CLEAR_FLAG(); //THIS SHOULD NEVER BE THE LAST LINE IN AN ISR!
     rx = HAL_UART_RX_GETCH();
-
-    led_red_toggle();
 
     if (uart_rx_callback != 0) {
         // execute callback

@@ -13,7 +13,7 @@
 
 //note: change of adc ch require change in adc.c!
 #define ADC_PORT P0
-#define ADC0 SERVO_3
+#define ADC0 SERVO_2
 #define ADC1 SERVO_2
 //acs712 in inverted mode on adc1?
 //when powered by 5V we can use a trick
