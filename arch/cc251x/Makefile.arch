@@ -50,12 +50,11 @@ board: $(OUTPUT_UPDATE) $(OUTPUT_FULL)
 
 bootloader:
 	@echo "building bootloader"
-	cd $(BL_DIR) && \
-		$(MAKE) \
-			STYLECHECKROOT=$(BL_DIR) \
-			FLASH_SIZE=$(FLASH_SIZE) \
-			CONFIG_INCLUDE_DIR=$(TARGET_DIR) \
-			clean all
+	$(MAKE) -C $(BL_DIR) \
+		STYLECHECKROOT=$(BL_DIR) \
+		FLASH_SIZE=$(FLASH_SIZE) \
+		CONFIG_INCLUDE_DIR=$(TARGET_DIR) \
+		clean all
 
 $(OUTPUT_UPDATE): $(REL) Makefile
 	$(CC) $(LDFLAGS_FLASH) $(CFLAGS) -o $(OUTPUT_UPDATE) $(REL)
