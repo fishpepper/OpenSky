@@ -46,15 +46,15 @@
 // Note: default/futaba is INVERTED=1! (use this for a cc3d etc)
 //       inverted     => idle = LOW
 //       non inverted => idle = high
-//#define SBUS_INVERTED
+#define SBUS_INVERTED
 
 // PPM (only used if sbus is disabled)
 // invert SBUS output (normal is non inverted)
 //#define PPM_INVERTED
 
 //hub telemetry input (soft serial)
-#define HUB_TELEMETRY_ON_SBUS_UART
-//#define HUB_TELEMETRY_INVERTED
+//#define HUB_TELEMETRY_ON_SBUS_UART
+#define HUB_TELEMETRY_INVERTED
 
 #ifndef HUB_TELEMETRY_ON_SBUS_UART
   // if not shared with sbus, use any pin in softserial mode at 9600baud
