@@ -104,8 +104,9 @@ void sbus_update(EXTERNAL_MEMORY uint16_t *data){
         }
     }
 
-    //rescale frsky rssi to 0..2048 (TODO: find correct conversion)
+    //rescale frsky rssi to 0..2047 (TODO: find correct conversion)
     rssi_scaled = frsky_rssi*20;
+    rssi_scaled = min(2047, rssi_scaled);
 
     //sbus transmits up to 16 channels with 11bit each.
     //build up channel data frame:
