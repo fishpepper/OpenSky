@@ -11,6 +11,16 @@
 
 #define PPM_OUT_PIN SERVO_4
 
+//note: change of adc ch require change in adc.c!
+#define ADC_PORT P0
+//make sure not to use SERVO_3
+#define ADC0 SERVO_2
+#define ADC1 SERVO_2
+
+//voltage divider on my board is 10 / 3.3 k, scale to 100 / 33 to avoid floating point calc
+#define ADC0_DIVIDER_A 100
+#define ADC0_DIVIDER_B  33
+
 #if 0
 //APA102 SPI CLOCK
 #define SOFT_SPI_CLOCK_PORT P0
@@ -61,27 +71,6 @@
   #define HUB_TELEMETRY_PORT        P0
   #define HUB_TELEMETRY_PIN         7
 #endif
-
-//note: change of adc ch require change in adc.c!
-#define ADC_PORT P0
-#ifdef HUB_TELEMETRY_ON_SBUS_UART
-  //free up SERVO_3 for hub telemetry input!
-  #define ADC0 SERVO_2
-  #define ADC1 SERVO_2
-#else
-  #define ADC0 SERVO_2
-  #define ADC1 SERVO_3
-#endif
-//acs712 in inverted mode on adc1?
-//when powered by 5V we can use a trick
-//to get a good resolution: use inverted power inputs
-// 0A = 2.5V
-//30A = 0.0V
-#define ADC1_USE_ACS712
-
-//voltage divider on my board is 10 / 3.3 k, scale to 100 / 33 to avoid floating point calc
-#define ADC0_DIVIDER_A 100
-#define ADC0_DIVIDER_B  33
 
 //bootloader config
 #define BOOTLOADER_LED_GREEN_PORT LED_GREEN_PORT
