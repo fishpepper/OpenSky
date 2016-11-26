@@ -2,7 +2,7 @@
 #define __SBUS_H__
 #include <stdint.h>
 
-#if SBUS_ENABLED
+#ifdef SBUS_ENABLED
 
 void sbus_init(void);
 void sbus_update(EXTERNAL_MEMORY uint16_t *data);

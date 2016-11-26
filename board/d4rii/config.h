@@ -9,7 +9,23 @@
 #define LED_GREEN_PIN             GPIO_Pin_12
 
 
-#if SBUS_INVERTED
+// enable SBUS output -> this will DISABLE ppm!
+#define SBUS_ENABLED
+// Note: default/futaba is INVERTED=1! (use this for a cc3d etc)
+//       inverted     => idle = LOW
+//       non inverted => idle = high
+#define SBUS_INVERTED
+
+// PPM (only used if sbus is disabled)
+// invert SBUS output (normal is non inverted)
+//#define PPM_INVERTED
+
+//hub telemetry input (soft serial)
+//#define HUB_TELEMETRY_ON_SBUS_UART
+//#define HUB_TELEMETRY_INVERTED 
+//#define PPM_INVERTED
+
+#ifdef SBUS_INVERTED
     //DEBUG is on SERVO4 output:
     #define DEBUG_USART               USART3
     #define DEBUG_USART_CLK           RCC_APB1Periph_USART3
@@ -148,6 +164,7 @@
 #define SOFT_SPI_SCK              GPIO_Pin_2
 
 //hub telemetry input NOTE: this has to be a timer io
+#define SOFT_SERIAL_PIN_HAS_INVERTER  //there is an inverter on GPIOA.10!
 #define SOFT_SERIAL_GPIO          GPIOA
 #define SOFT_SERIAL_CLK           RCC_APB2Periph_GPIOA
 #define SOFT_SERIAL_CLK_RCC       2
@@ -164,8 +181,6 @@
 #define SOFT_SERIAL_TIMER_IC_IRQn TIM1_CC_IRQn
 #define SOFT_SERIAL_TIMER_UP_IRQn TIM1_UP_IRQn
 
-//there is an inverter on GPIOA.10
-#define SOFT_SERIAL_INVERTED 1
 
 // THIS CONFIGURES IRQ PRIORITIES - DO NOT MESS THIS UP!
 // this is the most critical stuff:

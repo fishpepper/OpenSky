@@ -36,7 +36,7 @@ void hal_cc25xx_init(void) {
     hal_cc25xx_mode = CC25XX_MODE_RX;
 
     //if we support LNA/PA make sure to config the pin as output:
-    #if RF_LNA_PA_AVAILABLE
+    #ifdef RF_LNA_PORT
       PORT2DIR(RF_LNA_PORT) |= (1<<RF_LNA_PIN);
       PORT2DIR(RF_PA_PORT) |= (1<<RF_PA_PIN);
       //set default to LNA active
@@ -45,10 +45,10 @@ void hal_cc25xx_init(void) {
     #endif
 
     //if we support HIGH GAIN mode config in as output:
-    #if RF_HIGH_GAIN_MODE_AVAILABLE
+    #ifdef RF_HIGH_GAIN_MODE_PORT
       PORT2DIR(RF_HIGH_GAIN_MODE_PORT) |= (1<<RF_HIGH_GAIN_MODE_PIN);
       //enable high gain mode?
-      #if RF_HIGH_GAIN_MODE_ENABLED
+      #ifdef RF_HIGH_GAIN_MODE_ENABLED
         RF_HIGH_GAIN_MODE_ENABLE();
       #else
         RF_HIGH_GAIN_MODE_DISABLE();
@@ -62,7 +62,7 @@ void hal_cc25xx_disable_rf_interrupt(void) {
 }
 
 void hal_cc25xx_enter_rxmode(void) {
-#if RF_LNA_PA_AVAILABLE
+#ifdef RF_LNA_PORT
     RF_LNA_ENABLE();
     delay_us(20);
     RF_PA_DISABLE();
@@ -82,7 +82,7 @@ void hal_cc25xx_enter_rxmode(void) {
 }
 
 void hal_cc25xx_enter_txmode(void) {
-#if RF_LNA_PA_AVAILABLE
+#ifdef RF_LNA_PORT
     RF_LNA_DISABLE();
     delay_us(20);
     RF_PA_ENABLE();

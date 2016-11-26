@@ -23,6 +23,8 @@
 
 #define SOFTSERIAL_DEBUG_RX 0
 
+#ifndef HUB_TELEMETRY_ON_SBUS_UART
+
 volatile EXTERNAL_MEMORY uint16_t soft_serial_databits;
 volatile EXTERNAL_MEMORY uint16_t soft_serial_databit_count;
 volatile soft_serial_rx_callback_t soft_serial_rx_callback;
@@ -52,18 +54,10 @@ uint8_t soft_serial_process_databit(void) {
     // handle data
     if (soft_serial_databit_count != 0){
         // sample bits
-#if HUB_TELEMETRY_INVERTED
-  #if SOFT_SERIAL_INVERTED
-        if (HAL_SOFT_SERIAL_PIN_HI()){
-  #else
-        if (HAL_SOFT_SERIAL_PIN_LO()){
-  #endif
+#ifdef HUB_TELEMETRY_INVERTED
+        if (HUB_TELEMETRY_PIN_LO()){
 #else
-  #if SOFT_SERIAL_INVERTED
-        if (HAL_SOFT_SERIAL_PIN_LO()){
-  #else
-        if (HAL_SOFT_SERIAL_PIN_HI()){
-  #endif
+        if (HUB_TELEMETRY_PIN_HI()){
 #endif
             soft_serial_databits |= (1<<10);
         }
@@ -103,3 +97,5 @@ uint8_t soft_serial_process_databit(void) {
     // not yet finished
     return 0;
 }
+
+#endif

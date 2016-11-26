@@ -15,7 +15,7 @@
    author: fishpepper <AT> gmail.com
 */
 
-#include "hal_uart.h"
+#include "hal_debug.h"
 #include "debug.h"
 #include "delay.h"
 #include "main.h"
@@ -39,7 +39,7 @@ void debug_init(void) {
 }
 
 void debug_uart_init(void) {
-    hal_uart_init();
+    hal_debug_init();
 
     debug_buffer.write = 0;
     debug_buffer.read = 0;
@@ -49,19 +49,19 @@ void debug_uart_init(void) {
 }
 
 void DEBUG_ISR(void) {
-    if (HAL_UART_ISR_FLAG_SET()){
+    if (HAL_DEBUG_ISR_FLAG_SET()){
         // clear flag
-        HAL_UART_ISR_CLEAR_FLAG();
+        HAL_DEBUG_ISR_CLEAR_FLAG();
 
         //finished with sending?
         if(debug_buffer.read == debug_buffer.write){
             //no data in fifo -> disable tx int:
-            HAL_UART_ISR_DISABLE();
+            HAL_DEBUG_ISR_DISABLE();
             return;
         }
 
         //else: data to tx
-        HAL_UART_TX_DATA(debug_buffer.data[debug_buffer.read]);
+        HAL_DEBUG_TX_DATA(debug_buffer.data[debug_buffer.read]);
 
         //handle out pointer
         debug_buffer.read = (debug_buffer.read+1) & DEBUG_TX_BUFFER_AND_OPERAND;
@@ -81,9 +81,9 @@ void debug_putc(uint8_t ch){
     if (ch == '\n') debug_putc('\r');
 
     //disable interrupts
-    hal_uart_int_disable();
+    hal_debug_int_disable();
 
-    if (hal_uart_int_enabled()){
+    if (hal_debug_int_enabled()){
         //int already active, copy to buffer!
         debug_buffer.data[debug_buffer.write] = ch;
         debug_buffer.write = (debug_buffer.write + 1) & DEBUG_TX_BUFFER_AND_OPERAND;
@@ -110,11 +110,11 @@ void debug_putc(uint8_t ch){
         //no int active. send first byte and reset buffer indices
         debug_buffer.write  = debug_buffer.read;
 
-        hal_uart_start_transmission(ch);
+        hal_debug_start_transmission(ch);
     }
 
     //re enable interrupts
-    hal_uart_int_enable();
+    hal_debug_int_enable();
 }
 
 void debug_flush(void){
@@ -123,7 +123,7 @@ void debug_flush(void){
     }
     //wait until uart buffer is empty
     //once TX INT is disabled our buffer is empty again
-    while(hal_uart_int_enabled()) {}
+    while(hal_debug_int_enabled()) {}
 }
 
 

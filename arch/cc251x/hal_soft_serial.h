@@ -2,6 +2,9 @@
 #define __HAL_SOFT_SERIAL_H__
 #include "hal_cc25xx.h"
 #include "cc2510fx.h"
+#include "config.h"
+
+#ifndef HUB_TELEMETRY_ON_SBUS_UART
 
 void hal_soft_serial_init(void);
 void hal_soft_serial_init_gpio(void);
@@ -12,12 +15,15 @@ void hal_soft_serial_init_interrupts(void);
 // = 169,27... -> 169 -> 0.16% error (thats ok..)
 #define HAL_SOFTSERIAL_BIT_DURATION_TICKS  (169)
 
-#define HAL_SOFT_SERIAL_PIN_HI() (SOFT_SERIAL_PORT & (1<<SOFT_SERIAL_PIN))
-#define HAL_SOFT_SERIAL_PIN_LO() (! HAL_SOFT_SERIAL_PIN_HI())
+#define HUB_TELEMETRY_PIN_HI() (HUB_TELEMETRY_PORT & (1<<HUB_TELEMETRY_PIN))
+#define HUB_TELEMETRY_PIN_LO() (! HUB_TELEMETRY_PIN_HI())
 
 #define HAL_SOFT_SERIAL_UPDATE_TOP_VALUE(x)   { T4CC0 = x; }
 
 extern void hal_soft_serial_update_interrupt(void) __interrupt T4_VECTOR;
 extern void hal_soft_serial_startbit_interrupt(void) __interrupt P0INT_VECTOR;
 
+#endif
+
 #endif // __HAL_SOFT_SERIAL_H__
+

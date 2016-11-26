@@ -18,15 +18,17 @@
 #include "main.h"
 #include "hal_defines.h"
 #include "debug.h"
+#include "uart.h"
 #include "wdt.h"
 #include "delay.h"
+#include "config.h"
 #include "sbus.h"
 #include "ppm.h"
 #include "frsky.h"
 #include "failsafe.h"
 #include "hal_sbus.h"
 
-#if SBUS_ENABLED
+#ifdef SBUS_ENABLED
 EXTERNAL_MEMORY uint8_t sbus_data[SBUS_DATA_LEN];
 
 //SBUS is:
@@ -35,7 +37,7 @@ EXTERNAL_MEMORY uint8_t sbus_data[SBUS_DATA_LEN];
 void sbus_init(void){
     debug("sbus: init\n"); debug_flush();
 
-    hal_sbus_init(sbus_data);
+    hal_uart_init();
 
     //start in failsafe mode:
     failsafe_enter();
@@ -71,7 +73,7 @@ void sbus_start_transmission(uint8_t frame_lost){
     sbus_data[23] = HAL_SBUS_PREPARE_DATA(tmp);
 
     //send data!
-    hal_sbus_start_transmission(sbus_data, SBUS_DATA_LEN-1);
+    uart_start_transmission(sbus_data, SBUS_DATA_LEN-1);
 }
 
 
@@ -102,8 +104,9 @@ void sbus_update(EXTERNAL_MEMORY uint16_t *data){
         }
     }
 
-    //rescale frsky rssi to 0..2048 (TODO: find correct conversion)
+    //rescale frsky rssi to 0..2047 (TODO: find correct conversion)
     rssi_scaled = frsky_rssi*20;
+    rssi_scaled = min(2047, rssi_scaled);
 
     //sbus transmits up to 16 channels with 11bit each.
     //build up channel data frame:

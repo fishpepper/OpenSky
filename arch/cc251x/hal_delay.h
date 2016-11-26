@@ -4,5 +4,6 @@
 
 void hal_delay_ms(uint16_t ms);
 void hal_delay_us(uint16_t us);
+#define hal_delay_45nop(void){ uint8_t n=45; while(n--){ NOP(); } }
 
 #endif

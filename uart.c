@@ -15,6 +15,32 @@
    author: fishpepper <AT> gmail.com
 */
 
-#include "sbus.h"
+#include "main.h"
+#include "hal_defines.h"
+#include "debug.h"
+#include "wdt.h"
+#include "delay.h"
+#include "uart.h"
+#include "hal_uart.h"
 
+#ifdef SBUS_ENABLED
+volatile uart_rx_callback_t uart_rx_callback;
+
+void uart_init(void){
+    debug("uart: init\n"); debug_flush();
+
+    uart_rx_callback = 0;
+
+    hal_uart_init();
+}
+
+void uart_start_transmission(uint8_t *buf, uint8_t len){
+    //send data!
+    hal_uart_start_transmission(buf, len);
+}
+
+void uart_set_rx_callback(uart_rx_callback_t callback){
+    uart_rx_callback = callback;
+}
+#endif
 

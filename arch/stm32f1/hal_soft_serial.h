@@ -1,8 +1,8 @@
 #ifndef __HAL_SOFT_SERIAL_H__
 #define __HAL_SOFT_SERIAL_H__
-#include "soft_serial.h"
+
 #include "config.h"
-//#include "stm32f10x_tim.h"
+#include "soft_serial.h"
 #include "stm32f10x_gpio.h"
 
 
@@ -17,9 +17,16 @@ static void hal_soft_serial_init_gpio(void);
 static void hal_soft_serial_init_timer(void);
 static void hal_soft_serial_init_nvic(void);
 
-#define HAL_SOFT_SERIAL_PIN_LO() (GPIO_ReadInputDataBit(SOFT_SERIAL_GPIO, SOFT_SERIAL_PIN) == 0)
-#define HAL_SOFT_SERIAL_PIN_HI() (! HAL_SOFT_SERIAL_PIN_LO())
+#define HUB_TELEMETRY_PIN_LO_RAW() (GPIO_ReadInputDataBit(SOFT_SERIAL_GPIO, SOFT_SERIAL_PIN) == 0)
+#define HUB_TELEMETRY_PIN_HI_RAW() (! HUB_TELEMETRY_PIN_LO_RAW())
 
+#ifdef SOFT_SERIAL_PIN_HAS_INVERTER
+  #define HUB_TELEMETRY_PIN_LO() HUB_TELEMETRY_PIN_HI_RAW()
+  #define HUB_TELEMETRY_PIN_HI() HUB_TELEMETRY_PIN_LO_RAW()
+#else
+  #define HUB_TELEMETRY_PIN_LO() HUB_TELEMETRY_PIN_LO_RAW()
+  #define HUB_TELEMETRY_PIN_HI() HUB_TELEMETRY_PIN_HI_RAW()
+#endif
 
 #define HAL_SOFT_SERIAL_IC_ISR_DISABLE()    { TIM_ITConfig(SOFT_SERIAL_TIMER, SOFT_SERIAL_TIMER_IT_IC, DISABLE); }
 #define HAL_SOFT_SERIAL_IC_ISR_ENABLE()     { TIM_ITConfig(SOFT_SERIAL_TIMER, SOFT_SERIAL_TIMER_IT_IC, ENABLE); }

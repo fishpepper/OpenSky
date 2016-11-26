@@ -11,6 +11,7 @@
 #ifndef NOP
     #define NOP() { __asm nop __endasm; }
 #endif
+#define NOP45() { NOP(); NOP(); NOP(); NOP(); NOP(); NOP(); NOP(); NOP();
 
 #define HI(a)     (uint8_t) ((uint16_t)(a) >> 8 )
 #define LO(a)     (uint8_t)  (uint16_t)(a)

@@ -14,14 +14,14 @@
 #define hal_cc25xx_get_register_burst(r) (r)
 
 
-#if RF_LNA_PA_AVAILABLE
+#ifdef RF_LNA_PORT
   #define RF_LNA_ENABLE()  { PORT2BIT(RF_LNA_PORT, RF_LNA_PIN) = RF_LNA_ON_LEVEL; }
   #define RF_LNA_DISABLE() { PORT2BIT(RF_LNA_PORT, RF_LNA_PIN) = ~RF_LNA_ON_LEVEL; }
   #define RF_PA_ENABLE()   { PORT2BIT(RF_PA_PORT, RF_PA_PIN) = RF_PA_ON_LEVEL; }
   #define RF_PA_DISABLE()  { PORT2BIT(RF_PA_PORT, RF_PA_PIN) = ~RF_PA_ON_LEVEL; }
 #endif
 
-#if RF_HIGH_GAIN_MODE_AVAILABLE
+#ifdef RF_HIGH_GAIN_MODE_PORT
   #define RF_HIGH_GAIN_MODE_ENABLE()  { PORT2BIT(RF_HIGH_GAIN_MODE_PORT, RF_HIGH_GAIN_MODE_PIN) = RF_HIGH_GAIN_MODE_ON_LEVEL; }
   #define RF_HIGH_GAIN_MODE_DISBALE() { PORT2BIT(RF_HIGH_GAIN_MODE_PORT, RF_HIGH_GAIN_MODE_PIN) = ~RF_HIGH_GAIN_MODE_ON_LEVEL; }
 #endif
@@ -92,6 +92,9 @@ void hal_cc25xx_rf_interrupt(void) __interrupt RF_VECTOR;
 #define U1GCR_ORDER (1<<5)
 #define U1GCR_CPHA  (1<<6)
 #define U1GCR_CPOL  (1<<7)
+
+#define U1CSR_RX_ENABLE (1<<6)
+#define U1CSR_RX_BYTE (1<<2)
 #define U1CSR_TX_BYTE (1<<1)
 
 #define RFST_SNOP    0x05

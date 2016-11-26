@@ -120,7 +120,7 @@ uint8_t hal_adc_get_scaled(uint8_t ch){
     }else{
         adc_data = hal_adc_data[0]>>7;
         if (adc_data & (1<<8)) adc_data = 0; //bugfix: handle negative numbers
-        #if ADC1_USE_ACS712
+        #ifdef ADC1_USE_ACS712
         //acs712 is connected to ADC1
         //when powered by 5V we can use a trick
         //to get a good resolution:
