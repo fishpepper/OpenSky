@@ -49,9 +49,9 @@ PAOM=$(PROGS:.hex=)
 board: $(OUTPUT_UPDATE) $(OUTPUT_FULL)
 
 bootloader:
-	@echo "building bootloader"
+	@echo "### Building bootloader ###"
 	$(MAKE) -C $(BL_DIR) \
-		STYLECHECKROOT=$(BL_DIR) \
+		STYLECHECK_DISABLED=1 \
 		FLASH_SIZE=$(FLASH_SIZE) \
 		CONFIG_INCLUDE_DIR=$(TARGET_DIR) \
 		clean all
