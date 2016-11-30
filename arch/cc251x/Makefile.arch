@@ -43,6 +43,8 @@ PMAP=$(PROGS:.hex=.map)
 PMEM=$(PROGS:.hex=.mem)
 PAOM=$(PROGS:.hex=)
 
+SREC_CAT_FOUND := $(shell command -v srec_cat 2> /dev/null)
+
 %.rel : %.c $(HEADERS)
 	$(CC) -c $(CFLAGS) -o$*.rel $<
 
@@ -61,11 +63,15 @@ $(OUTPUT_UPDATE): $(REL) Makefile
 
 $(OUTPUT_FULL): $(OUTPUT_UPDATE) bootloader
 	@echo "merging bootloader and main code"
+ifndef SREC_CAT_FOUND
+	$(error "could not find srec_cat binary. make sure to install the srecord package")
+else
 	srec_cat -disable_sequence_warnings \
 		$(OUTPUT_UPDATE) -intel \
 		$(BL_DIR)/$(BL_HEX) -intel \
 		-o $(OUTPUT_FULL) -intel 
 	@echo "done."
+endif
 
 # this is just for development, DO NOT flash this for production
 $(OUTPUT_NO_BL): $(REL) Makefile
