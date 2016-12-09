@@ -63,7 +63,7 @@
 #define BOOTLOADER_LED_RED_PORT   LED_RED_PORT
 #define BOOTLOADER_LED_RED_PIN    LED_RED_PIN
 //bootloader runs on UART1 P1
-#define BOOTLOADER_UART_NUM           1
+#define BOOTLOADER_UART_NUM           0
 #define BOOTLOADER_UART_PORT          1
 #define BOOTLOADER_UART_INVERTED      0
 #define BOOTLOADER_UART_BAUDRATE      100000
