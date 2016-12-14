@@ -188,8 +188,7 @@ TODO: add flash command to makefile/doc
 
 # Random notes:
 
-Just in case you need to mount a new antenna:
-my vd5m came with a 3.5cm antenna wire (shouldn't this by ~3cm??)...
+Just in case you need to mount a new antenna: It should be 31.5mm long (1/4 wavelength at 2.4GHz)
 
 
 # Thanks
