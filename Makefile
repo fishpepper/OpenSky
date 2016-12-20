@@ -3,7 +3,7 @@ TARGET ?= USKY
 
 ASFLAGS = -g
 GENERIC_SRCS  = main.c debug.c assert.c clocksource.c timeout.c wdt.c delay.c frsky.c spi.c cc25xx.c uart.c
-GENERIC_SRCS += io.c storage.c failsafe.c ppm.c adc.c sbus.c apa102.c soft_spi.c soft_serial.c telemetry.c
+GENERIC_SRCS += io.c storage.c failsafe.c ppm.c adc.c sbus.c soft_spi.c soft_serial.c telemetry.c
 
 #a special file can trigger the use of a fixed id (see storage.c)
 #i use this during development to avoid uneccessary re-binding for vd5m targets
