@@ -30,7 +30,6 @@
 #include "storage.h"
 #include "adc.h"
 #include "ppm.h"
-#include "apa102.h"
 #include "failsafe.h"
 #include "sbus.h"
 
@@ -675,7 +674,6 @@ void frsky_main(void){
 
     //start with conn lost (allow full sync)
     conn_lost = 1;
-    apa102_show_no_connection();
 
     //reset wdt once in order to have at least one second waiting for a packet:
     wdt_reset();
@@ -749,9 +747,6 @@ void frsky_main(void){
                     //enter failsafe mode
                     failsafe_enter();
                     debug("\nCONN LOST!\n");
-
-                    //no connection led info
-                    apa102_show_no_connection();
                 }
 
                 //statistics
@@ -834,7 +829,6 @@ void frsky_main(void){
 
                     while(!timeout2_timed_out()){
                         //wait for tx timeslot, do something useful here:
-                        apa102_statemachine();
                     }
 
                    //build & send packet
@@ -848,10 +842,6 @@ void frsky_main(void){
             //invalid packet -> mark as not received
             frsky_packet_received = 0;
         }
-
-        //process leds:
-        apa102_statemachine();
-
     }
 }
 
@@ -927,10 +917,6 @@ void frsky_update_ppm(void){
     channel_data[5] = (uint16_t)(((frsky_packet_buffer[16] & 0xF0)<<4 | frsky_packet_buffer[13]));
     channel_data[6] = (uint16_t)(((frsky_packet_buffer[17] & 0x0F)<<8 | frsky_packet_buffer[14]));
     channel_data[7] = (uint16_t)(((frsky_packet_buffer[17] & 0xF0)<<4 | frsky_packet_buffer[15]));
-
-    // set apa leds:
-    apa102_update_leds(channel_data, frsky_link_quality);
-    apa102_start_transmission();
 
     // exit failsafe mode
     failsafe_exit();

@@ -27,7 +27,6 @@
 #include "storage.h"
 #include "sbus.h"
 #include "failsafe.h"
-#include "apa102.h"
 #include "telemetry.h"
 #include "soft_serial.h"
 
@@ -52,9 +51,6 @@ int main(void){
 
     //init storage
     storage_init();
-
-    //init apa led bar
-    apa102_init();
 
     //init frsky core
     frsky_init();
