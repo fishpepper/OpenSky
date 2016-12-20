@@ -189,6 +189,7 @@ void hal_storage_flash_enable_write(void){
     __asm
     .even //IMPORTANT: PLACE THIS ON A 2BYTE BOUNDARY!
     ORL _FCTL, #0x02; //FCTL |=  FCTL_WRITE
+    NOP; 
     __endasm;
 }
 
