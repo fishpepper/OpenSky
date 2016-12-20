@@ -2,6 +2,10 @@
 #define __HAL_ADC_H__
 #include <stdint.h>
 
+#ifdef ADC_PORT
+  #define ADC_ENABLED
+#endif
+
 //adc results
 extern __xdata uint16_t hal_adc_data[2];
 
