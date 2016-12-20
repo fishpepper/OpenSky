@@ -1,6 +1,6 @@
 # object files
 DRIVER_SRCS   = 
-HAL_SRCS      = hal_adc.c hal_cc25xx.c hal_io.c hal_sbus.c hal_soft_serial.c hal_soft_spi.c hal_spi.c hal_storage.c hal_timeout.c hal_uart.c hal_wdt.c hal_ppm.c hal_debug.c
+HAL_SRCS      = hal_adc.c hal_cc25xx.c hal_io.c hal_sbus.c hal_soft_serial.c hal_spi.c hal_storage.c hal_timeout.c hal_uart.c hal_wdt.c hal_ppm.c hal_debug.c
 BOARD_SRCS    = $(STARTUP) $(DRIVER_SRCS) $(HAL_SRCS) $(GENERIC_SRCS)
 
 # fetch this dir during include
