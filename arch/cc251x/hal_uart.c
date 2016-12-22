@@ -31,7 +31,20 @@
 void hal_uart_init(void) {
     EXTERNAL_MEMORY union hal_uart_config_t sbus_uart_config;
 
-#if SBUS_UART == USART1_P0
+#if SBUS_UART == USART0_P1
+    // -> USART0_P1
+    //    use ALT2 -> Set flag -> P1_5 = TX / P1_4 = RX
+    PERCFG |= (PERCFG_U0CFG);
+
+    // configure pins as peripheral:
+    P1SEL |= (1<<5) | (1<<4);
+
+    // make sure all P0 pins switch to normal GPIO
+    P0SEL &= ~(0x3C);
+
+    // make tx pin output:
+    P1DIR |= (1<<5);
+#elif SBUS_UART == USART1_P0
     //USART1 use ALT1 -> Clear flag -> Port P0_4 = TX
     PERCFG &= ~(PERCFG_U1CFG);
 
@@ -63,8 +76,13 @@ void hal_uart_init(void) {
 #endif
 
     // set baudrate
+#if (SBUS_UART == USART0_P1) || (SBUS_UART == USART0_P0)
+    U0BAUD = CC2510_BAUD_M_100000;
+    U0GCR = (U0GCR & ~0x1F) | (CC2510_BAUD_E_100000);
+#else
     U1BAUD = CC2510_BAUD_M_100000;
     U1GCR = (U1GCR & ~0x1F) | (CC2510_BAUD_E_100000);
+#endif
 
     //set up config for USART -> 8E2
     #ifdef SBUS_INVERTED
@@ -98,13 +116,21 @@ void hal_uart_init(void) {
     hal_dma_config[3].PRIORITY       = DMA_PRI_LOW;
     hal_dma_config[3].M8             = DMA_M8_USE_7_BITS;
     hal_dma_config[3].IRQMASK        = DMA_IRQMASK_DISABLE;
+#if (SBUS_UART == USART0_P1) || (SBUS_UART == USART0_P0)
+    hal_dma_config[3].TRIG           = DMA_TRIG_UTX0;
+#else
     hal_dma_config[3].TRIG           = DMA_TRIG_UTX1;
+#endif
     hal_dma_config[3].TMODE          = DMA_TMODE_SINGLE;
     hal_dma_config[3].WORDSIZE       = DMA_WORDSIZE_BYTE;
 
     // source address will be set during tx start
     SET_WORD(hal_dma_config[3].SRCADDRH,  hal_dma_config[3].SRCADDRL,  0);
+#if (SBUS_UART == USART0_P1) || (SBUS_UART == USART0_P0)
+    SET_WORD(hal_dma_config[3].DESTADDRH, hal_dma_config[3].DESTADDRL, &X_U0DBUF);
+#else
     SET_WORD(hal_dma_config[3].DESTADDRH, hal_dma_config[3].DESTADDRL, &X_U1DBUF);
+#endif
     hal_dma_config[3].VLEN           = DMA_VLEN_USE_LEN;
 
     // len will be set during tx start
@@ -126,13 +152,23 @@ void hal_uart_init(void) {
 
 #ifdef HUB_TELEMETRY_ON_SBUS_UART
     // activate serial rx interrupt
+#if (SBUS_UART == USART0_P1) || (SBUS_UART == USART0_P0)
+    URX0IF = 0;
+
+    // enable receiption
+    U0CSR |= UxCSR_RX_ENABLE;
+
+    // enable RX interrupt
+    URX0IE = 1;
+#else
     URX1IF = 0;
 
     // enable receiption
-    U1CSR |= U1CSR_RX_ENABLE;
+    U1CSR |= UxCSR_RX_ENABLE;
 
     // enable RX interrupt
     URX1IE = 1;
+#endif
 
     // enable global ints
     EA = 1;
@@ -140,6 +176,24 @@ void hal_uart_init(void) {
 }
 
 static void hal_uart_set_mode(EXTERNAL_MEMORY union hal_uart_config_t *cfg){
+#if (SBUS_UART == USART0_P1) || (SBUS_UART == USART0_P0)
+    //enable uart mode
+    U0CSR |= 0x80;
+
+    //store config to U1UCR register
+    U0UCR = cfg->byte & (0x7F);
+
+    //store config to U1GCR: (msb/lsb)
+    if (cfg->bit.ORDER){
+        U0GCR |= U0GCR_ORDER;
+    }else{
+        U0GCR &= ~U0GCR_ORDER;
+    }
+
+    //interrupt prio to 1 (0..3=highest)
+    IP0 |= (1<<2);
+    IP1 &= ~(1<<2);
+#else
     //enable uart mode
     U1CSR |= 0x80;
 
@@ -156,6 +210,7 @@ static void hal_uart_set_mode(EXTERNAL_MEMORY union hal_uart_config_t *cfg){
     //interrupt prio to 1 (0..3=highest)
     IP0 |= (1<<3);
     IP1 &= ~(1<<3);
+#endif
 }
 
 void hal_uart_start_transmission(uint8_t *data, uint8_t len){
@@ -173,7 +228,11 @@ void hal_uart_start_transmission(uint8_t *data, uint8_t len){
     hal_delay_45nop();
 
     //send the very first UART byte to trigger a UART TX session:
+#if (SBUS_UART == USART0_P1) || (SBUS_UART == USART0_P0)
+    U0DBUF = data[0];
+#else
     U1DBUF = data[0];
+#endif
 }
 
 #ifdef HUB_TELEMETRY_ON_SBUS_UART

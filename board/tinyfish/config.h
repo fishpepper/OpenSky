@@ -32,12 +32,12 @@
 #define LED_RED_PIN    1
 
 //DEBUG
-#define DEBUG_UART USART0_P1
+#define DEBUG_UART USART1_P0
 
 // SBUS
 // enable SBUS output -> this will DISABLE ppm!
 #define SBUS_ENABLED
-#define SBUS_UART USART1_P1
+#define SBUS_UART USART0_P1
 // Note: default/futaba is INVERTED=1! (use this for a cc3d etc)
 //       inverted     => idle = LOW
 //       non inverted => idle = high
@@ -54,7 +54,7 @@
 #ifndef HUB_TELEMETRY_ON_SBUS_UART
   // if not shared with sbus, use any pin in softserial mode at 9600baud
   #define HUB_TELEMETRY_PORT        P1
-  #define HUB_TELEMETRY_PIN         4
+  #define HUB_TELEMETRY_PIN         3
 #endif
 
 //bootloader config
@@ -62,7 +62,7 @@
 #define BOOTLOADER_LED_GREEN_PIN  LED_GREEN_PIN
 #define BOOTLOADER_LED_RED_PORT   LED_RED_PORT
 #define BOOTLOADER_LED_RED_PIN    LED_RED_PIN
-//bootloader runs on UART1 P1
+//bootloader runs on UART0 P1
 #define BOOTLOADER_UART_NUM           0
 #define BOOTLOADER_UART_PORT          1
 #define BOOTLOADER_UART_INVERTED      0

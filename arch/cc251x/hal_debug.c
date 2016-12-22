@@ -21,6 +21,10 @@
 void hal_debug_init(void) {
     __xdata union hal_uart_config_t uart_config;
 
+#ifndef DEBUG_UART
+#error "ERROR: DEBUG_UART not defined"
+#endif
+
 #if DEBUG_UART == USART0_P0
     //USART0 use ALT1 -> Clear flag -> Port P0_3 = TX
     PERCFG &= ~(PERCFG_U0CFG);
@@ -42,14 +46,34 @@ void hal_debug_init(void) {
 
     //make tx pin output:
     P1DIR |= (1<<5);
+#elif DEBUG_UART == USART1_P0
+    //USART1 use ALT1 -> Clear flag -> Port P0_4 = TX
+    PERCFG &= ~(PERCFG_U1CFG);
+
+    // USART1 has priority when USART0 is also enabled
+    P2DIR = (P2DIR & 0x3F) | 0b01000000;
+
+    //configure pin P0_4 (TX) and P0_5 (RX) as special function:
+    P0SEL |= (1<<4) | (1<<5);
+
+    // make sure all P1 pins switch to normal GPIO
+    //P1SEL &= ~(0xF0);
+
+    //make tx pin output:
+    P0DIR |= (1<<4);
 #else
   #error "ERROR: UNSUPPORTED DEBUG UART"
 #endif
 
     //this assumes cpu runs from XOSC (26mhz) !
     //set baudrate
+#if (DEBUG_UART == USART0_P0) || (DEBUG_UART == USART0_P1)
     U0BAUD = CC2510_BAUD_M_115200;
     U0GCR = (U0GCR & ~0x1F) | (CC2510_BAUD_E_115200);
+#else
+    U1BAUD = CC2510_BAUD_M_115200;
+    U1GCR = (U1GCR & ~0x1F) | (CC2510_BAUD_E_115200);
+#endif
 
     //set up config
     uart_config.bit.START = 0; //startbit level = low
@@ -67,6 +91,7 @@ void hal_debug_init(void) {
 }
 
 static void hal_debug_set_mode(EXTERNAL_MEMORY union hal_uart_config_t *cfg){
+#if (DEBUG_UART == USART0_P0) || (DEBUG_UART == USART0_P1)
     //enable uart mode
     U0CSR |= 0x80;
 
@@ -80,23 +105,51 @@ static void hal_debug_set_mode(EXTERNAL_MEMORY union hal_uart_config_t *cfg){
         U0GCR &= ~U0GCR_ORDER;
     }
 
-    //interrupt prio to 1 (0..3=highest)
+    //interrupt prio to 0 (0..3=highest)
     IP0 &= ~(1<<2);
     IP1 &= ~(1<<2);
+#else
+    //enable uart mode
+    U1CSR |= 0x80;
+
+    //store config to UxUCR register
+    U1UCR = cfg->byte & (0x7F);
+
+    //store config to U1GCR: (msb/lsb)
+    if (cfg->bit.ORDER){
+        U1GCR |= U1GCR_ORDER;
+    }else{
+        U1GCR &= ~U1GCR_ORDER;
+    }
+    //interrupt prio to 0 (0..3=highest)
+    IP0 &= ~(1<<3);
+    IP1 &= ~(1<<3);
+#endif
 }
 
 
 void hal_debug_start_transmission(uint8_t ch){
+#if (DEBUG_UART == USART0_P0) || (DEBUG_UART == USART0_P1)
     //clear flags
     UTX0IF = 0;
-    U0CSR &= ~U0CSR_TX_BYTE;
+    U0CSR &= ~UxCSR_TX_BYTE;
 
     //enable TX int:
     IEN2 |= (IEN2_UTX0IE);
 
     //send this char
     U0DBUF = ch;
-}
+#else
+    //clear flags
+    UTX1IF = 0;
+    U1CSR &= ~UxCSR_TX_BYTE;
 
+    //enable TX int:
+    IEN2 |= (IEN2_UTX1IE);
+
+    //send this char
+    U1DBUF = ch;
+#endif
+}
 
 
