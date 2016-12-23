@@ -39,7 +39,7 @@ int main(void){
 
     //init ios
     io_init();
-
+    
     //init debug
     debug_init();
 

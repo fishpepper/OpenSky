@@ -55,7 +55,7 @@ void hal_uart_init(void) {
     P0SEL |= (1<<4) | (1<<5);
 
     // make sure all P1 pins switch to normal GPIO
-    P1SEL &= ~(0xF0);
+//    P1SEL &= ~(0xF0);
 
     //make tx pin output:
     P0DIR |= (1<<4);
@@ -238,9 +238,14 @@ void hal_uart_start_transmission(uint8_t *data, uint8_t len){
 #ifdef HUB_TELEMETRY_ON_SBUS_UART
 void HAL_UART_RX_ISR(void) {
     uint8_t rx;
-
+    
     HAL_UART_RX_ISR_CLEAR_FLAG(); //THIS SHOULD NEVER BE THE LAST LINE IN AN ISR!
+
+#ifdef SBUS_INVERTED
+    rx = 0xFF ^ HAL_UART_RX_GETCH(); //remove data inversion 
+#else
     rx = HAL_UART_RX_GETCH();
+#endif
 
     if (uart_rx_callback != 0) {
         // execute callback

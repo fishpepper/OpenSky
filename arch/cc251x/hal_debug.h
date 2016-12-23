@@ -8,7 +8,11 @@
 void hal_debug_init(void);
 void hal_debug_start_transmission(uint8_t ch);
 
-#define hal_debug_int_enabled() (IEN2 & IEN2_UTX0IE)
+#if (DEBUG_UART == USART0_P0) || (DEBUG_UART == USART0_P1)
+  #define hal_debug_int_enabled() (IEN2 & IEN2_UTX0IE)
+#else
+  #define hal_debug_int_enabled() (IEN2 & IEN2_UTX1IE)
+#endif
 #define hal_debug_int_enable() { sei(); }
 #define hal_debug_int_disable() { cli(); }
 

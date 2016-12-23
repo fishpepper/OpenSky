@@ -29,11 +29,10 @@ void hal_debug_init(void) {
     //USART0 use ALT1 -> Clear flag -> Port P0_3 = TX
     PERCFG &= ~(PERCFG_U0CFG);
 
-    //configure pin P0_3 (TX) as output:
+    //configure pin P0_3 (TX) as special function:
     P0SEL |= (1<<3);
-
-    //make sure all P1 pins switch to normal GPIO
-//    P1SEL &= ~(0x3C);
+    //set P0_5 as normal IO
+    P1SEL &= ~(1<<5);
 
     //make tx pin output:
     P0DIR |= (1<<3);
@@ -41,8 +40,10 @@ void hal_debug_init(void) {
     //USART0 use ALT2 -> Set flag -> Port P1_5 = TX
     PERCFG |= (PERCFG_U0CFG);
 
-    //configure pin P1_5 (TX) as output:
+    //configure pin P1_5 (TX) as special function
     P1SEL |= (1<<5);
+    //set P0_3 as normal IO
+    P0SEL &= ~(1<<3);     
 
     //make tx pin output:
     P1DIR |= (1<<5);
@@ -53,8 +54,10 @@ void hal_debug_init(void) {
     // USART1 has priority when USART0 is also enabled
     P2DIR = (P2DIR & 0x3F) | 0b01000000;
 
-    //configure pin P0_4 (TX) and P0_5 (RX) as special function:
-    P0SEL |= (1<<4) | (1<<5);
+    //configure pin P0_4 special function:
+    P0SEL |= (1<<4);
+    //configure P1_6 as normal IO
+    P1SEL &= ~(1<<6);
 
     // make sure all P1 pins switch to normal GPIO
     //P1SEL &= ~(0xF0);

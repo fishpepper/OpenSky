@@ -105,7 +105,6 @@ void telemetry_fill_buffer(volatile EXTERNAL_MEMORY uint8_t *buffer, uint8_t tel
         telemetry_buffer.read = telemetry_buffer.read_ok;
     }
 
-
     // fetch all stored bytes (max 10)
     for(i=2; i<2+10; i++){
         if (!telemetry_pop(&buffer[i])){
