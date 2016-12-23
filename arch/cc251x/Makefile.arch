@@ -17,7 +17,7 @@ ARCH_DIR = arch/cc251x
 CFLAGS  +=  -I . -I$(ARCH_DIR)
 CFLAGS  += -I$(TARGET_DIR)
 HAL_SRC  = hal_led.c hal_debug.c hal_uart.c hal_clocksource.c hal_timeout.c hal_wdt.c hal_delay.c hal_dma.c hal_spi.c 
-HAL_SRC += hal_cc25xx.c hal_io.c hal_adc.c hal_storage.c hal_sbus.c hal_ppm.c hal_soft_spi.c hal_soft_serial.c
+HAL_SRC += hal_cc25xx.c hal_io.c hal_adc.c hal_storage.c hal_sbus.c hal_ppm.c hal_soft_serial.c
 SRC = $(GENERIC_SRCS) $(HAL_SRC:%.c=$(ARCH_DIR)/%.c)
 HEADERS := $(SRC:.c=.h)
 ADB=$(SRC:.c=.adb)
@@ -43,15 +43,17 @@ PMAP=$(PROGS:.hex=.map)
 PMEM=$(PROGS:.hex=.mem)
 PAOM=$(PROGS:.hex=)
 
+SREC_CAT_FOUND := $(shell command -v srec_cat 2> /dev/null)
+
 %.rel : %.c $(HEADERS)
 	$(CC) -c $(CFLAGS) -o$*.rel $<
 
 board: $(OUTPUT_UPDATE) $(OUTPUT_FULL)
 
 bootloader:
-	@echo "building bootloader"
+	@echo "### Building bootloader ###"
 	$(MAKE) -C $(BL_DIR) \
-		STYLECHECKROOT=$(BL_DIR) \
+		STYLECHECK_DISABLED=1 \
 		FLASH_SIZE=$(FLASH_SIZE) \
 		CONFIG_INCLUDE_DIR=$(TARGET_DIR) \
 		clean all
@@ -61,11 +63,15 @@ $(OUTPUT_UPDATE): $(REL) Makefile
 
 $(OUTPUT_FULL): $(OUTPUT_UPDATE) bootloader
 	@echo "merging bootloader and main code"
+ifndef SREC_CAT_FOUND
+	$(error "could not find srec_cat binary. make sure to install the srecord package")
+else
 	srec_cat -disable_sequence_warnings \
 		$(OUTPUT_UPDATE) -intel \
 		$(BL_DIR)/$(BL_HEX) -intel \
 		-o $(OUTPUT_FULL) -intel 
 	@echo "done."
+endif
 
 # this is just for development, DO NOT flash this for production
 $(OUTPUT_NO_BL): $(REL) Makefile

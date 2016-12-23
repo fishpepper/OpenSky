@@ -15,40 +15,53 @@
 author: fishpepper <AT> gmail.com
 */
 
-#include "hal_uart.h"
-#include  "debug.h"
-#include  "led.h"
-
-#include <fcntl.h>
-#include <unistd.h>
 #include <stdio.h>
+#include <unistd.h>         //Used for UART
+#include <fcntl.h>          //Used for UART
+#include <asm/termios.h>        //Used for UART
 
-void hal_uart_init(void) {
+#include "hal_uart.h"
+#include "debug.h"
+#include "delay.h"
+#include "sbus.h"
+
+#if SBUS_ENABLED
+
+static int uart0_filestream = -1;
+
+void hal_uart_init(EXTERNAL_MEMORY uint8_t *sbus_data_ptr) {
+
+    uart0_filestream = open("/dev/ttyAMA0", O_WRONLY | O_NOCTTY | O_NDELAY); //Open in non blocking read/write mode
+    if (uart0_filestream == -1)
+    {
+        printf("Error - Unable to open UART.  Ensure it is not in use by another application\n");
+    }
+
+    // USART configuration:
+    // 100000bps inverted serial stream, 8 bits, even parity, 2 stop bits
+    // no hw flow control
+    struct termios2 options;
+    options.c_cflag = BOTHER | CS8 | CLOCAL | PARENB | CSTOPB;
+    options.c_iflag = 0;
+    options.c_oflag = 0;
+    options.c_lflag = 0;
+    options.c_ispeed = 100000;
+    options.c_ospeed = 100000;
+    if (ioctl(uart0_filestream, TCSETS2, &options) != 0) {
+        printf("ioctl TCSETS2 failed");
+    }
 }
 
-void hal_uart_init_nvic(uint8_t enable) {
+void hal_uart_start_transmission(uint8_t *data, uint8_t len){
+    if (uart0_filestream != -1)
+    {
+        int count = write(uart0_filestream, data, len);
+        if (count < len)
+        {
+            printf("UART TX error sent %u of %u\n", count, len);
+        }
+        //printf("%d bytes written\n", len);
+    }
 }
 
-
-static void hal_uart_init_mode(void) {
-}
-
-static void hal_uart_enable(void) {
-}
-
-void hal_uart_start_transmission(uint8_t ch) {
-    fwrite(&ch, 1, 1, stdout);
-}
-
-void hal_uart_int_enable(void) {
-}
-
-uint8_t hal_uart_int_enabled(void) {
-    return 0;
-}
-
-static void hal_uart_init_gpio(void){
-}
-
-static void hal_uart_init_rcc(void){
-}
+#endif

@@ -93,9 +93,10 @@ void hal_cc25xx_rf_interrupt(void) __interrupt RF_VECTOR;
 #define U1GCR_CPHA  (1<<6)
 #define U1GCR_CPOL  (1<<7)
 
-#define U1CSR_RX_ENABLE (1<<6)
-#define U1CSR_RX_BYTE (1<<2)
-#define U1CSR_TX_BYTE (1<<1)
+#define UxCSR_RX_ENABLE (1<<6)
+#define UxCSR_RX_BYTE (1<<2)
+#define UxCSR_TX_BYTE (1<<1)
+
 
 #define RFST_SNOP    0x05
 #define RFST_SIDLE   0x04

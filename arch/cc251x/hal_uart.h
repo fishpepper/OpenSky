@@ -33,10 +33,16 @@ static void hal_uart_set_mode(EXTERNAL_MEMORY union hal_uart_config_t *cfg);
 void hal_uart_start_transmission(uint8_t *data, uint8_t len);
 
 #ifdef HUB_TELEMETRY_ON_SBUS_UART
+#if (SBUS_UART == USART0_P1) || (SBUS_UART == USART0_P0)
+  #define HAL_UART_RX_ISR(void) hal_uart_rx_interrupt(void) __interrupt URX0_VECTOR
+  #define HAL_UART_RX_ISR_CLEAR_FLAG() { URX0IF = 0; }
+  #define HAL_UART_RX_GETCH() (U0DBUF)  
+#else
   #define HAL_UART_RX_ISR(void) hal_uart_rx_interrupt(void) __interrupt URX1_VECTOR
   #define HAL_UART_RX_ISR_CLEAR_FLAG() { URX1IF = 0; }
-  #define HAL_UART_RX_GETCH() (U1DBUF)
-  
+  #define HAL_UART_RX_GETCH() (U1DBUF)  
+#endif
+
   void HAL_UART_RX_ISR(void);
 #endif
 

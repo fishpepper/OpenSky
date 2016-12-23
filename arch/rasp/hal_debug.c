@@ -15,8 +15,40 @@
 author: fishpepper <AT> gmail.com
 */
 
-#include "hal_soft_spi.h"
-#include "soft_spi.h"
+#include "hal_debug.h"
+#include  "debug.h"
+#include  "led.h"
 
-void hal_soft_spi_init(void) {
+#include <fcntl.h>
+#include <unistd.h>
+#include <stdio.h>
+
+void hal_debug_init(void) {
+}
+
+void hal_debug_init_nvic(uint8_t enable) {
+}
+
+
+static void hal_debug_init_mode(void) {
+}
+
+static void hal_debug_enable(void) {
+}
+
+void hal_debug_start_transmission(uint8_t ch) {
+    fwrite(&ch, 1, 1, stdout);
+}
+
+void hal_debug_int_enable(void) {
+}
+
+uint8_t hal_debug_int_enabled(void) {
+    return 0;
+}
+
+static void hal_debug_init_gpio(void){
+}
+
+static void hal_debug_init_rcc(void){
 }
