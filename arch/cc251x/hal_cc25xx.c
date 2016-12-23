@@ -29,9 +29,10 @@
 EXTERNAL_MEMORY volatile uint8_t hal_cc25xx_mode;
 
 void hal_cc25xx_init(void) {
-    //set second highest prio for ch0 (RF)
-    IP0 &= ~(1<<0);
+    //set highest prio for ch0 (RF)
     IP1 |=  (1<<0);
+    IP0 |=  (1<<0);
+
 
     hal_cc25xx_mode = CC25XX_MODE_RX;
 
