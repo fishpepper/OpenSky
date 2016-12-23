@@ -1,20 +1,3 @@
-//pin layout ISP header
-#define ISP_DATA  P2_1
-#define ISP_CLOCK P2_2
-
-//pin layout servo connection
-#define SERVO_1 7 //P0_7 = BIND, pull down on startup to enter bind mode
-#define SERVO_2 6 //P0_6 = ADC1 = voltage sensor (max 3.3V on I/O ! -> voltage divider necessary!)
-#define SERVO_3 5 //P0_5 = ADC0 = current sensor (max 3.3V on I/O !)
-#define SERVO_4 4 //P0_4 = PPM or SBUS OUT
-#define SERVO_5 3 //P0_3 = debug UART
-
-#define PPM_OUT_PIN SERVO_4
-
-#define BIND_PORT P0
-#define BIND_PIN  SERVO_1
-
-//leds
 #define LED_GREEN_PORT P2
 #define LED_GREEN_PIN  4
 #define LED_RED_PORT P2
