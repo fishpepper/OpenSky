@@ -28,10 +28,10 @@ void hal_io_init(void) {
     //periph clock enable for port
     RCC_APBxPeriphClockCmd(BIND_JUMPER_GPIO_CLK_RCC, BIND_JUMPER_GPIO_CLK, ENABLE);
 
-    //configure led output as push-pull
+    //configure bind input as pullup
     gpio_init.GPIO_Pin = BIND_JUMPER_PIN;
     gpio_init.GPIO_Speed = GPIO_Speed_50MHz;
-    gpio_init.GPIO_Mode = GPIO_Mode_IN_FLOATING;
+    gpio_init.GPIO_Mode = GPIO_Mode_IPU;
     GPIO_Init(BIND_JUMPER_GPIO, &gpio_init);
 }
 
