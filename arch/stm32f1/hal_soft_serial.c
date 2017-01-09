@@ -76,15 +76,15 @@ static void hal_soft_serial_init_timer(void) {
 
     TIM_ICStructInit(&tim_ic_init);
     tim_ic_init.TIM_Channel        = SOFT_SERIAL_TIMER_CH;
-#if HUB_TELEMETRY_INVERTED
-  #if SOFT_SERIAL_INVERTED
+#ifdef HUB_TELEMETRY_INVERTED
+  #ifdef SOFT_SERIAL_PIN_HAS_INVERTER
     //board has inverter -> invert twice = no inversion
     tim_ic_init.TIM_ICPolarity     = TIM_ICPolarity_Falling;
   #else
     tim_ic_init.TIM_ICPolarity     = TIM_ICPolarity_Rising;
   #endif
 #else
-  #if SOFT_SERIAL_INVERTED
+  #ifdef SOFT_SERIAL_PIN_HAS_INVERTER
     //board has inverter -> invert 
     tim_ic_init.TIM_ICPolarity     = TIM_ICPolarity_Rising;
   #else
