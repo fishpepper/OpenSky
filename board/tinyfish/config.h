@@ -18,6 +18,10 @@
 #define BIND_PORT P0
 #define BIND_PIN  3
 
+#define BIND2_PORT P2
+#define BIND2_PIN  0
+
+
 //LEDS
 #define LED_GREEN_PORT P0
 #define LED_GREEN_PIN  4
