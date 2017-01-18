@@ -19,7 +19,7 @@
 #define BIND_PIN  3
 
 #define BIND2_PORT P2
-#define BIND2_PIN  0
+#define BIND2_PIN  2
 
 
 //LEDS
