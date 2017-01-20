@@ -4,5 +4,5 @@
 FLASH_SIZE=0x8000
 
 # continue with normal cc251x build
-include arch/cc251x/Makefile.arch
+include arch/cc251x/cc251x.mk
 

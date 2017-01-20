@@ -1,22 +1,46 @@
 #select target. supported: {VD5M, D4RII, USKY, TINYFISH, AFF4RX, RASP}
 TARGET ?= USKY
 
-ASFLAGS = -g
-GENERIC_SRCS  = main.c debug.c assert.c clocksource.c timeout.c wdt.c delay.c frsky.c spi.c cc25xx.c uart.c
-GENERIC_SRCS += io.c storage.c failsafe.c ppm.c adc.c sbus.c soft_serial.c telemetry.c
+ASFLAGS       = -g
+ROOT         := $(patsubst %/,%,$(dir $(lastword $(MAKEFILE_LIST))))
+SRC_DIR       = $(ROOT)/src
+INCLUDE_DIRS  = $(SRC_DIR)
+
+GENERIC_SRCS  = $(notdir $(wildcard $(SRC_DIR)/*.c))
 
 #a special file can trigger the use of a fixed id (see storage.c)
 #i use this during development to avoid uneccessary re-binding for vd5m targets
 ifneq ($(wildcard .use_fixed_id),)
-CFLAGS += -DFRSKY_USE_FIXED_ID
+CFLAGS       += -DFRSKY_USE_FIXED_ID
 endif
 
-TARGET_LC       = $(shell echo $(TARGET) | tr '[:upper:]' '[:lower:]')
-TARGET_DIR      = $(abspath board/$(TARGET_LC))
-TARGET_MAKEFILE = $(TARGET_DIR)/Makefile.board
-CC251X_BL_DIR   = arch/cc251x/bootloader
+OBJECT_DIR      := $(ROOT)/obj
+TARGET_LC       := $(shell echo $(TARGET) | tr '[:upper:]' '[:lower:]')
+TARGET_DIR      := $(ROOT)/board/$(TARGET_LC)
+TARGET_MAKEFILE := $(TARGET_DIR)/target.mk
+CC251X_BL_DIR   := arch/cc251x/bootloader
 
-RESULT ?= opensky_$(notdir $(TARGET_LC))
+RESULT          ?= opensky_$(notdir $(TARGET_LC))
+
+## V                 : Set verbosity level based on the V= parameter
+##                     V=0 Low
+##                     V=1 High
+export AT := @
+
+ifndef V
+export V0    :=
+export V1    := $(AT)
+export STDOUT   :=
+else ifeq ($(V), 0)
+export V0    := $(AT)
+export V1    := $(AT)
+export STDOUT:= "> /dev/null"
+export MAKE  := $(MAKE) --no-print-directory
+else ifeq ($(V), 1)
+export V0    :=
+export V1    :=
+export STDOUT   :=
+endif
 
 all  : git_submodule_init ack_disclaimer board
 
@@ -26,7 +50,7 @@ git_submodule_init :
 
 ifneq ($(wildcard $(TARGET_MAKEFILE)),)
   #fine, target exists
-  include  $(TARGET_MAKEFILE)
+  include $(TARGET_MAKEFILE)
 else
   #does not exist
   $(error UNSUPPORTED Target ($(TARGET)) given. could not find makefile at $(TARGET_MAKEFILE). aborting)
