@@ -168,7 +168,7 @@ void CEC_Cmd(FunctionalState NewState)
 
   *(__IO uint32_t *) CFGR_PE_BB = (uint32_t)NewState;
 
-  if(NewState == DISABLE)
+  if (NewState == DISABLE)
   {
     /* Wait until the PE bit is cleared by hardware (Idle Line detected) */
     while((CEC->CFGR & CEC_CFGR_PE) != (uint32_t)RESET)
@@ -305,7 +305,7 @@ FlagStatus CEC_GetFlagStatus(uint32_t CEC_FLAG)
   /* Get bit[23:0] of the flag */
   CEC_FLAG &= FLAG_Mask;
   
-  if(cecreg != 0)
+  if (cecreg != 0)
   {
     /* Flag in CEC ESR Register */
     CEC_FLAG = (uint32_t)(CEC_FLAG >> 16);
@@ -319,7 +319,7 @@ FlagStatus CEC_GetFlagStatus(uint32_t CEC_FLAG)
     cecbase += 0x10;
   }
   
-  if(((*(__IO uint32_t *)cecbase) & CEC_FLAG) != (uint32_t)RESET)
+  if (((*(__IO uint32_t *)cecbase) & CEC_FLAG) != (uint32_t)RESET)
   {
     /* CEC_FLAG is set */
     bitstatus = SET;

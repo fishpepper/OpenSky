@@ -10,7 +10,7 @@
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+    along with this program.  If not, see <http:// www.gnu.org/licenses/>.
 
    author: fishpepper <AT> gmail.com
 */
@@ -60,13 +60,13 @@ void telemetry_init(void) {
 }
 
 
-static void telemetry_rx_echo_test(void){
+static void telemetry_rx_echo_test(void) {
     // just for testing purposes...
     volatile EXTERNAL_MEMORY uint8_t data;
 
-    while(1){
+    while(1) {
         wdt_reset();
-        if (telemetry_pop(&data)){
+        if (telemetry_pop(&data)) {
             // debug_putc(data);
             debug_putc(' ');
             debug_put_hex8(data);
@@ -77,20 +77,20 @@ static void telemetry_rx_echo_test(void){
 
 
 // hub telemetry input will be forwarded in frsky frames
-// see http://www.rcgroups.com/forums/showthread.php?t=2547257 for a documentation
-//
+// see http:// www.rcgroups.com/forums/showthread.php?t=2547257 for a documentation
+// 
 // buffer[0]  = bytes used
 // buffer[1]  = last received telemetry id
 // buffer[2]  = byte 1
 // ...
 // buffer[11] = byte 10
-//
+// 
 // NOTES:
 // * buffer[ 0] corresponds to frsky_buffer[ 6]
 // * buffer[11] corresponds to frsky_buffer[17]
 // * not all 10 bytes has to be filled in, only the number of bytes that were received
 //   will be sent in one frame
-//
+// 
 void telemetry_fill_buffer(volatile EXTERNAL_MEMORY uint8_t *buffer, uint8_t telemetry_id) {
     uint8_t telemetry_bytecount = 0;
     uint8_t i;
@@ -106,8 +106,8 @@ void telemetry_fill_buffer(volatile EXTERNAL_MEMORY uint8_t *buffer, uint8_t tel
     }
 
     // fetch all stored bytes (max 10)
-    for(i=2; i<2+10; i++){
-        if (!telemetry_pop(&buffer[i])){
+    for(i=2; i<2+10; i++) {
+        if (!telemetry_pop(&buffer[i])) {
             break;
         }
         telemetry_bytecount++;
@@ -122,9 +122,9 @@ void telemetry_fill_buffer(volatile EXTERNAL_MEMORY uint8_t *buffer, uint8_t tel
 }
 
 
-//fetch byte from buffer, returns 0 on no data available, 1 on success
+// fetch byte from buffer, returns 0 on no data available, 1 on success
 uint8_t telemetry_pop(volatile EXTERNAL_MEMORY uint8_t *byte) {
-    if (telemetry_buffer.read == telemetry_buffer.write){
+    if (telemetry_buffer.read == telemetry_buffer.write) {
         // no data available
         return 0;
     }
@@ -142,7 +142,7 @@ void telemetry_rx_callback(uint8_t data) {
     // push 1 byte into fifo:
     next = (telemetry_buffer.write + 1) & (TELEMETRY_BUFFER_SIZE-1);
 
-    if (telemetry_buffer.read == next){
+    if (telemetry_buffer.read == next) {
         // no more space in buffer - byte is discarded!
         return;
     }

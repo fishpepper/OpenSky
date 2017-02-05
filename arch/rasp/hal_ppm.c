@@ -10,7 +10,7 @@
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+    along with this program.  If not, see <http:// www.gnu.org/licenses/>.
 
    author: fishpepper <AT> gmail.com
 */
@@ -21,7 +21,7 @@
 #include "led.h"
 
 #if SBUS_ENABLED == 1
-void hal_ppm_init(void){
+void hal_ppm_init(void) {
 }
 void hal_ppm_tick() {
 }
@@ -34,7 +34,7 @@ void hal_ppm_init(void) {
     hal_set_ppm(state);
 }
 
-void hal_ppm_failsafe_enter(void){
+void hal_ppm_failsafe_enter(void) {
     failsafe = 1;
 }
 

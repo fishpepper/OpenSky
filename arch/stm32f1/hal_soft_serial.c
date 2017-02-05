@@ -10,7 +10,7 @@
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+    along with this program.  If not, see <http:// www.gnu.org/licenses/>.
 
    author: fishpepper <AT> gmail.com
 */
@@ -68,24 +68,24 @@ static void hal_soft_serial_init_timer(void) {
     tim_init.TIM_ClockDivision  = 0;
     tim_init.TIM_CounterMode    = TIM_CounterMode_Up;
 
-    //set time base. NOTE: this will immediately trigger an INT!
+    // set time base. NOTE: this will immediately trigger an INT!
     TIM_TimeBaseInit(SOFT_SERIAL_TIMER, &tim_init);
 
-    //clear IT flag (caused by TimeBaseInit()):
+    // clear IT flag (caused by TimeBaseInit()):
     TIM_ClearITPendingBit(SOFT_SERIAL_TIMER, TIM_IT_Update);
 
     TIM_ICStructInit(&tim_ic_init);
     tim_ic_init.TIM_Channel        = SOFT_SERIAL_TIMER_CH;
 #ifdef HUB_TELEMETRY_INVERTED
   #ifdef SOFT_SERIAL_PIN_HAS_INVERTER
-    //board has inverter -> invert twice = no inversion
+    // board has inverter -> invert twice = no inversion
     tim_ic_init.TIM_ICPolarity     = TIM_ICPolarity_Falling;
   #else
     tim_ic_init.TIM_ICPolarity     = TIM_ICPolarity_Rising;
   #endif
 #else
   #ifdef SOFT_SERIAL_PIN_HAS_INVERTER
-    //board has inverter -> invert 
+    // board has inverter -> invert 
     tim_ic_init.TIM_ICPolarity     = TIM_ICPolarity_Rising;
   #else
     tim_ic_init.TIM_ICPolarity     = TIM_ICPolarity_Falling;
@@ -98,7 +98,7 @@ static void hal_soft_serial_init_timer(void) {
 
     TIM_ClearITPendingBit(SOFT_SERIAL_TIMER, SOFT_SERIAL_TIMER_IT_IC);
 /*
-    //Output Compare Active Mode configuration:
+    // Output Compare Active Mode configuration:
     TIM_OCStructInit(&tim_oc_init);
     tim_oc_init.TIM_OCMode      = TIM_OCMode_ disable;
     tim_oc_init.TIM_OutputState = TIM_OutputState_ disable;
@@ -106,7 +106,7 @@ static void hal_soft_serial_init_timer(void) {
     tim_oc_init.TIM_OCPolarity  = TIM_OCPolarity_High;
     hal_ppm_init_ocx(PPM_TIMER_CH, PPM_TIMER, &tim_oc_init);
     */
-    //enable counter
+    // enable counter
     TIM_Cmd(SOFT_SERIAL_TIMER, ENABLE);
 }
 
@@ -143,7 +143,7 @@ static void hal_soft_serial_init_nvic(void) {
 
 void SOFT_SERIAL_TIMER_IC_IRQHandler(void) {
     // handle startbit:
-    if (HAL_SOFT_SERIAL_IC_ISR_FLAG_SET()){
+    if (HAL_SOFT_SERIAL_IC_ISR_FLAG_SET()) {
         // reset counter
         TIM_SetCounter(SOFT_SERIAL_TIMER, 0);
         // this is the startbit -> re synchronize the timer to this
@@ -161,7 +161,7 @@ void SOFT_SERIAL_TIMER_IC_IRQHandler(void) {
         // clear any pending update flags as well
         HAL_SOFT_SERIAL_UP_ISR_FLAG_CLEAR();
 
-        //process
+        // process
         soft_serial_process_startbit();
     }
 }

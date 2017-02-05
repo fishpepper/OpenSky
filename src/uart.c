@@ -10,7 +10,7 @@
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+    along with this program.  If not, see <http:// www.gnu.org/licenses/>.
 
    author: fishpepper <AT> gmail.com
 */
@@ -26,7 +26,7 @@
 #ifdef SBUS_ENABLED
 volatile uart_rx_callback_t uart_rx_callback;
 
-void uart_init(void){
+void uart_init(void) {
     debug("uart: init\n"); debug_flush();
 
     uart_rx_callback = 0;
@@ -34,12 +34,12 @@ void uart_init(void){
     hal_uart_init();
 }
 
-void uart_start_transmission(uint8_t *buf, uint8_t len){
-    //send data!
+void uart_start_transmission(uint8_t *buf, uint8_t len) {
+    // send data!
     hal_uart_start_transmission(buf, len);
 }
 
-void uart_set_rx_callback(uart_rx_callback_t callback){
+void uart_set_rx_callback(uart_rx_callback_t callback) {
     uart_rx_callback = callback;
 }
 #endif

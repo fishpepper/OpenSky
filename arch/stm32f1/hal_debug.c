@@ -10,7 +10,7 @@
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+    along with this program.  If not, see <http:// www.gnu.org/licenses/>.
 
    author: fishpepper <AT> gmail.com
 */
@@ -18,7 +18,7 @@
 #include "hal_uart.h"
 #include  "stm32f10x_rcc.h"
 #include  "stm32f10x_usart.h"
-#include  "misc.h" //this is actually a stm32 include (nvic stuff)
+#include  "misc.h" // this is actually a stm32 include (nvic stuff)
 #include  "debug.h"
 #include  "led.h"
 
@@ -54,7 +54,7 @@ void hal_debug_init_nvic(uint8_t enable) {
 static void hal_debug_init_mode(void) {
     USART_InitTypeDef uart_init;
 
-    //USART configuration:
+    // USART configuration:
     // 115200 baud, 8N1
     // no hw flow control
     uart_init.USART_BaudRate = 115200;
@@ -67,35 +67,35 @@ static void hal_debug_init_mode(void) {
 }
 
 static void hal_debug_enable(void) {
-    //enable uart
+    // enable uart
     USART_Cmd(DEBUG_USART, ENABLE);
 }
 
 void hal_debug_start_transmission(uint8_t ch) {
-    //enable TXE int
+    // enable TXE int
     USART_ITConfig(DEBUG_USART, USART_IT_TXE, ENABLE);
     hal_debug_txe_is_on = 1;
 
-    //send first byte
+    // send first byte
     USART_SendData(DEBUG_USART, ch);
 }
 
 uint8_t hal_debug_int_enabled(void) {
-    //is the txe int enabled?
+    // is the txe int enabled?
     return hal_debug_txe_is_on;
 }
 
-static void hal_debug_init_gpio(void){
+static void hal_debug_init_gpio(void) {
     GPIO_InitTypeDef gpio_init;
 
-    //Configure USART TX as alternate function push-pull
+    // Configure USART TX as alternate function push-pull
     gpio_init.GPIO_Pin   = DEBUG_USART_TX_PIN;
     gpio_init.GPIO_Speed = GPIO_Speed_50MHz;
     gpio_init.GPIO_Mode  = GPIO_Mode_AF_PP;
     GPIO_Init(DEBUG_USART_GPIO, &gpio_init);
 }
 
-static void hal_debug_init_rcc(void){
+static void hal_debug_init_rcc(void) {
     // configure clocks for uart:
     // enable GPIO clock
     RCC_APBxPeriphClockCmd(DEBUG_USART_GPIO_CLK_RCC, DEBUG_USART_GPIO_CLK | RCC_APB2Periph_AFIO, ENABLE);

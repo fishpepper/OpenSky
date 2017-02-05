@@ -6,7 +6,7 @@
   #define ADC_ENABLED
 #endif
 
-//adc results
+// adc results
 extern __xdata uint16_t hal_adc_data[2];
 
 void hal_adc_init(void);

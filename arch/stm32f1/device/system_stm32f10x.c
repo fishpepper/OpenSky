@@ -168,7 +168,7 @@ static void SetSysClockTo24(void);
   * @param  None
   * @retval None
   */
-void SystemInit (void){
+void SystemInit (void) {
   /* Reset the RCC clock configuration to the default reset state(for debug purpose) */
   /* Set HSION bit */
   RCC->CR |= (uint32_t)0x00000001;
@@ -527,7 +527,7 @@ static void SetSysClockTo24(void)
     StartUpCounter++;
   } while((HSEStatus == 0) && (StartUpCounter != HSE_STARTUP_TIMEOUT));
 
-  if ((RCC->CR & RCC_CR_HSERDY) != RESET){
+  if ((RCC->CR & RCC_CR_HSERDY) != RESET) {
     HSEStatus = (uint32_t)0x01;
   } else {
     HSEStatus = (uint32_t)0x00;
@@ -546,8 +546,8 @@ static void SetSysClockTo24(void)
 
     /*  PLL configuration:  = (HSE / 1) * 2 = 24 MHz */
     RCC->CFGR &= (uint32_t)((uint32_t)~(RCC_CFGR_PLLSRC | RCC_CFGR_PLLXTPRE | RCC_CFGR_PLLMULL));
-    //RCC->CFGR |= (uint32_t)(RCC_CFGR_PLLSRC_PREDIV1 | RCC_CFGR_PLLXTPRE_PREDIV1_Div2 | RCC_CFGR_PLLMULL6);
-    //RCC->CFGR |= (uint32_t)(RCC_CFGR_PLLSRC_PREDIV1 | RCC_CFGR_PLLMULL2);
+    // RCC->CFGR |= (uint32_t)(RCC_CFGR_PLLSRC_PREDIV1 | RCC_CFGR_PLLXTPRE_PREDIV1_Div2 | RCC_CFGR_PLLMULL6);
+    // RCC->CFGR |= (uint32_t)(RCC_CFGR_PLLSRC_PREDIV1 | RCC_CFGR_PLLMULL2);
     RCC->CFGR |= (uint32_t)(RCC_CFGR_PLLSRC_HSE | RCC_CFGR_PLLMULL2);
 
     /* Enable PLL */

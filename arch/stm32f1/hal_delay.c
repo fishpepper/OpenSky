@@ -10,7 +10,7 @@
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+    along with this program.  If not, see <http:// www.gnu.org/licenses/>.
 
    author: fishpepper <AT> gmail.com
 */
@@ -18,10 +18,10 @@
 #include "hal_delay.h"
 
 inline void hal_delay_us(uint32_t us) {
-    //based on https://github.com/leaflabs/libmaple
+    // based on https:// github.com/leaflabs/libmaple
     us *= 8;
 
-    //fudge for function call overhead
+    // fudge for function call overhead
     us--;
     us--;
     us--;

@@ -33,14 +33,14 @@ void hal_cc25xx_read_fifo(uint8_t *buf, uint8_t len);
 void hal_cc25xx_register_read_multi(uint8_t address, uint8_t *buffer, uint8_t len);
 uint8_t hal_cc25xx_transmission_completed(void);
 
-//adress checks
+// adress checks
 #define CC2500_PKTCTRL1_FLAG_ADR_CHECK_00 ((0<<1) | (0<<0))
 #define CC2500_PKTCTRL1_FLAG_ADR_CHECK_01 ((0<<1) | (1<<0))
 #define CC2500_PKTCTRL1_FLAG_ADR_CHECK_10 ((1<<1) | (0<<0))
 #define CC2500_PKTCTRL1_FLAG_ADR_CHECK_11 ((1<<1) | (1<<0))
-//append status bytes?
+// append status bytes?
 #define CC2500_PKTCTRL1_APPEND_STATUS     (1<<2)
-//crc autoflush
+// crc autoflush
 #define CC2500_PKTCTRL1_CRC_AUTOFLUSH     (1<<3)
 
 // Flags
@@ -48,7 +48,7 @@ uint8_t hal_cc25xx_transmission_completed(void);
 #define WRITE_FLAG   0b00000000
 #define READ_FLAG    0b10000000
 
-//Definitions for burst/single access to registers
+// Definitions for burst/single access to registers
 #define CC2500_WRITE_SINGLE     0x00
 #define CC2500_WRITE_BURST      0x40
 #define CC2500_READ_SINGLE      0x80

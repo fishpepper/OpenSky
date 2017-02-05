@@ -10,7 +10,7 @@
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+    along with this program.  If not, see <http:// www.gnu.org/licenses/>.
 
    author: fishpepper <AT> gmail.com
 */
@@ -22,6 +22,6 @@
 void hal_wdt_init(void) {
 }
 
-inline void hal_wdt_reset(void){
+inline void hal_wdt_reset(void) {
 }
 

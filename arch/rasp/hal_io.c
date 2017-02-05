@@ -10,7 +10,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program.  If not, see <http://www.gnu.org/licenses/>.
+   along with this program.  If not, see <http:// www.gnu.org/licenses/>.
 
 author: fishpepper <AT> gmail.com
 */
@@ -59,18 +59,18 @@ void setup_io()
 
     /* mmap GPIO */
     gpio_map = mmap(
-            NULL,             //Any adddress in our space will do
-            BLOCK_SIZE,       //Map length
+            NULL,             // Any adddress in our space will do
+            BLOCK_SIZE,       // Map length
             PROT_READ|PROT_WRITE,// Enable reading & writting to mapped memory
-            MAP_SHARED,       //Shared with other processes
-            mem_fd,           //File to map
+            MAP_SHARED,       // Shared with other processes
+            mem_fd,           // File to map
             0x200000          // GPIO controller
             );
 
-    close(mem_fd); //No need to keep mem_fd open after mmap
+    close(mem_fd); // No need to keep mem_fd open after mmap
 
     if (gpio_map == MAP_FAILED) {
-        printf("mmap error %d\n", (int)gpio_map);//errno also set!
+        printf("mmap error %d\n", (int)gpio_map);// errno also set!
         exit(-1);
     }
 
@@ -130,6 +130,6 @@ void hal_set_ppm(int state) {
         GPIO_CLR = 1 << PPM;
 }
 
-uint8_t hal_io_bind_request(void){
+uint8_t hal_io_bind_request(void) {
     return !!GET_GPIO(BIND);
 }

@@ -10,7 +10,7 @@
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+    along with this program.  If not, see <http:// www.gnu.org/licenses/>.
 
    author: fishpepper <AT> gmail.com
 */
@@ -23,7 +23,7 @@
 
 void hal_wdt_init(void) {
     // detect resets from wdt
-    if (RCC_GetFlagStatus(RCC_FLAG_IWDGRST) != RESET){
+    if (RCC_GetFlagStatus(RCC_FLAG_IWDGRST) != RESET) {
         debug("hal_wdt: watchdog reset detected\n"); debug_flush();
         RCC_ClearFlag();
     }
@@ -49,8 +49,8 @@ void hal_wdt_init(void) {
     IWDG_Enable();
 }
 
-inline void hal_wdt_reset(void){
-    //reset wdt
+inline void hal_wdt_reset(void) {
+    // reset wdt
      IWDG_ReloadCounter();
 }
 

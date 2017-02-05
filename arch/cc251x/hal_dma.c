@@ -10,7 +10,7 @@
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+    along with this program.  If not, see <http:// www.gnu.org/licenses/>.
 
    author: fishpepper <AT> gmail.com
 */
@@ -18,7 +18,7 @@
 #include "main.h"
 #include "hal_dma.h"
 
-//dma config
-//dma0 can be given independently but 1-4 has
-//to be given in one consequent array...
+// dma config
+// dma0 can be given independently but 1-4 has
+// to be given in one consequent array...
 __xdata HAL_DMA_DESC hal_dma_config[5];

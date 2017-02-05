@@ -10,7 +10,7 @@
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+    along with this program.  If not, see <http:// www.gnu.org/licenses/>.
 
    author: fishpepper <AT> gmail.com
 */
@@ -45,31 +45,31 @@ void hal_uart_init(void) {
     // make tx pin output:
     P1DIR |= (1<<5);
 #elif SBUS_UART == USART1_P0
-    //USART1 use ALT1 -> Clear flag -> Port P0_4 = TX
+    // USART1 use ALT1 -> Clear flag -> Port P0_4 = TX
     PERCFG &= ~(PERCFG_U1CFG);
 
     // USART1 has priority when USART0 is also enabled
     P2DIR = (P2DIR & 0x3F) | 0b01000000;
 
-    //configure pin P0_4 (TX) and P0_5 (RX) as special function:
+    // configure pin P0_4 (TX) and P0_5 (RX) as special function:
     P0SEL |= (1<<4) | (1<<5);
 
     // make sure all P1 pins switch to normal GPIO
 //    P1SEL &= ~(0xF0);
 
-    //make tx pin output:
+    // make tx pin output:
     P0DIR |= (1<<4);
 #elif SBUS_UART == USART1_P1
-    //USART1 use ALT2 -> SET flag -> Port P1_6 = TX
+    // USART1 use ALT2 -> SET flag -> Port P1_6 = TX
     PERCFG |= (PERCFG_U1CFG);
 
     // USART1 has priority when USART0 is also enabled
     P2DIR = (P2DIR & 0x3F) | 0b01000000;
 
-    //configure pin P1_6 (TX) and P1_7(RX) as special function:
+    // configure pin P1_6 (TX) and P1_7(RX) as special function:
     P1SEL |= (1<<6) | (1<<7);
 
-    //make tx pin output:
+    // make tx pin output:
     P1DIR |= (1<<6);
 #else
  #error "UNSUPPORTED UART"
@@ -84,35 +84,35 @@ void hal_uart_init(void) {
     U1GCR = (U1GCR & ~0x1F) | (CC2510_BAUD_E_100000);
 #endif
 
-    //set up config for USART -> 8E2
+    // set up config for USART -> 8E2
     #ifdef SBUS_INVERTED
-        //this is a really nice feature of the cc2510:
-        //we can invert the idle level of the usart
-        //by setting STOP to zero. by inverting
-        //the parity, the startbit, and the data
-        //by using the SBUS_PREPARE_DATA() macro
-        //we can effectively invert the usart in software :)
-        sbus_uart_config.bit.START  = 1; //startbit level = low
-        sbus_uart_config.bit.STOP   = 0; //stopbit level = high
-        sbus_uart_config.bit.D9     = 1; //UNEven parity
+        // this is a really nice feature of the cc2510:
+        // we can invert the idle level of the usart
+        // by setting STOP to zero. by inverting
+        // the parity, the startbit, and the data
+        // by using the SBUS_PREPARE_DATA() macro
+        // we can effectively invert the usart in software :)
+        sbus_uart_config.bit.START  = 1; // startbit level = low
+        sbus_uart_config.bit.STOP   = 0; // stopbit level = high
+        sbus_uart_config.bit.D9     = 1; // UNEven parity
     #else
-        //standard usart, non-inverted mode
-        //NOTE: most sbus implementations use inverted mode
-        sbus_uart_config.bit.START  = 0; //startbit level = low
-        sbus_uart_config.bit.STOP   = 1; //stopbit level = high
-        sbus_uart_config.bit.D9     = 0; //Even parity
+        // standard usart, non-inverted mode
+        // NOTE: most sbus implementations use inverted mode
+        sbus_uart_config.bit.START  = 0; // startbit level = low
+        sbus_uart_config.bit.STOP   = 1; // stopbit level = high
+        sbus_uart_config.bit.D9     = 0; // Even parity
     #endif
 
-    sbus_uart_config.bit.SPB    = 1; //1 = 2 stopbits
-    sbus_uart_config.bit.PARITY = 1; //1 = parity enabled, D9=0 -> even parity
-    sbus_uart_config.bit.BIT9   = 1; //8bit
-    sbus_uart_config.bit.FLOW   = 0; //no hw flow control
-    sbus_uart_config.bit.ORDER  = 0; //lsb first
+    sbus_uart_config.bit.SPB    = 1; // 1 = 2 stopbits
+    sbus_uart_config.bit.PARITY = 1; // 1 = parity enabled, D9=0 -> even parity
+    sbus_uart_config.bit.BIT9   = 1; // 8bit
+    sbus_uart_config.bit.FLOW   = 0; // no hw flow control
+    sbus_uart_config.bit.ORDER  = 0; // lsb first
 
     // activate uart config
     hal_uart_set_mode(&sbus_uart_config);
 
-    //use dma channel 3 for transmission:
+    // use dma channel 3 for transmission:
     hal_dma_config[3].PRIORITY       = DMA_PRI_LOW;
     hal_dma_config[3].M8             = DMA_M8_USE_7_BITS;
     hal_dma_config[3].IRQMASK        = DMA_IRQMASK_DISABLE;
@@ -140,13 +140,13 @@ void hal_uart_init(void) {
     hal_dma_config[3].SRCINC         = DMA_SRCINC_1;
     hal_dma_config[3].DESTINC        = DMA_DESTINC_0;
 
-    //set pointer to the DMA configuration struct into DMA-channel 1-4
-    //configuration, should have happened in adc.c already...
+    // set pointer to the DMA configuration struct into DMA-channel 1-4
+    // configuration, should have happened in adc.c already...
     SET_WORD(DMA1CFGH, DMA1CFGL, &hal_dma_config[1]);
 
-    //arm the relevant DMA channel for UART TX, and apply 45 NOP's
-    //to allow the DMA configuration to load
-    //-> do a sleep instead of those nops...
+    // arm the relevant DMA channel for UART TX, and apply 45 NOP's
+    // to allow the DMA configuration to load
+    // -> do a sleep instead of those nops...
     DMAARM |= DMA_ARM_CH3;
     hal_delay_45nop();
 
@@ -175,59 +175,59 @@ void hal_uart_init(void) {
 #endif
 }
 
-static void hal_uart_set_mode(EXTERNAL_MEMORY union hal_uart_config_t *cfg){
+static void hal_uart_set_mode(EXTERNAL_MEMORY union hal_uart_config_t *cfg) {
 #if (SBUS_UART == USART0_P1) || (SBUS_UART == USART0_P0)
-    //enable uart mode
+    // enable uart mode
     U0CSR |= 0x80;
 
-    //store config to U1UCR register
+    // store config to U1UCR register
     U0UCR = cfg->byte & (0x7F);
 
-    //store config to U1GCR: (msb/lsb)
-    if (cfg->bit.ORDER){
+    // store config to U1GCR: (msb/lsb)
+    if (cfg->bit.ORDER) {
         U0GCR |= U0GCR_ORDER;
     }else{
         U0GCR &= ~U0GCR_ORDER;
     }
 
-    //interrupt prio to 1 (0..3=highest)
+    // interrupt prio to 1 (0..3=highest)
     IP0 |= (1<<2);
     IP1 &= ~(1<<2);
 #else
-    //enable uart mode
+    // enable uart mode
     U1CSR |= 0x80;
 
-    //store config to U1UCR register
+    // store config to U1UCR register
     U1UCR = cfg->byte & (0x7F);
 
-    //store config to U1GCR: (msb/lsb)
-    if (cfg->bit.ORDER){
+    // store config to U1GCR: (msb/lsb)
+    if (cfg->bit.ORDER) {
         U1GCR |= U1GCR_ORDER;
     }else{
         U1GCR &= ~U1GCR_ORDER;
     }
 
-    //interrupt prio to 1 (0..3=highest)
+    // interrupt prio to 1 (0..3=highest)
     IP0 |= (1<<3);
     IP1 &= ~(1<<3);
 #endif
 }
 
-void hal_uart_start_transmission(uint8_t *data, uint8_t len){
-    //important: src addr start is data[1]
+void hal_uart_start_transmission(uint8_t *data, uint8_t len) {
+    // important: src addr start is data[1]
     SET_WORD(hal_dma_config[3].SRCADDRH,  hal_dma_config[3].SRCADDRL,  &data[1]);
 
     // configure length of transfer
     SET_WORD(hal_dma_config[3].LENH, hal_dma_config[3].LENL, len);
 
-    //time to send this frame!
-    //re-arm dma:
+    // time to send this frame!
+    // re-arm dma:
     DMAARM |= DMA_ARM_CH3;
 
-    //45 nops to make sure the dma config is loaded
+    // 45 nops to make sure the dma config is loaded
     hal_delay_45nop();
 
-    //send the very first UART byte to trigger a UART TX session:
+    // send the very first UART byte to trigger a UART TX session:
 #if (SBUS_UART == USART0_P1) || (SBUS_UART == USART0_P0)
     U0DBUF = data[0];
 #else
@@ -239,10 +239,10 @@ void hal_uart_start_transmission(uint8_t *data, uint8_t len){
 void HAL_UART_RX_ISR(void) {
     uint8_t rx;
     
-    HAL_UART_RX_ISR_CLEAR_FLAG(); //THIS SHOULD NEVER BE THE LAST LINE IN AN ISR!
+    HAL_UART_RX_ISR_CLEAR_FLAG(); // THIS SHOULD NEVER BE THE LAST LINE IN AN ISR!
 
 #ifdef SBUS_INVERTED
-    rx = 0xFF ^ HAL_UART_RX_GETCH(); //remove data inversion 
+    rx = 0xFF ^ HAL_UART_RX_GETCH(); // remove data inversion 
 #else
     rx = HAL_UART_RX_GETCH();
 #endif

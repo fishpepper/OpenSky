@@ -241,7 +241,7 @@ void I2S_Init(SPI_TypeDef* SPIx, I2S_InitTypeDef* I2S_InitStruct)
   tmpreg = SPIx->I2SCFGR;
   
   /* If the default value has to be written, reinitialize i2sdiv and i2sodd*/
-  if(I2S_InitStruct->I2S_AudioFreq == I2S_AudioFreq_Default)
+  if (I2S_InitStruct->I2S_AudioFreq == I2S_AudioFreq_Default)
   {
     i2sodd = (uint16_t)0;
     i2sdiv = (uint16_t)2;   
@@ -250,7 +250,7 @@ void I2S_Init(SPI_TypeDef* SPIx, I2S_InitTypeDef* I2S_InitStruct)
   else
   {
     /* Check the frame length (For the Prescaler computing) */
-    if(I2S_InitStruct->I2S_DataFormat == I2S_DataFormat_16b)
+    if (I2S_InitStruct->I2S_DataFormat == I2S_DataFormat_16b)
     {
       /* Packet length is 16 bits */
       packetlength = 1;
@@ -262,7 +262,7 @@ void I2S_Init(SPI_TypeDef* SPIx, I2S_InitTypeDef* I2S_InitStruct)
     }
 
     /* Get the I2S clock source mask depending on the peripheral number */
-    if(((uint32_t)SPIx) == SPI2_BASE)
+    if (((uint32_t)SPIx) == SPI2_BASE)
     {
       /* The mask is relative to I2S2 */
       tmp = I2S2_CLOCK_SRC;
@@ -276,13 +276,13 @@ void I2S_Init(SPI_TypeDef* SPIx, I2S_InitTypeDef* I2S_InitStruct)
     /* Check the I2S clock source configuration depending on the Device:
        Only Connectivity line devices have the PLL3 VCO clock */
 #ifdef STM32F10X_CL
-    if((RCC->CFGR2 & tmp) != 0)
+    if ((RCC->CFGR2 & tmp) != 0)
     {
       /* Get the configuration bits of RCC PLL3 multiplier */
       tmp = (uint32_t)((RCC->CFGR2 & I2S_MUL_MASK) >> 12);
 
       /* Get the value of the PLL3 multiplier */      
-      if((tmp > 5) && (tmp < 15))
+      if ((tmp > 5) && (tmp < 15))
       {
         /* Multiplier is between 8 and 14 (value 15 is forbidden) */
         tmp += 2;
@@ -318,7 +318,7 @@ void I2S_Init(SPI_TypeDef* SPIx, I2S_InitTypeDef* I2S_InitStruct)
 #endif /* STM32F10X_CL */    
 
     /* Compute the Real divider depending on the MCLK output state with a floating point */
-    if(I2S_InitStruct->I2S_MCLKOutput == I2S_MCLKOutput_Enable)
+    if (I2S_InitStruct->I2S_MCLKOutput == I2S_MCLKOutput_Enable)
     {
       /* MCLK output is enabled */
       tmp = (uint16_t)(((((sourceclock / 256) * 10) / I2S_InitStruct->I2S_AudioFreq)) + 5);

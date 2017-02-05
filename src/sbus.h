@@ -10,8 +10,8 @@ void sbus_start_transmission(uint8_t frame_lost);
 void sbus_exit_failsafe(void);
 void sbus_enter_failsafe(void);
 
-//best match for 100kbit/s = 99975.5859375 bit/s
-//baudrate = (((256.0 + baud_m)*2.0**baud_e) / (2**28)) * 26000000.0
+// best match for 100kbit/s = 99975.5859375 bit/s
+// baudrate = (((256.0 + baud_m)*2.0**baud_e) / (2**28)) * 26000000.0
 #define SBUS_BAUD_E 11
 #define SBUS_BAUD_M 248
 

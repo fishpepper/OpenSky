@@ -3,8 +3,8 @@
 
 #include <stdint.h>
 
-//HAL_DMA CONFIG
-//see https://e2e.ti.com/support/wireless_connectivity/f/156/t/16922
+// HAL_DMA CONFIG
+// see https:// e2e.ti.com/support/wireless_connectivity/f/156/t/16922
 typedef struct {
     uint8_t SRCADDRH;
     uint8_t SRCADDRL;

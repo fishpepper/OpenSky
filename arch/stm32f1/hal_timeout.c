@@ -10,7 +10,7 @@
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+    along with this program.  If not, see <http:// www.gnu.org/licenses/>.
 
    author: fishpepper <AT> gmail.com
 */
@@ -24,8 +24,8 @@ volatile static __IO uint32_t hal_timeout2_100us;
 volatile static __IO uint32_t hal_timeout_100us_delay;
 
 void hal_timeout_init(void) {
-    //configure 1ms sys tick:
-    if (SysTick_Config(SystemCoreClock / 10000)){
+    // configure 1ms sys tick:
+    if (SysTick_Config(SystemCoreClock / 10000)) {
         debug("hal_timeout: failed to set systick timeout\n");
     }
 
@@ -45,45 +45,45 @@ void hal_timeout2_set_100us(__IO uint32_t hus) {
     hal_timeout2_100us = hus;
 }
 
-void hal_timeout_set(__IO uint32_t ms){
+void hal_timeout_set(__IO uint32_t ms) {
     hal_timeout_100us = 10*ms;
 }
 
 uint8_t hal_timeout_timed_out(void) {
-    //debug_put_uint16(hal_timeout_ms); debug("\n"); debug_flush();
+    // debug_put_uint16(hal_timeout_ms); debug("\n"); debug_flush();
     return (hal_timeout_100us == 0);
 }
 
 uint8_t hal_timeout2_timed_out(void) {
-    //debug_put_uint16(hal_timeout_ms); debug("\n"); debug_flush();
+    // debug_put_uint16(hal_timeout_ms); debug("\n"); debug_flush();
     return (hal_timeout2_100us == 0);
 }
 
 
 // seperate ms delay function
-void hal_timeout_delay_ms(uint32_t timeout){
+void hal_timeout_delay_ms(uint32_t timeout) {
     hal_timeout_100us_delay = 10*timeout;
 
-    while(hal_timeout_100us_delay > 0){
+    while(hal_timeout_100us_delay > 0) {
     }
 }
 
 /*// seperate ms delay function
-void hal_timeout_delay_100us(uint32_t timeout){
+void hal_timeout_delay_100us(uint32_t timeout) {
     hal_timeout_100us_delay = timeout;
 
-    while(hal_timeout_100us_delay > 0){
+    while(hal_timeout_100us_delay > 0) {
     }
 }*/
 
-void SysTick_Handler(void){
-    if (hal_timeout_100us != 0){
+void SysTick_Handler(void) {
+    if (hal_timeout_100us != 0) {
         hal_timeout_100us--;
     }
-    if (hal_timeout_100us_delay != 0){
+    if (hal_timeout_100us_delay != 0) {
         hal_timeout_100us_delay--;
     }
-    if (hal_timeout2_100us != 0){
+    if (hal_timeout2_100us != 0) {
         hal_timeout2_100us--;
     }
 }

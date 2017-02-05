@@ -10,7 +10,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program.  If not, see <http://www.gnu.org/licenses/>.
+   along with this program.  If not, see <http:// www.gnu.org/licenses/>.
 
 author: fishpepper <AT> gmail.com
 */
@@ -86,7 +86,7 @@ void hal_timeout2_set_100us(uint32_t hus) {
     timer_add(&timer_2, hus * 100);
 }
 
-void hal_timeout_set(uint32_t ms){
+void hal_timeout_set(uint32_t ms) {
     clock_gettime(CLOCK_REALTIME, &timer_1);
     timer_add(&timer_1, ms * 1000);
 }
@@ -96,7 +96,7 @@ uint8_t hal_timeout_timed_out(void) {
     struct timespec now;
     clock_gettime(CLOCK_REALTIME, &now);
 
-    if(timeval_gt(&now, &timer_ppm)) {
+    if (timeval_gt(&now, &timer_ppm)) {
         hal_ppm_tick();
     }
 
@@ -107,7 +107,7 @@ uint8_t hal_timeout2_timed_out(void) {
     struct timespec now;
     clock_gettime(CLOCK_REALTIME, &now);
 
-    if(timeval_gt(&now, &timer_ppm)) {
+    if (timeval_gt(&now, &timer_ppm)) {
         hal_ppm_tick();
     }
     return timeval_gt(&now, &timer_2);
@@ -125,7 +125,7 @@ void hal_timeout_delay_us(int32_t timeout_us) {
         if (timeval_gt(&delay_timer, &timer_ppm)) {
 
             /* Calculate how far to sleep */
-            if(timeval_subtract(&sleep, &now, &timer_ppm) > 0) {
+            if (timeval_subtract(&sleep, &now, &timer_ppm) > 0) {
                 nanosleep(&sleep, &rem);
             }
 
@@ -140,13 +140,13 @@ void hal_timeout_delay_us(int32_t timeout_us) {
         }
 
         /* Calculate how long to sleep */
-        if(timeval_subtract(&sleep, &now, &delay_timer) > 0) {
+        if (timeval_subtract(&sleep, &now, &delay_timer) > 0) {
             nanosleep(&sleep, &rem);
         }
     } while(0);
 }
 
-void hal_timeout_add_ppm(uint32_t us){
+void hal_timeout_add_ppm(uint32_t us) {
     timer_add(&timer_ppm, us);
 }
 

@@ -213,7 +213,7 @@ void PWR_EnterSTOPMode(uint32_t PWR_Regulator, uint8_t PWR_STOPEntry)
   SCB->SCR |= SCB_SCR_SLEEPDEEP;
   
   /* Select STOP mode entry --------------------------------------------------*/
-  if(PWR_STOPEntry == PWR_STOPEntry_WFI)
+  if (PWR_STOPEntry == PWR_STOPEntry_WFI)
   {   
     /* Request Wait For Interrupt */
     __WFI();

@@ -10,7 +10,7 @@
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+    along with this program.  If not, see <http:// www.gnu.org/licenses/>.
 
    author: fishpepper <AT> gmail.com
 */
@@ -24,11 +24,11 @@ void timeout_init(void) {
     hal_timeout_init();
 
 #if 0
-    //measure delay_us(x) accuracy
+    // measure delay_us(x) accuracy
     timeout_set(2000);
     uint32_t c;
-    for(c=0; c<1000; c++){
-        delay_us(1000); //1ms
+    for(c=0; c<1000; c++) {
+        delay_us(1000); // 1ms
     }
     uint32_t remaining = timeout_time_remaining();
     uint32_t duration  = 2000-remaining;
@@ -38,8 +38,8 @@ void timeout_init(void) {
 #endif
 }
 
-//caution: do not use large timeouts, they will trigger the wdt!
-void timeout2_delay_100us(uint16_t us){
+// caution: do not use large timeouts, they will trigger the wdt!
+void timeout2_delay_100us(uint16_t us) {
     timeout2_set_100us(us);
-    while(!timeout2_timed_out()){}
+    while(!timeout2_timed_out()) {}
 }

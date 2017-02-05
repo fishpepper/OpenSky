@@ -10,7 +10,7 @@
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+    along with this program.  If not, see <http:// www.gnu.org/licenses/>.
 
    author: fishpepper <AT> gmail.com
 */
@@ -19,7 +19,7 @@
 #include "hal_spi.h"
 #include "debug.h"
 
-void spi_init(void){
+void spi_init(void) {
     debug("spi: init\n"); debug_flush();
     hal_spi_init();
 }

@@ -1,17 +1,17 @@
-//pin layout ISP header
+// pin layout ISP header
 #define ISP_DATA  P2_1
 #define ISP_CLOCK P2_2
 
-//NOT USED
+// NOT USED
 #define PPM_OUT_PIN 4
 
-//NOT USED
+// NOT USED
 #define ADC_PORT P0
 #define ADC0 5
 #define ADC1 6
-//#define ADC1_USE_ACS712
+// #define ADC1_USE_ACS712
 
-//voltage divider on my board is 10 / 5.6 k, scale to 100 / 56 to avoid floating point calc
+// voltage divider on my board is 10 / 5.6 k, scale to 100 / 56 to avoid floating point calc
 #define ADC0_DIVIDER_A 100
 #define ADC0_DIVIDER_B  56
 
@@ -22,13 +22,13 @@
 #define BIND2_PIN  2
 
 
-//LEDS
+// LEDS
 #define LED_GREEN_PORT P0
 #define LED_GREEN_PIN  4
 #define LED_RED_PORT   P0
 #define LED_RED_PIN    1
 
-//DEBUG
+// DEBUG
 #define DEBUG_UART USART1_P0
 
 // SBUS
@@ -38,15 +38,15 @@
 // Note: default/futaba is INVERTED=1! (use this for a cc3d etc)
 //       inverted     => idle = LOW
 //       non inverted => idle = high
-//#define SBUS_INVERTED
+// #define SBUS_INVERTED
 
 // PPM (only used if sbus is disabled)
 // invert SBUS output (normal is non inverted)
-//#define PPM_INVERTED
+// #define PPM_INVERTED
 
-//hub telemetry input (soft serial)
+// hub telemetry input (soft serial)
 #define HUB_TELEMETRY_ON_SBUS_UART
-//#define HUB_TELEMETRY_INVERTED
+// #define HUB_TELEMETRY_INVERTED
 
 #ifndef HUB_TELEMETRY_ON_SBUS_UART
   // if not shared with sbus, use any pin in softserial mode at 9600baud
@@ -54,12 +54,12 @@
   #define HUB_TELEMETRY_PIN         3
 #endif
 
-//bootloader config
+// bootloader config
 #define BOOTLOADER_LED_GREEN_PORT LED_GREEN_PORT
 #define BOOTLOADER_LED_GREEN_PIN  LED_GREEN_PIN
 #define BOOTLOADER_LED_RED_PORT   LED_RED_PORT
 #define BOOTLOADER_LED_RED_PIN    LED_RED_PIN
-//bootloader runs on UART0 P1
+// bootloader runs on UART0 P1
 #define BOOTLOADER_UART_NUM           0
 #define BOOTLOADER_UART_PORT          1
 #define BOOTLOADER_UART_INVERTED      0

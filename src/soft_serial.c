@@ -10,7 +10,7 @@
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+    along with this program.  If not, see <http:// www.gnu.org/licenses/>.
 
    author: fishpepper <AT> gmail.com
 */
@@ -39,7 +39,7 @@ void soft_serial_init(void) {
     hal_soft_serial_init();
 }
 
-void soft_serial_set_rx_callback(soft_serial_rx_callback_t callback){
+void soft_serial_set_rx_callback(soft_serial_rx_callback_t callback) {
     soft_serial_rx_callback = callback;
 }
 
@@ -52,12 +52,12 @@ void soft_serial_process_startbit(void) {
 
 uint8_t soft_serial_process_databit(void) {
     // handle data
-    if (soft_serial_databit_count != 0){
+    if (soft_serial_databit_count != 0) {
         // sample bits
 #ifdef HUB_TELEMETRY_INVERTED
-        if (HUB_TELEMETRY_PIN_LO()){
+        if (HUB_TELEMETRY_PIN_LO()) {
 #else
-        if (HUB_TELEMETRY_PIN_HI()){
+        if (HUB_TELEMETRY_PIN_HI()) {
 #endif
             soft_serial_databits |= (1<<10);
         }
@@ -65,18 +65,18 @@ uint8_t soft_serial_process_databit(void) {
         soft_serial_databits >>= 1;
     }
 
-    if (soft_serial_databit_count == 0){
+    if (soft_serial_databit_count == 0) {
         uint8_t data_byte;
         data_byte = (soft_serial_databits >> 1) & 0xFF;
 
         // process incoming data byte
-        if ((soft_serial_databits & (1<<0)) != 0){
+        if ((soft_serial_databits & (1<<0)) != 0) {
             // FRAME ERROR: start bit invalid
             debug_putc('S');
-        }else if ((soft_serial_databits & (1<<9)) == 0){
+        }else if ((soft_serial_databits & (1<<9)) == 0) {
             // FRAME ERROR: stop bit invalid
             debug_putc('s');
-            //debug_put_hex16(soft_serial_databits); debug_put_newline();
+            // debug_put_hex16(soft_serial_databits); debug_put_newline();
         }else{
             // fine, data byte received
             // process data
@@ -87,7 +87,7 @@ uint8_t soft_serial_process_databit(void) {
         }
 #if SOFTSERIAL_DEBUG_RX
         debug("RX: 0x"); debug_put_hex8(data_byte); debug_put_newline();
-        //debug_putc(data_byte);
+        // debug_putc(data_byte);
 #endif
 
         // finished data byte

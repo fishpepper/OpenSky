@@ -10,13 +10,13 @@
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+    along with this program.  If not, see <http:// www.gnu.org/licenses/>.
 
    author: fishpepper <AT> gmail.com
 */
 
 #include "hal_spi.h"
 
-void hal_spi_init(void){
+void hal_spi_init(void) {
 }
 

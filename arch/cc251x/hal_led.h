@@ -5,8 +5,8 @@
 #include "config.h"
 #include "hal_cc25xx.h"
 
-//use helper macros to do expansion to *DIR etc
-//LEDS
+// use helper macros to do expansion to *DIR etc
+// LEDS
 #define LED_GREEN_DIR PORT2DIR(LED_GREEN_PORT)
 #define LED_RED_DIR   PORT2DIR(LED_RED_PORT)
 #define LED_RED_BIT PORT2BIT(LED_RED_PORT, LED_RED_PIN)

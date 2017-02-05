@@ -10,7 +10,7 @@
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+    along with this program.  If not, see <http:// www.gnu.org/licenses/>.
 
    author: fishpepper <AT> gmail.com
 */
@@ -39,24 +39,24 @@ void hal_uart_init(EXTERNAL_MEMORY uint8_t *data_ptr) {
     hal_uart_init_mode();
 }
 
-void SBUS_USART_IRQHANDLER(void){
-    if(USART_GetITStatus(SBUS_USART, USART_IT_TXE) != RESET){
-        //TXE interrupt
-        //finished with sending?
-        if(hal_uart_tx_pos >= SBUS_DATA_LEN){
-            //no data in fifo -> disable tx int:
+void SBUS_USART_IRQHANDLER(void) {
+    if (USART_GetITStatus(SBUS_USART, USART_IT_TXE) != RESET) {
+        // TXE interrupt
+        // finished with sending?
+        if (hal_uart_tx_pos >= SBUS_DATA_LEN) {
+            // no data in fifo -> disable tx int:
             USART_ITConfig(SBUS_USART, USART_IT_TXE, DISABLE);
-            //debug_put_newline();
+            // debug_put_newline();
         }else{
-            //else: data to tx
-            //debug_put_hex8(hal_uart_tx_buffer[hal_uart_tx_pos]);
+            // else: data to tx
+            // debug_put_hex8(hal_uart_tx_buffer[hal_uart_tx_pos]);
             USART_SendData(SBUS_USART, hal_uart_tx_buffer[hal_uart_tx_pos++]);
         }
     }
 
 #ifdef HUB_TELEMETRY_ON_SBUS_UART
-    if(USART_GetITStatus(SBUS_USART, USART_IT_RXE) != RESET){
-        //RXE interrupt
+    if (USART_GetITStatus(SBUS_USART, USART_IT_RXE) != RESET) {
+        // RXE interrupt
         uint8_t rx = USART_ReceiveData(SBUS_USART);
         
         if (uart_rx_callback != 0) {
@@ -84,17 +84,17 @@ static void hal_uart_init_nvic(void) {
     NVIC_Init(&nvic_init);
 }
 
-static void hal_uart_init_gpio(void){
+static void hal_uart_init_gpio(void) {
     GPIO_InitTypeDef gpio_init;
 
-    //Configure USART TX as alternate function push-pull
+    // Configure USART TX as alternate function push-pull
     gpio_init.GPIO_Pin   = SBUS_USART_TX_PIN;
     gpio_init.GPIO_Speed = GPIO_Speed_50MHz;
     gpio_init.GPIO_Mode  = GPIO_Mode_AF_PP;
     GPIO_Init(SBUS_USART_GPIO, &gpio_init);
 }
 
-static void hal_uart_init_rcc(void){
+static void hal_uart_init_rcc(void) {
     // configure clocks for uart:
     // enable GPIO clock
     RCC_APBxPeriphClockCmd(SBUS_USART_GPIO_CLK_RCC, SBUS_USART_GPIO_CLK, ENABLE);
@@ -132,13 +132,13 @@ static void hal_uart_init_mode(void) {
 }
 
 void hal_uart_start_transmission(uint8_t *buffer, uint8_t len) {
-    //copy data ptr:
+    // copy data ptr:
     hal_uart_tx_buffer = buffer;
 
-    //set up counter:
+    // set up counter:
     hal_uart_tx_pos = 0;
 
-    //enable TXE int
+    // enable TXE int
     USART_ITConfig(SBUS_USART, USART_IT_TXE, ENABLE);
 }
 

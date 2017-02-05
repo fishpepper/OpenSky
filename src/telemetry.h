@@ -4,7 +4,7 @@
 #include "hal_defines.h"
 #include <stdint.h>
 
-//this has to be a power of 2 (2,4,8,16,32,...)
+// this has to be a power of 2 (2,4,8,16,32,...)
 #define TELEMETRY_BUFFER_SIZE 64
 typedef struct {
     uint8_t data[TELEMETRY_BUFFER_SIZE];

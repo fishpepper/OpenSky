@@ -10,7 +10,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program.  If not, see <http://www.gnu.org/licenses/>.
+   along with this program.  If not, see <http:// www.gnu.org/licenses/>.
 
 author: fishpepper <AT> gmail.com
 */
@@ -28,13 +28,13 @@ void hal_storage_init(void) {
     debug("hal_storage: init\n"); debug_flush();
 }
 
-void hal_storage_write(uint8_t *buffer, uint16_t len){
+void hal_storage_write(uint8_t *buffer, uint16_t len) {
     FILE *f = fopen("flash_storage.bin", "w");
     fwrite(buffer, len, 1, f);
     fclose(f);
 }
 
-void hal_storage_read(uint8_t *storage_ptr, uint16_t len){
+void hal_storage_read(uint8_t *storage_ptr, uint16_t len) {
     FILE *f = fopen("flash_storage.bin", "r");
     if (!f) {
         memset(storage_ptr, 0, len);

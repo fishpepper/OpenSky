@@ -1,26 +1,26 @@
-//pin layout ISP header
+// pin layout ISP header
 #define ISP_DATA  P2_1
 #define ISP_CLOCK P2_2
 
-//pin layout servo connection
-#define SERVO_1 7 //P0_7 = BIND, pull down on startup to enter bind mode
-#define SERVO_2 6 //P0_6 = ADC1 = voltage sensor (max 3.3V on I/O ! -> voltage divider necessary!)
-#define SERVO_3 5 //P0_5 = ADC0 = current sensor (max 3.3V on I/O !)
-#define SERVO_4 4 //P0_4 = PPM or SBUS OUT
-#define SERVO_5 3 //P0_3 = debug UART
+// pin layout servo connection
+#define SERVO_1 7 // P0_7 = BIND, pull down on startup to enter bind mode
+#define SERVO_2 6 // P0_6 = ADC1 = voltage sensor (max 3.3V on I/O ! -> voltage divider necessary!)
+#define SERVO_3 5 // P0_5 = ADC0 = current sensor (max 3.3V on I/O !)
+#define SERVO_4 4 // P0_4 = PPM or SBUS OUT
+#define SERVO_5 3 // P0_3 = debug UART
 
 #define PPM_OUT_PIN SERVO_4
 
 #define BIND_PORT P0
 #define BIND_PIN  SERVO_1
 
-//leds
+// leds
 #define LED_GREEN_PORT P2
 #define LED_GREEN_PIN  4
 #define LED_RED_PORT P2
 #define LED_RED_PIN  3
 
-//DEBUG
+// DEBUG
 #define DEBUG_UART USART0_P0
 
 // SBUS
@@ -34,9 +34,9 @@
 
 // PPM (only used if sbus is disabled)
 // invert SBUS output (normal is non inverted)
-//#define PPM_INVERTED
+// #define PPM_INVERTED
 
-//hub telemetry input (soft serial)
+// hub telemetry input (soft serial)
 #define HUB_TELEMETRY_ON_SBUS_UART
 #define HUB_TELEMETRY_INVERTED
 
@@ -46,33 +46,33 @@
   #define HUB_TELEMETRY_PIN         7
 #endif
 
-//note: change of adc ch require change in adc.c!
+// note: change of adc ch require change in adc.c!
 #define ADC_PORT P0
 #ifdef HUB_TELEMETRY_ON_SBUS_UART
-  //free up SERVO_3 for hub telemetry input!
+  // free up SERVO_3 for hub telemetry input!
   #define ADC0 SERVO_2
   #define ADC1 SERVO_2
 #else
   #define ADC0 SERVO_2
   #define ADC1 SERVO_3
 #endif
-//acs712 in inverted mode on adc1?
-//when powered by 5V we can use a trick
-//to get a good resolution: use inverted power inputs
+// acs712 in inverted mode on adc1?
+// when powered by 5V we can use a trick
+// to get a good resolution: use inverted power inputs
 // 0A = 2.5V
-//30A = 0.0V
+// 30A = 0.0V
 #define ADC1_USE_ACS712
 
-//voltage divider on my board is 10 / 3.3 k, scale to 100 / 33 to avoid floating point calc
+// voltage divider on my board is 10 / 3.3 k, scale to 100 / 33 to avoid floating point calc
 #define ADC0_DIVIDER_A 100
 #define ADC0_DIVIDER_B  33
 
-//bootloader config
+// bootloader config
 #define BOOTLOADER_LED_GREEN_PORT LED_GREEN_PORT
 #define BOOTLOADER_LED_GREEN_PIN  LED_GREEN_PIN
 #define BOOTLOADER_LED_RED_PORT   LED_RED_PORT
 #define BOOTLOADER_LED_RED_PIN    LED_RED_PIN
-//bootloader runs on UART1 P0
+// bootloader runs on UART1 P0
 #define BOOTLOADER_UART_NUM           1
 #define BOOTLOADER_UART_PORT          0
 #define BOOTLOADER_UART_INVERTED      1

@@ -12,7 +12,7 @@
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+    along with this program.  If not, see <http:// www.gnu.org/licenses/>.
 
    author: fishpepper <AT> gmail.com
 */
@@ -27,26 +27,26 @@ void io_init(void) {
     hal_io_init();
 }
 
-uint8_t io_bind_request(void){
+uint8_t io_bind_request(void) {
     uint8_t i;
 
-    //wait for pin status to settle
+    // wait for pin status to settle
     delay_ms(100);
 
-    //check if pressed at least 200ms:
-    if (hal_io_bind_request()){
+    // check if pressed at least 200ms:
+    if (hal_io_bind_request()) {
         // double check to see if this was really a press:
-        for(i=0; i<200; i++){
+        for(i=0; i<200; i++) {
             delay_ms(1);
-            if (! hal_io_bind_request()){
+            if (! hal_io_bind_request()) {
                 // not pressed any more -> return
                 return 0;
             }
         }
-        //still pressed, return true
+        // still pressed, return true
         return 1;
     }
 
-    //not pressed
+    // not pressed
     return 0;
 }

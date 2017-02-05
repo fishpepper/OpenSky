@@ -12,7 +12,7 @@
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+    along with this program.  If not, see <http:// www.gnu.org/licenses/>.
 
    author: fishpepper <AT> gmail.com
 */
@@ -22,9 +22,9 @@
 #include "led.h"
 #include "delay.h"
 
-void assert_failed(uint8_t* filename, uint32_t line){
-    //todo: add own implementation to report the file name and line number,
-    //eg  : printf("Wrong parameters value: file %s on line %d\r\n", file, line)
+void assert_failed(uint8_t* filename, uint32_t line) {
+    // todo: add own implementation to report the file name and line number,
+    // eg  : printf("Wrong parameters value: file %s on line %d\r\n", file, line)
     if (debug_is_initialized()) {
         debug("assert failed: ");
         debug(filename);
@@ -35,8 +35,8 @@ void assert_failed(uint8_t* filename, uint32_t line){
         debug_flush();
     }
 
-    //infinite loop
-    while (1){
+    // infinite loop
+    while (1) {
         led_red_on();
         delay_ms(100);
         led_green_on();

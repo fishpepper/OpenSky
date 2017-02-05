@@ -12,7 +12,7 @@
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+    along with this program.  If not, see <http:// www.gnu.org/licenses/>.
 
    author: fishpepper <AT> gmail.com
 */
@@ -40,17 +40,17 @@ void cc25xx_switch_antenna(void) {
 }
 
 void cc25xx_wait_for_transmission_complete(void) {
-    //after STX we go back to RX state (see MCSM1 register)
-    //so wait a maximum of 9ms for completion
+    // after STX we go back to RX state (see MCSM1 register)
+    // so wait a maximum of 9ms for completion
     timeout2_set_100us(90);
 
-    while(!timeout2_timed_out()){
-        if (hal_cc25xx_transmission_completed()){
-            //done with tx, return
+    while(!timeout2_timed_out()) {
+        if (hal_cc25xx_transmission_completed()) {
+            // done with tx, return
             return;
         }
     }
 
-    //if we reach this point, tx timed out:
+    // if we reach this point, tx timed out:
     debug("!TX");
 }

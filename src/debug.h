@@ -52,10 +52,10 @@ void debug_put_newline(void);
 void DEBUG_ISR(void);
 
 #if ((DEBUG_TX_BUFFER_SIZE==128) || (DEBUG_TX_BUFFER_SIZE==64) || (DEBUG_TX_BUFFER_SIZE==32))
-    //ALWAYS use 2^n for buffer size! -> faster code and no int16 in interrupts (see Readme.md)
+    // ALWAYS use 2^n for buffer size! -> faster code and no int16 in interrupts (see Readme.md)
     #define DEBUG_TX_BUFFER_AND_OPERAND (DEBUG_TX_BUFFER_SIZE-1)
 #else
-    //FAIL!
+    // FAIL!
     #warn "ALWAYS USE POWER OF TWO FOR BUFFER SIZE!"
 #endif
 

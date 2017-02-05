@@ -10,7 +10,7 @@
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+    along with this program.  If not, see <http:// www.gnu.org/licenses/>.
 
    author: fishpepper <AT> gmail.com
 */
@@ -30,51 +30,51 @@
 #include "telemetry.h"
 #include "soft_serial.h"
 
-int main(void){
-    //leds:
+int main(void) {
+    // leds:
     led_init();
 
-    //init clock sources:
+    // init clock sources:
     clocksource_init();
 
-    //init ios
+    // init ios
     io_init();
     
-    //init debug
+    // init debug
     debug_init();
 
-    //init wdt timer
+    // init wdt timer
     wdt_init();
 
-    //enable timeout routines
+    // enable timeout routines
     timeout_init();
 
-    //init storage
+    // init storage
     storage_init();
 
-    //init frsky core
+    // init frsky core
     frsky_init();
 
-    //init adc
+    // init adc
     adc_init();
 
-    //init output
+    // init output
 #ifdef SBUS_ENABLED
     sbus_init();
 #else
     ppm_init();
 #endif
 
-    //init failsafe
+    // init failsafe
     failsafe_init();
 
-    //init telemetry
+    // init telemetry
     telemetry_init();
 
-    //run main
+    // run main
     debug("main: init done\n");
 
-    //frsky_frame_sniffer();
+    // frsky_frame_sniffer();
     frsky_main();
 
     debug("main: frsky main ended?! THIS SHOULD NOT HAPPEN!");

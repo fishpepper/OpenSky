@@ -3,10 +3,10 @@
 
 #include "hal_defines.h"
 
-//debugging data
+// debugging data
 #define DEBUG 1
 
-//useful for debugging. DO NOT USE!
+// useful for debugging. DO NOT USE!
 #define ADC_DO_TEST 0
 #define TELEMETRY_DO_TEST 0
 

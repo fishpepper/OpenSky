@@ -19,12 +19,12 @@
 
 // PPM (only used if sbus is disabled)
 // invert SBUS output (normal is non inverted)
-//#define PPM_INVERTED
+// #define PPM_INVERTED
 
-//hub telemetry input (soft serial)
-//#define HUB_TELEMETRY_ON_SBUS_UART
-//#define HUB_TELEMETRY_INVERTED 
-//#define PPM_INVERTED
+// hub telemetry input (soft serial)
+// #define HUB_TELEMETRY_ON_SBUS_UART
+// #define HUB_TELEMETRY_INVERTED 
+// #define PPM_INVERTED
 
 #define SBUS_USART                 USART1
 #define SBUS_USART_CLK             RCC_APB2Periph_USART1
@@ -60,9 +60,9 @@
 
 /* 
     XSR uses the Skyworks SE2431 range extender
-    See: http://www.skyworksinc.com/uploads/documents/SE2431L_202410J.pdf
+    See: http:// www.skyworksinc.com/uploads/documents/SE2431L_202410J.pdf
 
-    Looks to be a similar design to this: http://www.ti.com/tool/CC2530-SE2431L
+    Looks to be a similar design to this: http:// www.ti.com/tool/CC2530-SE2431L
 
     Which means the RX pin selection is not needed (it is RX if TX is off)
 
@@ -124,12 +124,12 @@
 #define EEPROM_I2C_SCL_PIN         GPIO_Pin_0
 /* TODO: ??? */
 #define EEPROM_WP_PIN              GPIO_Pin_8
-//A2=LO, A1=LO, A0=HI on pcb
+// A2=LO, A1=LO, A0=HI on pcb
 #define EEPROM_I2C_ADDRESS         0xA2
 
 /* NOTE no analogue input for XSR, and no servo pins */
 
-//cppm output is on PB12
+// cppm output is on PB12
 #define PPM_GPIO                  GPIOB
 #define PPM_GPIO_CLK              RCC_APB2Periph_GPIOB
 #define PPM_GPIO_CLK_RCC          2
@@ -165,4 +165,4 @@
 
 #define DEFAULT_FSCAL_VALUE -62
 
-#endif //__PIN_CONFIG_H__
+#endif // __PIN_CONFIG_H__

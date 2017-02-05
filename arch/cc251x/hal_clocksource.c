@@ -10,7 +10,7 @@
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+    along with this program.  If not, see <http:// www.gnu.org/licenses/>.
 
    author: fishpepper <AT> gmail.com
 */
@@ -19,29 +19,29 @@
 #include "hal_cc25xx.h"
 #include "led.h"
 
-void hal_clocksource_init(void){
-    //for debugging clocksource problems
+void hal_clocksource_init(void) {
+    // for debugging clocksource problems
     led_red_on();
     led_green_on();
 
-    //power up osc (?)
+    // power up osc (?)
     SLEEP &= ~CLOCKSOURCE_OSC_PD_BIT;
-    //wait for XOSC stable
-    while(!CLOCKSOURCE_XOSC_STABLE()){}
+    // wait for XOSC stable
+    while(!CLOCKSOURCE_XOSC_STABLE()) {}
     NOP();
 
-    //start crystal osc as HS clocksource, OSC32 is int rc osc
+    // start crystal osc as HS clocksource, OSC32 is int rc osc
     CLKCON = 0x80;
 
-    //wait for selection to be active
-    while(!CLOCKSOURCE_XOSC_STABLE()){}
+    // wait for selection to be active
+    while(!CLOCKSOURCE_XOSC_STABLE()) {}
     NOP();
 
-    //power down the unused oscillator
+    // power down the unused oscillator
     SLEEP |= CLOCKSOURCE_OSC_PD_BIT;
 
 
-    //for debugging clocksource problems
+    // for debugging clocksource problems
     led_red_off();
     led_green_off();
 }

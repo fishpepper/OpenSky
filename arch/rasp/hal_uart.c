@@ -10,15 +10,15 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program.  If not, see <http://www.gnu.org/licenses/>.
+   along with this program.  If not, see <http:// www.gnu.org/licenses/>.
 
 author: fishpepper <AT> gmail.com
 */
 
 #include <stdio.h>
-#include <unistd.h>         //Used for UART
-#include <fcntl.h>          //Used for UART
-#include <asm/termios.h>        //Used for UART
+#include <unistd.h>         // Used for UART
+#include <fcntl.h>          // Used for UART
+#include <asm/termios.h>        // Used for UART
 
 #include "hal_uart.h"
 #include "debug.h"
@@ -31,7 +31,7 @@ static int uart0_filestream = -1;
 
 void hal_uart_init(EXTERNAL_MEMORY uint8_t *sbus_data_ptr) {
 
-    uart0_filestream = open("/dev/ttyAMA0", O_WRONLY | O_NOCTTY | O_NDELAY); //Open in non blocking read/write mode
+    uart0_filestream = open("/dev/ttyAMA0", O_WRONLY | O_NOCTTY | O_NDELAY); // Open in non blocking read/write mode
     if (uart0_filestream == -1)
     {
         printf("Error - Unable to open UART.  Ensure it is not in use by another application\n");
@@ -52,7 +52,7 @@ void hal_uart_init(EXTERNAL_MEMORY uint8_t *sbus_data_ptr) {
     }
 }
 
-void hal_uart_start_transmission(uint8_t *data, uint8_t len){
+void hal_uart_start_transmission(uint8_t *data, uint8_t len) {
     if (uart0_filestream != -1)
     {
         int count = write(uart0_filestream, data, len);
@@ -60,7 +60,7 @@ void hal_uart_start_transmission(uint8_t *data, uint8_t len){
         {
             printf("UART TX error sent %u of %u\n", count, len);
         }
-        //printf("%d bytes written\n", len);
+        // printf("%d bytes written\n", len);
     }
 }
 

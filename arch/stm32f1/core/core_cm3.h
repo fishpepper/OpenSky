@@ -1,4 +1,4 @@
-/**************************************************************************//**
+/**************************************************************************// **
  * @file     core_cm3.h
  * @brief    CMSIS Cortex-M3 Core Peripheral Access Layer Header File
  * @version  V1.30
@@ -1585,7 +1585,7 @@ static __INLINE uint32_t NVIC_GetActive(IRQn_Type IRQn)
  */
 static __INLINE void NVIC_SetPriority(IRQn_Type IRQn, uint32_t priority)
 {
-  if(IRQn < 0) {
+  if (IRQn < 0) {
     SCB->SHP[((uint32_t)(IRQn) & 0xF)-4] = ((priority << (8 - __NVIC_PRIO_BITS)) & 0xff); } /* set Priority for Cortex-M3 System Interrupts */
   else {
     NVIC->IP[(uint32_t)(IRQn)] = ((priority << (8 - __NVIC_PRIO_BITS)) & 0xff);    }        /* set Priority for device specific Interrupts  */
@@ -1609,7 +1609,7 @@ static __INLINE void NVIC_SetPriority(IRQn_Type IRQn, uint32_t priority)
 static __INLINE uint32_t NVIC_GetPriority(IRQn_Type IRQn)
 {
 
-  if(IRQn < 0) {
+  if (IRQn < 0) {
     return((uint32_t)(SCB->SHP[((uint32_t)(IRQn) & 0xF)-4] >> (8 - __NVIC_PRIO_BITS)));  } /* get priority for Cortex-M3 system interrupts */
   else {
     return((uint32_t)(NVIC->IP[(uint32_t)(IRQn)]           >> (8 - __NVIC_PRIO_BITS)));  } /* get priority for device specific interrupts  */

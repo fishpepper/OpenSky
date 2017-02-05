@@ -554,7 +554,7 @@ void GPIO_PinRemapConfig(uint32_t GPIO_Remap, FunctionalState NewState)
   assert_param(IS_GPIO_REMAP(GPIO_Remap));
   assert_param(IS_FUNCTIONAL_STATE(NewState));  
   
-  if((GPIO_Remap & 0x80000000) == 0x80000000)
+  if ((GPIO_Remap & 0x80000000) == 0x80000000)
   {
     tmpreg = AFIO->MAPR2;
   }
@@ -588,7 +588,7 @@ void GPIO_PinRemapConfig(uint32_t GPIO_Remap, FunctionalState NewState)
     tmpreg |= (tmp << ((GPIO_Remap >> 0x15)*0x10));
   }
 
-  if((GPIO_Remap & 0x80000000) == 0x80000000)
+  if ((GPIO_Remap & 0x80000000) == 0x80000000)
   {
     AFIO->MAPR2 = tmpreg;
   }

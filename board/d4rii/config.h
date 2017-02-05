@@ -18,15 +18,15 @@
 
 // PPM (only used if sbus is disabled)
 // invert SBUS output (normal is non inverted)
-//#define PPM_INVERTED
+// #define PPM_INVERTED
 
-//hub telemetry input (soft serial)
-//#define HUB_TELEMETRY_ON_SBUS_UART
-//#define HUB_TELEMETRY_INVERTED 
-//#define PPM_INVERTED
+// hub telemetry input (soft serial)
+// #define HUB_TELEMETRY_ON_SBUS_UART
+// #define HUB_TELEMETRY_INVERTED 
+// #define PPM_INVERTED
 
 #ifdef SBUS_INVERTED
-    //DEBUG is on SERVO4 output:
+    // DEBUG is on SERVO4 output:
     #define DEBUG_USART               USART3
     #define DEBUG_USART_CLK           RCC_APB1Periph_USART3
     #define DEBUG_USART_CLK_RCC       1
@@ -36,7 +36,7 @@
     #define DEBUG_USART_TX_PIN        GPIO_Pin_10
     #define DEBUG_USART_IRQHANDLER    USART3_IRQHandler
     #define DEBUG_USART_IRQn          USART3_IRQn
-    //SBUS is INVERTED on 4 pin header TX pin
+    // SBUS is INVERTED on 4 pin header TX pin
     #define SBUS_USART                 USART1
     #define SBUS_USART_CLK             RCC_APB2Periph_USART1
     #define SBUS_USART_RCC             2
@@ -47,7 +47,7 @@
     #define SBUS_USART_IRQHANDLER      USART1_IRQHandler
     #define SBUS_USART_IRQn            USART1_IRQn
 #else
-    //DEBUG is INVERTED(!) on 4pin header TX pin
+    // DEBUG is INVERTED(!) on 4pin header TX pin
     #define DEBUG_USART               USART1
     #define DEBUG_USART_CLK           RCC_APB2Periph_USART1
     #define DEBUG_USART_CLK_RCC       2
@@ -57,7 +57,7 @@
     #define DEBUG_USART_TX_PIN        GPIO_Pin_9
     #define DEBUG_USART_IRQHANDLER    USART1_IRQHandler
     #define DEBUG_USART_IRQn          USART1_IRQn
-    //SBUS is non-inverted on SERVO4 output:
+    // SBUS is non-inverted on SERVO4 output:
     #define SBUS_USART                 USART3
     #define SBUS_USART_CLK             RCC_APB1Periph_USART3
     #define SBUS_USART_RCC             1
@@ -129,7 +129,7 @@
 #define EEPROM_I2C_SDA_PIN         GPIO_Pin_7
 #define EEPROM_I2C_SCL_PIN         GPIO_Pin_6
 #define EEPROM_WP_PIN              GPIO_Pin_8
-//A2=LO, A1=LO, A0=HI on pcb
+// A2=LO, A1=LO, A0=HI on pcb
 #define EEPROM_I2C_ADDRESS         0xA2
 
 
@@ -144,7 +144,7 @@
 #define ADC_DMA_TC_FLAG           DMA1_FLAG_TC1
 #define ADC                       ADC1
 
-//ppm output
+// ppm output
 #define PPM_GPIO                  GPIOB
 #define PPM_GPIO_CLK              RCC_APB2Periph_GPIOB
 #define PPM_GPIO_CLK_RCC          2
@@ -156,15 +156,15 @@
 #define PPM_TIMER_IRQHANDLER      TIM3_IRQHandler
 #define PPM_TIMER_IRQn            TIM3_IRQn
 
-//soft spi for apa102 led
+// soft spi for apa102 led
 #define SOFT_SPI_GPIO             GPIOB
 #define SOFT_SPI_GPIO_CLK         RCC_APB2Periph_GPIOB
 #define SOFT_SPI_GPIO_CLK_RCC     2
 #define SOFT_SPI_MOSI             GPIO_Pin_1
 #define SOFT_SPI_SCK              GPIO_Pin_2
 
-//hub telemetry input NOTE: this has to be a timer io
-#define SOFT_SERIAL_PIN_HAS_INVERTER  //there is an inverter on GPIOA.10!
+// hub telemetry input NOTE: this has to be a timer io
+#define SOFT_SERIAL_PIN_HAS_INVERTER  // there is an inverter on GPIOA.10!
 #define SOFT_SERIAL_GPIO          GPIOA
 #define SOFT_SERIAL_CLK           RCC_APB2Periph_GPIOA
 #define SOFT_SERIAL_CLK_RCC       2
@@ -197,4 +197,4 @@
 
 #define DEFAULT_FSCAL_VALUE -62
 
-#endif //__PIN_CONFIG_H__
+#endif // __PIN_CONFIG_H__

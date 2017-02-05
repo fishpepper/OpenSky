@@ -234,7 +234,7 @@ void TIM_TimeBaseInit(TIM_TypeDef* TIMx, TIM_TimeBaseInitTypeDef* TIM_TimeBaseIn
 
   tmpcr1 = TIMx->CR1;  
 
-  if((TIMx == TIM1) || (TIMx == TIM8)|| (TIMx == TIM2) || (TIMx == TIM3)||
+  if ((TIMx == TIM1) || (TIMx == TIM8)|| (TIMx == TIM2) || (TIMx == TIM3)||
      (TIMx == TIM4) || (TIMx == TIM5)) 
   {
     /* Select the Counter Mode */
@@ -242,7 +242,7 @@ void TIM_TimeBaseInit(TIM_TypeDef* TIMx, TIM_TimeBaseInitTypeDef* TIM_TimeBaseIn
     tmpcr1 |= (uint32_t)TIM_TimeBaseInitStruct->TIM_CounterMode;
   }
  
-  if((TIMx != TIM6) && (TIMx != TIM7))
+  if ((TIMx != TIM6) && (TIMx != TIM7))
   {
     /* Set the clock division */
     tmpcr1 &= (uint16_t)(~((uint16_t)TIM_CR1_CKD));
@@ -310,7 +310,7 @@ void TIM_OC1Init(TIM_TypeDef* TIMx, TIM_OCInitTypeDef* TIM_OCInitStruct)
   /* Set the Output State */
   tmpccer |= TIM_OCInitStruct->TIM_OutputState;
     
-  if((TIMx == TIM1) || (TIMx == TIM8)|| (TIMx == TIM15)||
+  if ((TIMx == TIM1) || (TIMx == TIM8)|| (TIMx == TIM15)||
      (TIMx == TIM16)|| (TIMx == TIM17))
   {
     assert_param(IS_TIM_OUTPUTN_STATE(TIM_OCInitStruct->TIM_OutputNState));
@@ -394,7 +394,7 @@ void TIM_OC2Init(TIM_TypeDef* TIMx, TIM_OCInitTypeDef* TIM_OCInitStruct)
   /* Set the Output State */
   tmpccer |= (uint16_t)(TIM_OCInitStruct->TIM_OutputState << 4);
     
-  if((TIMx == TIM1) || (TIMx == TIM8))
+  if ((TIMx == TIM1) || (TIMx == TIM8))
   {
     assert_param(IS_TIM_OUTPUTN_STATE(TIM_OCInitStruct->TIM_OutputNState));
     assert_param(IS_TIM_OCN_POLARITY(TIM_OCInitStruct->TIM_OCNPolarity));
@@ -475,7 +475,7 @@ void TIM_OC3Init(TIM_TypeDef* TIMx, TIM_OCInitTypeDef* TIM_OCInitStruct)
   /* Set the Output State */
   tmpccer |= (uint16_t)(TIM_OCInitStruct->TIM_OutputState << 8);
     
-  if((TIMx == TIM1) || (TIMx == TIM8))
+  if ((TIMx == TIM1) || (TIMx == TIM8))
   {
     assert_param(IS_TIM_OUTPUTN_STATE(TIM_OCInitStruct->TIM_OutputNState));
     assert_param(IS_TIM_OCN_POLARITY(TIM_OCInitStruct->TIM_OCNPolarity));
@@ -555,7 +555,7 @@ void TIM_OC4Init(TIM_TypeDef* TIMx, TIM_OCInitTypeDef* TIM_OCInitStruct)
   /* Set the Output State */
   tmpccer |= (uint16_t)(TIM_OCInitStruct->TIM_OutputState << 12);
     
-  if((TIMx == TIM1) || (TIMx == TIM8))
+  if ((TIMx == TIM1) || (TIMx == TIM8))
   {
     assert_param(IS_TIM_OCIDLE_STATE(TIM_OCInitStruct->TIM_OCIdleState));
     /* Reset the Output Compare IDLE State */
@@ -592,7 +592,7 @@ void TIM_ICInit(TIM_TypeDef* TIMx, TIM_ICInitTypeDef* TIM_ICInitStruct)
   assert_param(IS_TIM_IC_PRESCALER(TIM_ICInitStruct->TIM_ICPrescaler));
   assert_param(IS_TIM_IC_FILTER(TIM_ICInitStruct->TIM_ICFilter));
   
-  if((TIMx == TIM1) || (TIMx == TIM8) || (TIMx == TIM2) || (TIMx == TIM3) ||
+  if ((TIMx == TIM1) || (TIMx == TIM8) || (TIMx == TIM2) || (TIMx == TIM3) ||
      (TIMx == TIM4) ||(TIMx == TIM5))
   {
     assert_param(IS_TIM_IC_POLARITY(TIM_ICInitStruct->TIM_ICPolarity));
@@ -2060,7 +2060,7 @@ void TIM_SelectOCxM(TIM_TypeDef* TIMx, uint16_t TIM_Channel, uint16_t TIM_OCMode
   /* Disable the Channel: Reset the CCxE Bit */
   TIMx->CCER &= (uint16_t) ~tmp1;
 
-  if((TIM_Channel == TIM_Channel_1) ||(TIM_Channel == TIM_Channel_3))
+  if ((TIM_Channel == TIM_Channel_1) ||(TIM_Channel == TIM_Channel_3))
   {
     tmp += (TIM_Channel>>1);
 
@@ -2710,7 +2710,7 @@ static void TI1_Config(TIM_TypeDef* TIMx, uint16_t TIM_ICPolarity, uint16_t TIM_
   tmpccmr1 &= (uint16_t)(((uint16_t)~((uint16_t)TIM_CCMR1_CC1S)) & ((uint16_t)~((uint16_t)TIM_CCMR1_IC1F)));
   tmpccmr1 |= (uint16_t)(TIM_ICSelection | (uint16_t)(TIM_ICFilter << (uint16_t)4));
   
-  if((TIMx == TIM1) || (TIMx == TIM8) || (TIMx == TIM2) || (TIMx == TIM3) ||
+  if ((TIMx == TIM1) || (TIMx == TIM8) || (TIMx == TIM2) || (TIMx == TIM3) ||
      (TIMx == TIM4) ||(TIMx == TIM5))
   {
     /* Select the Polarity and set the CC1E Bit */
@@ -2759,7 +2759,7 @@ static void TI2_Config(TIM_TypeDef* TIMx, uint16_t TIM_ICPolarity, uint16_t TIM_
   tmpccmr1 |= (uint16_t)(TIM_ICFilter << 12);
   tmpccmr1 |= (uint16_t)(TIM_ICSelection << 8);
   
-  if((TIMx == TIM1) || (TIMx == TIM8) || (TIMx == TIM2) || (TIMx == TIM3) ||
+  if ((TIMx == TIM1) || (TIMx == TIM8) || (TIMx == TIM2) || (TIMx == TIM3) ||
      (TIMx == TIM4) ||(TIMx == TIM5))
   {
     /* Select the Polarity and set the CC2E Bit */
@@ -2807,7 +2807,7 @@ static void TI3_Config(TIM_TypeDef* TIMx, uint16_t TIM_ICPolarity, uint16_t TIM_
   tmpccmr2 &= (uint16_t)(((uint16_t)~((uint16_t)TIM_CCMR2_CC3S)) & ((uint16_t)~((uint16_t)TIM_CCMR2_IC3F)));
   tmpccmr2 |= (uint16_t)(TIM_ICSelection | (uint16_t)(TIM_ICFilter << (uint16_t)4));
     
-  if((TIMx == TIM1) || (TIMx == TIM8) || (TIMx == TIM2) || (TIMx == TIM3) ||
+  if ((TIMx == TIM1) || (TIMx == TIM8) || (TIMx == TIM2) || (TIMx == TIM3) ||
      (TIMx == TIM4) ||(TIMx == TIM5))
   {
     /* Select the Polarity and set the CC3E Bit */
@@ -2857,7 +2857,7 @@ static void TI4_Config(TIM_TypeDef* TIMx, uint16_t TIM_ICPolarity, uint16_t TIM_
   tmpccmr2 |= (uint16_t)(TIM_ICSelection << 8);
   tmpccmr2 |= (uint16_t)(TIM_ICFilter << 12);
   
-  if((TIMx == TIM1) || (TIMx == TIM8) || (TIMx == TIM2) || (TIMx == TIM3) ||
+  if ((TIMx == TIM1) || (TIMx == TIM8) || (TIMx == TIM2) || (TIMx == TIM3) ||
      (TIMx == TIM4) ||(TIMx == TIM5))
   {
     /* Select the Polarity and set the CC4E Bit */

@@ -10,7 +10,7 @@
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+    along with this program.  If not, see <http:// www.gnu.org/licenses/>.
 
    author: fishpepper <AT> gmail.com
 */
@@ -22,13 +22,13 @@
 #include  "stm32f10x_gpio.h"
 
 void hal_io_init(void) {
-    //configure bind io as input:
+    // configure bind io as input:
     GPIO_InitTypeDef gpio_init;
 
-    //periph clock enable for port
+    // periph clock enable for port
     RCC_APBxPeriphClockCmd(BIND_JUMPER_GPIO_CLK_RCC, BIND_JUMPER_GPIO_CLK, ENABLE);
 
-    //configure bind input as pullup
+    // configure bind input as pullup
     gpio_init.GPIO_Pin = BIND_JUMPER_PIN;
     gpio_init.GPIO_Speed = GPIO_Speed_50MHz;
     gpio_init.GPIO_Mode = GPIO_Mode_IPU;
@@ -36,12 +36,12 @@ void hal_io_init(void) {
 }
 
 uint8_t hal_io_bind_request(void) {
-    //Returs pin state (1 if HIGH, 0 if LOW)
-    if (GPIO_ReadInputDataBit(BIND_JUMPER_GPIO, BIND_JUMPER_PIN)){
-        //HIGH -> button not pressed
+    // Returs pin state (1 if HIGH, 0 if LOW)
+    if (GPIO_ReadInputDataBit(BIND_JUMPER_GPIO, BIND_JUMPER_PIN)) {
+        // HIGH -> button not pressed
         return 0;
     }else{
-        //LOW -> button pressed
+        // LOW -> button pressed
         return 1;
     }
 }

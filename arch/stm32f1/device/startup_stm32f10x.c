@@ -10,7 +10,7 @@ void Reset_Handler(void);
 void default_handler (void) {
 	uint64_t i;
 	led_red_on();
-	while(1){
+	while(1) {
 		for(i=0; i<0x00FFFFF; i++) {}
 		led_green_off();
 		for(i=0; i<0x00FFFFF; i++) {}
@@ -19,7 +19,7 @@ void default_handler (void) {
 	while(1);
 }
 
-void __attribute__ ((weak)) __libc_init_array (void){}
+void __attribute__ ((weak)) __libc_init_array (void) {}
 
 // Linker supplied pointers
 

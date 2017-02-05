@@ -10,7 +10,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program.  If not, see <http://www.gnu.org/licenses/>.
+   along with this program.  If not, see <http:// www.gnu.org/licenses/>.
 
 author: fishpepper <AT> gmail.com
 */
@@ -41,7 +41,7 @@ static int fd = -1;
 static uint32_t mode = 0;
 static uint16_t delay = 20;
 
-void hal_spi_init(void){
+void hal_spi_init(void) {
     int ret = 0;
 
     /*

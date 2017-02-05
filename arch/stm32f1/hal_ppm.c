@@ -10,7 +10,7 @@
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+    along with this program.  If not, see <http:// www.gnu.org/licenses/>.
 
    author: fishpepper <AT> gmail.com
 */
@@ -22,7 +22,7 @@
 #include "stm32f10x_rcc.h"
 #include "stm32f10x_gpio.h"
 #include "stm32f10x_tim.h"
-#include "misc.h" //stm32 nvic stuff
+#include "misc.h" // stm32 nvic stuff
 
 #ifndef SBUS_ENABLED
 
@@ -70,13 +70,13 @@ static void hal_ppm_init_timer(void) {
     tim_init.TIM_ClockDivision  = 0;
     tim_init.TIM_CounterMode    = TIM_CounterMode_Up;
 
-    //set time base. NOTE: this will immediately trigger an INT!
+    // set time base. NOTE: this will immediately trigger an INT!
     TIM_TimeBaseInit(PPM_TIMER, &tim_init);
 
-    //clear IT flag (caused by TimeBaseInit()):
+    // clear IT flag (caused by TimeBaseInit()):
     TIM_ClearITPendingBit(PPM_TIMER, TIM_IT_Update);
 
-    //Output Compare Active Mode configuration:
+    // Output Compare Active Mode configuration:
     TIM_OCStructInit(&tim_oc_init);
 #if PPM_INVERTED
     tim_oc_init.TIM_OCMode      = TIM_OCMode_PWM2;
@@ -88,14 +88,14 @@ static void hal_ppm_init_timer(void) {
     tim_oc_init.TIM_OCPolarity  = TIM_OCPolarity_High;
     hal_ppm_init_ocx(PPM_TIMER_CH, PPM_TIMER, &tim_oc_init);
 
-    //enable counter
+    // enable counter
     TIM_Cmd(PPM_TIMER, ENABLE);
 }
 
 static void hal_ppm_init_nvic(void) {
     NVIC_InitTypeDef nvic_init;
 
-    //strange, somehow the Timer IT Flags seem to be already enabled?!
+    // strange, somehow the Timer IT Flags seem to be already enabled?!
     TIM_ITConfig(PPM_TIMER, TIM_IT_Update, DISABLE);
     TIM_ITConfig(PPM_TIMER, TIM_IT_Break, DISABLE);
     TIM_ITConfig(PPM_TIMER, TIM_IT_CC1 | TIM_IT_CC2 | TIM_IT_CC3 | TIM_IT_CC4, DISABLE);
@@ -108,15 +108,15 @@ static void hal_ppm_init_nvic(void) {
     nvic_init.NVIC_IRQChannelCmd                = ENABLE;
     NVIC_Init(&nvic_init);
 
-    //enable ONLY update interrupt
+    // enable ONLY update interrupt
     TIM_ITConfig(PPM_TIMER, TIM_IT_Update, ENABLE);
 }
 
-void hal_ppm_failsafe_enter(void){
-    //set output to static value ZERO
+void hal_ppm_failsafe_enter(void) {
+    // set output to static value ZERO
     TIM_ITConfig(PPM_TIMER, TIM_IT_Update, DISABLE);
 
-    //set output to static low or high level:
+    // set output to static low or high level:
     GPIO_InitTypeDef gpio_init;
     gpio_init.GPIO_Pin   = PPM_PIN;
     gpio_init.GPIO_Mode  = GPIO_Mode_Out_PP;
@@ -124,24 +124,24 @@ void hal_ppm_failsafe_enter(void){
     GPIO_Init(PPM_GPIO, &gpio_init);
 
 #if PPM_INVERTED
-    //clear on zero -> default is high
+    // clear on zero -> default is high
     PPM_GPIO->BSRR = (PPM_PIN);
 #else
-    //set on zero -> default is low
+    // set on zero -> default is low
     PPM_GPIO->BRR  = (PPM_PIN);
 #endif
 }
 
 void hal_ppm_failsafe_exit(void) {
-    //exit failsafe, back to pulse generation
+    // exit failsafe, back to pulse generation
     hal_ppm_init_gpio();
 
-    //re-enable ppm output isr
+    // re-enable ppm output isr
     TIM_ITConfig(PPM_TIMER, TIM_IT_Update, ENABLE);
 }
 
 static void hal_ppm_init_ocx(uint8_t ch, TIM_TypeDef *TIMx, TIM_OCInitTypeDef *tim_oc_init) {
-    switch(PPM_TIMER_CH){
+    switch(PPM_TIMER_CH) {
         default:
             break;
         case(TIM_Channel_4):

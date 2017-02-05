@@ -10,7 +10,7 @@
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+    along with this program.  If not, see <http:// www.gnu.org/licenses/>.
 
    author: fishpepper <AT> gmail.com
 */
@@ -25,22 +25,22 @@
 #include "hal_defines.h"
 
 
-//run time copy of persistant storage data:
+// run time copy of persistant storage data:
 EXTERNAL_MEMORY STORAGE_DESC storage;
 
-void storage_init(void){
+void storage_init(void) {
     uint8_t i;
 
     debug("storage: init\n"); debug_flush();
 
-    //init hal storage
+    // init hal storage
     hal_storage_init();
 
-    //reload data from flash
+    // reload data from flash
     storage_read_from_flash();
 
     debug("storage: loaded hoptable[] = ");
-    for(i=0; i<FRSKY_HOPTABLE_SIZE; i++){
+    for(i=0; i<FRSKY_HOPTABLE_SIZE; i++) {
         debug_put_hex8(storage.frsky_hop_table[i]);
         debug_putc(' ');
         debug_flush();
@@ -54,7 +54,7 @@ static const uint8_t storage_default_hoptable[] =
                                 0x97, 0xD8, 0x2E, 0x6F, 0xB0, 0x06, 0x47, 0x88, 0xC9, 0x1F, 0x60, 0xA1,
                                 0xE2, 0x38, 0x79, 0xBA, 0x10, 0x51, 0x92, 0xD3, 0x29, 0x6A, 0xAB };
 
-void storage_read_from_flash(void){
+void storage_read_from_flash(void) {
     uint8_t *storage_ptr;
     uint16_t len;
     uint8_t i;
@@ -66,31 +66,31 @@ void storage_read_from_flash(void){
     hal_storage_read(storage_ptr, len);
 
 #ifdef FRSKY_USE_FIXED_ID
-    //allow override for testing
+    // allow override for testing
     if (1) {
 #else
-    //only init with defaults when no valid storage id was found
-    if (storage.version != STORAGE_VERSION_ID){
+    // only init with defaults when no valid storage id was found
+    if (storage.version != STORAGE_VERSION_ID) {
 #endif
         debug("storage: init with defaults (txid 0x1668)\n");
 
         storage.version = STORAGE_VERSION_ID;
 
-        //hard coded config for debugging:
+        // hard coded config for debugging:
         storage.frsky_txid[0] = 0x16;
         storage.frsky_txid[1] = 0x68;
         storage.frsky_freq_offset = DEFAULT_FSCAL_VALUE;
 
-        for(i=0; i<FRSKY_HOPTABLE_SIZE; i++){
+        for(i=0; i<FRSKY_HOPTABLE_SIZE; i++) {
             storage.frsky_hop_table[i] = storage_default_hoptable[i];
         }
 
-        //store settings
+        // store settings
         storage_write_to_flash();
     }
 }
 
-void storage_write_to_flash(void){
+void storage_write_to_flash(void) {
     uint8_t *storage_ptr ;
     uint16_t len;
 
@@ -100,7 +100,7 @@ void storage_write_to_flash(void){
     storage_ptr = (uint8_t*)&storage;
     len = sizeof(storage);
 
-    //execute flash write:
+    // execute flash write:
     hal_storage_write(storage_ptr, len);
 }
 

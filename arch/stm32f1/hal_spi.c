@@ -10,7 +10,7 @@
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+    along with this program.  If not, see <http:// www.gnu.org/licenses/>.
 
    author: fishpepper <AT> gmail.com
 */
@@ -53,7 +53,7 @@ static void hal_spi_init_mode(void) {
     spi_init.SPI_CPOL      = SPI_CPOL_Low;
     spi_init.SPI_CPHA      = SPI_CPHA_1Edge;
     spi_init.SPI_NSS       = SPI_NSS_Soft;
-    spi_init.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_8; //3mhz
+    spi_init.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_8; // 3mhz
     spi_init.SPI_FirstBit  = SPI_FirstBit_MSB;
     spi_init.SPI_CRCPolynomial = 7;
     SPI_Init(CC25XX_SPI, &spi_init);
@@ -104,7 +104,7 @@ static void hal_spi_init_dma(void) {
 // data in buffer will be sent and will be overwritten with
 // the data read back from the spi slave
 void hal_spi_dma_xfer(uint8_t *buffer, uint8_t len) {
-    //debug("xfer "); debug_put_uint8(len); debug(")\n");
+    // debug("xfer "); debug_put_uint8(len); debug(")\n");
 
     // TX: transfer buffer to slave
     CC25XX_SPI_TX_DMA_CHANNEL->CMAR  = (uint32_t)buffer;
@@ -118,34 +118,34 @@ void hal_spi_dma_xfer(uint8_t *buffer, uint8_t len) {
     DMA_Cmd(CC25XX_SPI_RX_DMA_CHANNEL, ENABLE);
     DMA_Cmd(CC25XX_SPI_TX_DMA_CHANNEL, ENABLE);
 
-    //debug("DMA EN\n"); debug_flush();
+    // debug("DMA EN\n"); debug_flush();
 
     // trigger the SPI TX + RX dma
     SPI_I2S_DMACmd(CC25XX_SPI, SPI_I2S_DMAReq_Rx | SPI_I2S_DMAReq_Tx, ENABLE);
 
-    //debug("TRIG\n"); debug_flush();
+    // debug("TRIG\n"); debug_flush();
 #if 0
     // Wait until the command is sent to the DR
     while (!DMA_GetFlagStatus(CC25XX_SPI_TX_DMA_TC_FLAG)) {};
 
-    //debug("ACTIVE\n"); debug_flush();
+    // debug("ACTIVE\n"); debug_flush();
 
     // wait for tx to be finished:
     while (DMA_GetFlagStatus(CC25XX_SPI_TX_DMA_TC_FLAG)) {};
     while (DMA_GetFlagStatus(CC25XX_SPI_RX_DMA_TC_FLAG)) {};
 
-    //wait for SPI to be no longer busy
-    while (SPI_I2S_GetFlagStatus(CC25XX_SPI, SPI_I2S_FLAG_BSY) != RESET){}
-    //debug("!BUSY\n"); debug_flush();
+    // wait for SPI to be no longer busy
+    while (SPI_I2S_GetFlagStatus(CC25XX_SPI, SPI_I2S_FLAG_BSY) != RESET) {}
+    // debug("!BUSY\n"); debug_flush();
 #endif
 
     while (SPI_I2S_GetFlagStatus(CC25XX_SPI, SPI_I2S_FLAG_TXE) == RESET);
-    while (SPI_I2S_GetFlagStatus(CC25XX_SPI, SPI_I2S_FLAG_BSY) != RESET){}
+    while (SPI_I2S_GetFlagStatus(CC25XX_SPI, SPI_I2S_FLAG_BSY) != RESET) {}
 
-    //while((SPI1->SR & 2) == 0);  // wait while TXE flag is 0 (TX is not empty)
-    //while((SPI1->SR & (1 << 7)) != 0);  // wait while BSY flag is 1 (SPI is busy)
+    // while((SPI1->SR & 2) == 0);  // wait while TXE flag is 0 (TX is not empty)
+    // while((SPI1->SR & (1 << 7)) != 0);  // wait while BSY flag is 1 (SPI is busy)
 
-    //disable DMA
+    // disable DMA
     DMA_Cmd(CC25XX_SPI_RX_DMA_CHANNEL, DISABLE);
     DMA_Cmd(CC25XX_SPI_TX_DMA_CHANNEL, DISABLE);
 
@@ -175,7 +175,7 @@ static void hal_spi_init_gpio(void) {
     GPIO_Init(CC25XX_SPI_GPIO, &gpio_init);
 }
 
-uint8_t hal_spi_tx(uint8_t address){
+uint8_t hal_spi_tx(uint8_t address) {
     // wait for SPI Tx buffer empty
     while (SPI_I2S_GetFlagStatus(CC25XX_SPI, SPI_I2S_FLAG_TXE) == RESET);
     // send SPI data

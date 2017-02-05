@@ -61,8 +61,8 @@ void hal_cc25xx_rf_interrupt(void) __interrupt RF_VECTOR;
 #define IEN0_STIE (1<<5)
 #define IEN0_EA (1<<7)
 
-//bit 7 - unused
-//bit 6 - unused
+// bit 7 - unused
+// bit 6 - unused
 #define PICTL_P2IEN  (1<<5)
 #define PICTL_P0IENH (1<<4)
 #define PICTL_P0IENL (1<<3)
@@ -109,11 +109,11 @@ void hal_cc25xx_rf_interrupt(void) __interrupt RF_VECTOR;
 #define RFST_SFTX    RFST_SIDLE
 #define RFST_SFRX    RFST_SIDLE
 
-//append status
+// append status
 #define CC2500_PKTCTRL1_APPEND_STATUS     (1<<2)
-//crc autoflush
+// crc autoflush
 #define CC2500_PKTCTRL1_CRC_AUTOFLUSH     (1<<3)
-//adress checks
+// adress checks
 #define CC2500_PKTCTRL1_FLAG_ADR_CHECK_00 ((0<<1) | (0<<0))
 #define CC2500_PKTCTRL1_FLAG_ADR_CHECK_01 ((0<<1) | (1<<0))
 #define CC2500_PKTCTRL1_FLAG_ADR_CHECK_10 ((1<<1) | (0<<0))
@@ -235,7 +235,7 @@ void hal_cc25xx_rf_interrupt(void) __interrupt RF_VECTOR;
 #define T1CCTLx_CPSEL_RF     (1<<7)
 
 
-//add missing defines
+// add missing defines
 #include <compiler.h>
 SFRX(TEST2,  0xDF23);
 SFRX(TEST1,  0xDF24);

@@ -4,12 +4,12 @@
 #include "hal_cc25xx.h"
 #include "hal_dma.h"
 
-//place data on end of flash
-//FIXME: this is for a cc2510f16 with flash size 0x4000, needs to be adjusted for bigger mcus
+// place data on end of flash
+// FIXME: this is for a cc2510f16 with flash size 0x4000, needs to be adjusted for bigger mcus
 #define STORAGE_PAGE_SIZE 1024
 #define STORAGE_LOCATION (0x4000-STORAGE_PAGE_SIZE)
 
-//place persistant storage:
+// place persistant storage:
 extern __code __at (STORAGE_LOCATION) uint8_t storage_on_flash[STORAGE_PAGE_SIZE];
 extern __xdata HAL_DMA_DESC flash_dma_config;
 

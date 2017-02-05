@@ -12,7 +12,7 @@
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+    along with this program.  If not, see <http:// www.gnu.org/licenses/>.
 
    author: fishpepper <AT> gmail.com
 */
@@ -27,16 +27,16 @@
 EXTERNAL_MEMORY volatile uint8_t failsafe_active;
 EXTERNAL_MEMORY volatile uint16_t failsafe_tick_counter;
 
-void failsafe_init(void){
+void failsafe_init(void) {
     debug("failsafe: init\n"); debug_flush();
     failsafe_tick_counter = 0;
 
-    //start in failsafe mode
+    // start in failsafe mode
     failsafe_enter();
 }
 
 void failsafe_enter(void) {
-    //debug("failsafe: enter\n");
+    // debug("failsafe: enter\n");
 
     led_red_on();
     led_green_off();
@@ -47,12 +47,12 @@ void failsafe_enter(void) {
     failsafe_active = 1;
 }
 
-void failsafe_exit(void){
-    //reset tick counter
+void failsafe_exit(void) {
+    // reset tick counter
     failsafe_tick_counter = 0;
 
-    if (failsafe_active){
-        //reset failsafe counter:
+    if (failsafe_active) {
+        // reset failsafe counter:
         failsafe_active = 0;
 
         led_red_off();
@@ -60,20 +60,20 @@ void failsafe_exit(void){
         sbus_exit_failsafe();
         ppm_exit_failsafe();
 
-        //debug("failsafe: left\n");
+        // debug("failsafe: left\n");
     }
 }
 
-void failsafe_tick(void){
-    //this could be running during an interrupt!
-    //count missing data packets
+void failsafe_tick(void) {
+    // this could be running during an interrupt!
+    // count missing data packets
     failsafe_tick_counter++;
 
-    //if >1.5s no packets -> enter failsafe!
-    //actually failsafe is also entered from within frsky.c
-    //this is meant as a second failsafe guard
-    if (failsafe_tick_counter >= 50*9*1.5){
-        //go to failsafe mode!
+    // if >1.5s no packets -> enter failsafe!
+    // actually failsafe is also entered from within frsky.c
+    // this is meant as a second failsafe guard
+    if (failsafe_tick_counter >= 50*9*1.5) {
+        // go to failsafe mode!
         failsafe_enter();
     }
 }

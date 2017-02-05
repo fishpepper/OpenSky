@@ -15,5 +15,5 @@ void hal_led_init(uint16_t pin);
 #define hal_led_red_off()  {}
 #define hal_led_red_toggle() {}
 
-#endif //__HAL_LED__H_
+#endif // __HAL_LED__H_
 

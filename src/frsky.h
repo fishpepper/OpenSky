@@ -7,23 +7,23 @@
 
 #define FRSKY_HOPTABLE_SIZE 47
 
-//#define FRSKY_COUNT_RXSTATS 100
+// #define FRSKY_COUNT_RXSTATS 100
 #define FRSKY_COUNT_RXSTATS 50
 
-//
-//extern EXTERNAL_MEMORY uint8_t frsky_txid[2];
-//extern EXTERNAL_MEMORY uint8_t frsky_hop_table[FRSKY_HOPTABLE_SIZE];
-//extern EXTERNAL_MEMORY int8_t frsky_freq_offset;
+// 
+// extern EXTERNAL_MEMORY uint8_t frsky_txid[2];
+// extern EXTERNAL_MEMORY uint8_t frsky_hop_table[FRSKY_HOPTABLE_SIZE];
+// extern EXTERNAL_MEMORY int8_t frsky_freq_offset;
 extern EXTERNAL_MEMORY uint8_t frsky_current_ch_idx;
 extern EXTERNAL_MEMORY uint8_t frsky_diversity_count;
-//rssi
+// rssi
 extern EXTERNAL_MEMORY uint8_t frsky_rssi;
 extern EXTERNAL_MEMORY uint8_t frsky_link_quality;
-//pll calibration
+// pll calibration
 extern EXTERNAL_MEMORY uint8_t frsky_calib_fscal1_table[FRSKY_HOPTABLE_SIZE];
 extern EXTERNAL_MEMORY uint8_t frsky_calib_fscal2;
 extern EXTERNAL_MEMORY uint8_t frsky_calib_fscal3;
-//extern EXTERNAL_MEMORY int16_t frsky_freq_offset_acc;
+// extern EXTERNAL_MEMORY int16_t frsky_freq_offset_acc;
 
 #define FRSKY_PACKET_LENGTH 17
 #define FRSKY_PACKET_BUFFER_SIZE (FRSKY_PACKET_LENGTH+3)
@@ -64,18 +64,18 @@ void frsky_enter_rxmode(uint8_t ch);
 void frsky_frame_sniffer(void);
 uint8_t frsky_append_hub_data(uint8_t sensor_id, uint16_t value, uint8_t *buf);
 
-//binding
+// binding
 uint8_t frsky_bind_jumper_set(void);
 void frsky_do_bind(void);
 void frsky_store_config(void);
 #endif
 
 
-//packet data example:
-//BIND:   [11 03 01 16 68 14 7E BF 15 56 97 00 00 00 00 00 00 0B F8 AF ]
-//NORMAL: [11 16 68 ... ]
-//TX:                 11 16 68 7A 1B 0B CA CB CF C4 88 85 CB CB CB 92 8B 78 21 AF
-//TELEMETRY WITH HUB: 11 16 68 60 64 5B 00 00 5E 3B 09 00 5E 5E 3B 09 00 5E 48 B1
+// packet data example:
+// BIND:   [11 03 01 16 68 14 7E BF 15 56 97 00 00 00 00 00 00 0B F8 AF ]
+// NORMAL: [11 16 68 ... ]
+// TX:                 11 16 68 7A 1B 0B CA CB CF C4 88 85 CB CB CB 92 8B 78 21 AF
+// TELEMETRY WITH HUB: 11 16 68 60 64 5B 00 00 5E 3B 09 00 5E 5E 3B 09 00 5E 48 B1
 #define FRSKY_VALID_FRAMELENGTH(_b) (_b[0] == 0x11)
 #define FRSKY_VALID_CRC(_b)     (_b[19] & 0x80)
 #define FRSKY_VALID_TXID(_b) ((_b[1] == storage.frsky_txid[0]) && (_b[2] == storage.frsky_txid[1]))
@@ -84,7 +84,7 @@ void frsky_store_config(void);
 
 /*
 #define FRSKY_HUB_TELEMETRY_HEADER 0x5E
-#define FRSKY_HUB_TELEMETRY_VOLTAGE 0x39 //not really documented, seems to be volt in 0.1V steps...
+#define FRSKY_HUB_TELEMETRY_VOLTAGE 0x39 // not really documented, seems to be volt in 0.1V steps...
 #define FRSKY_HUB_TELEMETRY_VOLTAGE_BEFORE 0x3A
 #define FRSKY_HUB_TELEMETRY_VOLTAGE_AFTER  0x3B
 #define FRSKY_HUB_TELEMETRY_CURRENT        0x28

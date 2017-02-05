@@ -10,7 +10,7 @@
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+    along with this program.  If not, see <http:// www.gnu.org/licenses/>.
 
    author: fishpepper <AT> gmail.com
 */
@@ -29,26 +29,26 @@
 EXTERNAL_MEMORY volatile uint8_t hal_cc25xx_mode;
 
 void hal_cc25xx_init(void) {
-    //set highest prio for ch0 (RF)
+    // set highest prio for ch0 (RF)
     IP1 |=  (1<<0);
     IP0 |=  (1<<0);
 
 
     hal_cc25xx_mode = CC25XX_MODE_RX;
 
-    //if we support LNA/PA make sure to config the pin as output:
+    // if we support LNA/PA make sure to config the pin as output:
     #ifdef RF_LNA_PORT
       PORT2DIR(RF_LNA_PORT) |= (1<<RF_LNA_PIN);
       PORT2DIR(RF_PA_PORT) |= (1<<RF_PA_PIN);
-      //set default to LNA active
+      // set default to LNA active
       RF_PA_DISABLE();
       RF_LNA_ENABLE();
     #endif
 
-    //if we support HIGH GAIN mode config in as output:
+    // if we support HIGH GAIN mode config in as output:
     #ifdef RF_HIGH_GAIN_MODE_PORT
       PORT2DIR(RF_HIGH_GAIN_MODE_PORT) |= (1<<RF_HIGH_GAIN_MODE_PIN);
-      //enable high gain mode?
+      // enable high gain mode?
       #ifdef RF_HIGH_GAIN_MODE_ENABLED
         RF_HIGH_GAIN_MODE_ENABLE();
       #else
@@ -70,16 +70,16 @@ void hal_cc25xx_enter_rxmode(void) {
     delay_us(5);
 #endif
 
-    //set up dma for radio--->buffer
+    // set up dma for radio--->buffer
     hal_cc25xx_setup_rf_dma(CC25XX_MODE_RX);
 
-    //configure interrupt for every received packet
+    // configure interrupt for every received packet
     IEN2 |= (IEN2_RFIE);
 
-    //mask done irq
+    // mask done irq
     RFIM = (1<<4);
-    //interrupts should be enabled globally already..
-    //skip this! sei();
+    // interrupts should be enabled globally already..
+    // skip this! sei();
 }
 
 void hal_cc25xx_enter_txmode(void) {
@@ -90,12 +90,12 @@ void hal_cc25xx_enter_txmode(void) {
     delay_us(5);
 #endif
 
-    //abort ch0
+    // abort ch0
     DMAARM = DMA_ARM_ABORT | DMA_ARM_CH0;
     hal_cc25xx_setup_rf_dma(CC25XX_MODE_TX);
 }
 
-void hal_cc25xx_setup_rf_dma(uint8_t mode){
+void hal_cc25xx_setup_rf_dma(uint8_t mode) {
     // CPU has priority over DMA
     // Use 8 bits for transfer count
     // No DMA interrupt when done
@@ -110,7 +110,7 @@ void hal_cc25xx_setup_rf_dma(uint8_t mode){
     hal_dma_config[0].TMODE          = DMA_TMODE_SINGLE;
     hal_dma_config[0].WORDSIZE       = DMA_WORDSIZE_BYTE;
 
-    //store mode
+    // store mode
     hal_cc25xx_mode = mode;
 
     if (hal_cc25xx_mode == CC25XX_MODE_TX) {
@@ -147,27 +147,27 @@ void hal_cc25xx_setup_rf_dma(uint8_t mode){
     // configuration registers
     SET_WORD(DMA0CFGH, DMA0CFGL, &hal_dma_config[0]);
 
-    //frsky_packet_received = 0;
+    // frsky_packet_received = 0;
 }
 
 void hal_cc25xx_enable_receive(void) {
-    //start receiving on dma channel 0
+    // start receiving on dma channel 0
     DMAARM = DMA_ARM_CH0;
 }
 
 
 
 void hal_cc25xx_rf_interrupt(void) __interrupt RF_VECTOR{
-    //clear int flag
+    // clear int flag
     RFIF &= ~(1<<4);
 
-    //clear general statistics reg
+    // clear general statistics reg
     S1CON &= ~0x03;
 
-    if (hal_cc25xx_mode == CC25XX_MODE_RX){
-        //mark as received:
+    if (hal_cc25xx_mode == CC25XX_MODE_RX) {
+        // mark as received:
         frsky_packet_received = 1;
-        //re arm DMA channel 0
+        // re arm DMA channel 0
         hal_cc25xx_enable_receive();
     }else{
         frsky_packet_sent = 1;
@@ -175,7 +175,7 @@ void hal_cc25xx_rf_interrupt(void) __interrupt RF_VECTOR{
 }
 
 uint8_t hal_cc25xx_transmission_completed(void) {
-    //this flag is set in the RF isr
+    // this flag is set in the RF isr
     return (frsky_packet_sent);
 }
 
@@ -186,13 +186,13 @@ void hal_cc25xx_transmit_packet(volatile uint8_t *buffer, uint8_t len) {
 
     RFST = RFST_STX;
 
-    //start transmitting on dma channel 0
+    // start transmitting on dma channel 0
     DMAARM = DMA_ARM_CH0;
 
-    //mark packet as not sent (will be modified in RF isr):
+    // mark packet as not sent (will be modified in RF isr):
     frsky_packet_sent = 0;
 
-    //tricky: this will force an int request and
+    // tricky: this will force an int request and
     //        initiate the actual transmission
     S1CON |= 0x03;
 }
