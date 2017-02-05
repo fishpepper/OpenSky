@@ -81,17 +81,15 @@ TARGET_DEPS     = $(addsuffix .d,$(addprefix $(OBJECT_DIR)/$(TARGET)/,$(basename
 vpath %.c ./src
 vpath %.c ./$(ARCH_DIR)
 
-board: $(TARGET_UPDATE)
+board: $(TARGET_UPDATE) $(TARGET_FULL)
 
 bootloader:
 	@echo "### Building bootloader ###"
 	$(MAKE) -C $(BL_DIR) \
 		STYLECHECK_DISABLED=1 \
 		FLASH_SIZE=$(FLASH_SIZE) \
-		CONFIG_INCLUDE_DIR=$(TARGET_DIR) \
+		CONFIG_INCLUDE_DIR=../../../$(TARGET_DIR) \
 		clean all
-
-full: $(TARGET_FULL)
 
 $(TARGET_FULL): $(TARGET_UPDATE) bootloader
 	@echo "merging bootloader and main code"
