@@ -223,14 +223,14 @@ inline void hal_cc25xx_process_packet(volatile uint8_t *packet_received, volatil
             // only accept valid packet lenbghts:
             if (len == maxlen) {
                 uint8_t i;
-                for(i=0; i<maxlen; i++) {
+                for (i=0; i<maxlen; i++) {
                     buffer[i] = tmp_buffer[i];
                 }
                 *packet_received = 1;
                 // debug(" OK");
             }
             // debug("\n"); debug_flush();
-        }else{
+        } else {
             // no, ignore this
             len = 0;
         }

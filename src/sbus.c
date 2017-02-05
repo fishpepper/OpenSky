@@ -1,4 +1,6 @@
 /*
+    Copyright 2017 fishpepper <AT> gmail.com
+
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -91,15 +93,15 @@ void sbus_update(EXTERNAL_MEMORY uint16_t *data) {
     // center was at 2250us, is now at 960, remap this to ~1023:
     // 1023/960 = 1,065625.. = approx by 17/16 = 1 1/16
     // sbus data = (input-1290)*(1 1/16) = (input-1290) + (input-1290)/16
-    for(i=0; i<8; i++) {
+    for (i = 0; i < 8; i++) {
         tmp = data[i] - 1290;
         tmp = tmp + (tmp>>4);
         tmp = tmp - 25;  // move center to 1500
         if (tmp < 0) {
             rescaled_data[i] = 0;
-        }else if (tmp > 2047) {
+        } else if (tmp > 2047) {
             rescaled_data[i] = 2047;
-        }else{
+        } else {
             rescaled_data[i] = tmp;
         }
     }
@@ -110,36 +112,36 @@ void sbus_update(EXTERNAL_MEMORY uint16_t *data) {
 
     // sbus transmits up to 16 channels with 11bit each.
     // build up channel data frame:
-    sbus_data[ 0] = HAL_SBUS_PREPARE_DATA( SBUS_SYNCBYTE );
+    sbus_data[ 0] = HAL_SBUS_PREPARE_DATA(SBUS_SYNCBYTE);
 
     // bits ch 0000 0000
-    sbus_data[ 1] = HAL_SBUS_PREPARE_DATA( LO(rescaled_data[0]) );
+    sbus_data[ 1] = HAL_SBUS_PREPARE_DATA(LO(rescaled_data[0]));
     // bits ch 1111 1000
-    sbus_data[ 2] = HAL_SBUS_PREPARE_DATA( (LO(rescaled_data[1])<<3) | HI(rescaled_data[0]) );
+    sbus_data[ 2] = HAL_SBUS_PREPARE_DATA((LO(rescaled_data[1]) << 3) | HI(rescaled_data[0]));
     // bits ch 2211 1111
-    sbus_data[ 3] = HAL_SBUS_PREPARE_DATA( (rescaled_data[1]>>5) | (rescaled_data[2]<<6) );
+    sbus_data[ 3] = HAL_SBUS_PREPARE_DATA((rescaled_data[1]>>5) | (rescaled_data[2] << 6));
     // bits ch 2222 2222
-    sbus_data[ 4] = HAL_SBUS_PREPARE_DATA( (rescaled_data[2]>>2) & 0xFF );
+    sbus_data[ 4] = HAL_SBUS_PREPARE_DATA((rescaled_data[2]>>2) & 0xFF);
     // bits ch 3333 3332
-    sbus_data[ 5] = HAL_SBUS_PREPARE_DATA( (rescaled_data[2]>>10) | (LO(rescaled_data[3])<<1) );
+    sbus_data[ 5] = HAL_SBUS_PREPARE_DATA((rescaled_data[2]>>10) | (LO(rescaled_data[3]) << 1));
     // bits ch 4444 3333
-    sbus_data[ 6] = HAL_SBUS_PREPARE_DATA( (rescaled_data[3]>>7) | (LO(rescaled_data[4])<<4) );
+    sbus_data[ 6] = HAL_SBUS_PREPARE_DATA((rescaled_data[3]>>7) | (LO(rescaled_data[4]) << 4));
     // bits ch 5444 4444
-    sbus_data[ 7] = HAL_SBUS_PREPARE_DATA( (rescaled_data[4]>>4) | (LO(rescaled_data[5])<<7) );
+    sbus_data[ 7] = HAL_SBUS_PREPARE_DATA((rescaled_data[4]>>4) | (LO(rescaled_data[5]) << 7));
     // bits ch 5555 5555
-    sbus_data[ 8] = HAL_SBUS_PREPARE_DATA( (rescaled_data[5]>>1) & 0xFF );
+    sbus_data[ 8] = HAL_SBUS_PREPARE_DATA((rescaled_data[5]>>1) & 0xFF);
     // bits ch 6666 6655
-    sbus_data[ 9] = HAL_SBUS_PREPARE_DATA( (rescaled_data[5]>>9) | (LO(rescaled_data[6])<<2) );
+    sbus_data[ 9] = HAL_SBUS_PREPARE_DATA((rescaled_data[5]>>9) | (LO(rescaled_data[6]) << 2));
     // bits ch 7776 6666
-    sbus_data[10] = HAL_SBUS_PREPARE_DATA( (rescaled_data[6]>>6) | (LO(rescaled_data[7])<<5) );
+    sbus_data[10] = HAL_SBUS_PREPARE_DATA((rescaled_data[6]>>6) | (LO(rescaled_data[7]) << 5));
     // bits ch 7777 7777
-    sbus_data[11] = HAL_SBUS_PREPARE_DATA( (rescaled_data[7]>>3) & 0xFF );
+    sbus_data[11] = HAL_SBUS_PREPARE_DATA((rescaled_data[7]>>3) & 0xFF);
     // bits ch 8888 8888
-    sbus_data[12] = HAL_SBUS_PREPARE_DATA( rssi_scaled & 0xFF);
+    sbus_data[12] = HAL_SBUS_PREPARE_DATA(rssi_scaled & 0xFF);
     // bits ch 9999 9888
-    sbus_data[13] = HAL_SBUS_PREPARE_DATA( HI(rssi_scaled) );
+    sbus_data[13] = HAL_SBUS_PREPARE_DATA(HI(rssi_scaled));
     // fill up to ch15 with zero
-    for(i=14; i<23; i++) {
+    for (i = 14; i < 23; i++) {
         sbus_data[i] = HAL_SBUS_PREPARE_DATA(0x00);
     }
     // sbus flags, will be set by start transmission...
@@ -158,6 +160,4 @@ void sbus_enter_failsafe(void) {
     // debug("sbus: entered FS\n");
 }
 
-#endif
-
-
+#endif  // SBUS_ENABLED

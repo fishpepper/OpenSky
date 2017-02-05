@@ -127,7 +127,7 @@ void hal_cc25xx_setup_rf_dma(uint8_t mode) {
         SET_WORD(hal_dma_config[0].LENH, hal_dma_config[0].LENL, (FRSKY_PACKET_LENGTH+1));
         hal_dma_config[0].SRCINC         = DMA_SRCINC_1;
         hal_dma_config[0].DESTINC        = DMA_DESTINC_0;
-    }else{
+    } else {
         // Receiver specific DMA settings:
         // Source: RFD register
         // Destination: radioPktBuffer
@@ -169,7 +169,7 @@ void hal_cc25xx_rf_interrupt(void) __interrupt RF_VECTOR{
         frsky_packet_received = 1;
         // re arm DMA channel 0
         hal_cc25xx_enable_receive();
-    }else{
+    } else {
         frsky_packet_sent = 1;
     }
 }

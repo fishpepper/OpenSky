@@ -34,7 +34,7 @@ void cc25xx_switch_antenna(void) {
     // switch to next antenna
     if (cc25xx_current_antenna) {
         cc25xx_current_antenna = hal_cc25xx_set_antenna(0);
-    }else{
+    } else {
         cc25xx_current_antenna = hal_cc25xx_set_antenna(1);
     }
 }
@@ -44,7 +44,7 @@ void cc25xx_wait_for_transmission_complete(void) {
     // so wait a maximum of 9ms for completion
     timeout2_set_100us(90);
 
-    while(!timeout2_timed_out()) {
+    while (!timeout2_timed_out()) {
         if (hal_cc25xx_transmission_completed()) {
             // done with tx, return
             return;

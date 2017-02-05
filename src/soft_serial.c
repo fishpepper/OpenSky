@@ -1,4 +1,6 @@
 /*
+    Copyright 2017 fishpepper <AT> gmail.com
+
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -56,9 +58,9 @@ uint8_t soft_serial_process_databit(void) {
         // sample bits
 #ifdef HUB_TELEMETRY_INVERTED
         if (HUB_TELEMETRY_PIN_LO()) {
-#else
+#else  // HUB_TELEMETRY_INVERTED
         if (HUB_TELEMETRY_PIN_HI()) {
-#endif
+#endif  // HUB_TELEMETRY_INVERTED
             soft_serial_databits |= (1<<10);
         }
         soft_serial_databit_count--;
@@ -73,11 +75,11 @@ uint8_t soft_serial_process_databit(void) {
         if ((soft_serial_databits & (1<<0)) != 0) {
             // FRAME ERROR: start bit invalid
             debug_putc('S');
-        }else if ((soft_serial_databits & (1<<9)) == 0) {
+        } else if ((soft_serial_databits & (1<<9)) == 0) {
             // FRAME ERROR: stop bit invalid
             debug_putc('s');
             // debug_put_hex16(soft_serial_databits); debug_put_newline();
-        }else{
+        } else {
             // fine, data byte received
             // process data
             if (soft_serial_rx_callback != 0) {
@@ -88,7 +90,7 @@ uint8_t soft_serial_process_databit(void) {
 #if SOFTSERIAL_DEBUG_RX
         debug("RX: 0x"); debug_put_hex8(data_byte); debug_put_newline();
         // debug_putc(data_byte);
-#endif
+#endif  // SOFTSERIAL_DEBUG_RX
 
         // finished data byte
         return 1;
@@ -98,4 +100,4 @@ uint8_t soft_serial_process_databit(void) {
     return 0;
 }
 
-#endif
+#endif  // HUB_TELEMETRY_ON_SBUS_UART

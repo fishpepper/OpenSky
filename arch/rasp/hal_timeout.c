@@ -143,7 +143,7 @@ void hal_timeout_delay_us(int32_t timeout_us) {
         if (timeval_subtract(&sleep, &now, &delay_timer) > 0) {
             nanosleep(&sleep, &rem);
         }
-    } while(0);
+    } while (0);
 }
 
 void hal_timeout_add_ppm(uint32_t us) {

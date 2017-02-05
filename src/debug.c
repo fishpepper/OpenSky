@@ -72,7 +72,7 @@ void DEBUG_ISR(void) {
 
 void debug_uart_test(void) {
     debug("uart: running test\n"); debug_flush();
-    while(1) {
+    while (1) {
         debug("TEST12345\n");
         delay_ms(500);
     }
@@ -98,7 +98,7 @@ void debug_putc(uint8_t ch) {
 
             /*LED_RED_ON();
             LED_GREEN_OFF();
-            while(1) {
+            while (1) {
                 LED_RED_ON();
                 LED_GREEN_ON();
                 delay_ms(200);
@@ -108,7 +108,7 @@ void debug_putc(uint8_t ch) {
             }*/
             return;
         }
-    }else{
+    } else {
         // no int active. send first byte and reset buffer indices
         debug_buffer.write  = debug_buffer.read;
 
@@ -125,13 +125,13 @@ void debug_flush(void) {
     }
     // wait until uart buffer is empty
     // once TX INT is disabled our buffer is empty again
-    while(hal_debug_int_enabled()) {}
+    while (hal_debug_int_enabled()) {}
 }
 
 
 void debug(uint8_t *data) {
     uint8_t c = *data++;
-    while(c) {
+    while (c) {
         debug_putc(c);
         c = *data++;
     }
@@ -141,16 +141,16 @@ void debug(uint8_t *data) {
 // put hexadecimal number to debug out.
 void debug_put_hex8(uint8_t val) {
     uint8_t lo = val&0x0F;
-    uint8_t hi = val>>4;
-    if (hi<0x0A) {
+    uint8_t hi = val >> 4;
+    if (hi < 0x0A) {
         hi = '0' + hi;
-    }else{
+    } else {
         hi = 'A' - 0x0A + hi;
     }
 
-    if (lo<0x0A) {
+    if (lo < 0x0A) {
         lo = '0' + lo;
-    }else{
+    } else {
         lo = 'A' - 0x0A + lo;
     }
     debug_putc(hi);
@@ -181,22 +181,22 @@ void debug_put_int8(int8_t c) {
     if (c < 0) {
         debug_putc('-');
         uint_s = -c;
-    }else{
+    } else {
         uint_s = c;
     }
 
-    l=0;
-    for(mul=100; mul>0; mul = mul/10) {
+    l = 0;
+    for (mul = 100; mul > 0; mul = mul / 10) {
         tmp = '0';
-        while(uint_s>=mul) {
+        while (uint_s >= mul) {
             uint_s -= mul;
             tmp++;
-            l=1;
+            l = 1;
         }
-        if ((l==0) && (tmp == '0') && (mul!=1)) {
+        if ((l == 0) && (tmp == '0') && (mul != 1)) {
             // dont print spacer
             // debug_putc(' ');
-        }else{
+        } else {
             debug_putc(tmp);
         }
     }
@@ -208,18 +208,18 @@ void debug_put_uint8(uint8_t c) {
     uint8_t mul;
     uint8_t l;
 
-    l=0;
-    for(mul=100; mul>0; mul = mul/10) {
+    l = 0;
+    for (mul = 100; mul > 0; mul = mul / 10) {
         tmp = '0';
-        while(c>=mul) {
+        while (c >= mul) {
             c -= mul;
             tmp++;
-            l=1;
+            l = 1;
         }
-        if ((l==0) && (tmp == '0') && (mul!=1)) {
+        if ((l == 0) && (tmp == '0') && (mul != 1)) {
             // dont print spacer
             // debug_putc(' ');
-        }else{
+        } else {
             debug_putc(tmp);
         }
     }
@@ -230,53 +230,53 @@ void debug_put_uint8(uint8_t c) {
 //       it is still unclear why this is causing problems?!
 void debug_put_uint16(uint16_t c) {
     uint8_t tmp;
-    uint8_t l=0;
+    uint8_t l = 0;
     // loop unrolling is better (no int16 arithmetic)
-    /*for(mul=10000; mul>0; mul = mul/10) {
+    /*for (mul=10000; mul>0; mul = mul/10) {
         uint16_t mul;
 
         l=0;
                 tmp = '0';
-                while(c>=mul) {
+                while (c>=mul) {
                         c -= mul;
                         tmp++;
                         l=1;
                 }
                 if ((l==0) && (tmp == '0') && (mul!=1)) {
                         // debug_putc(' ');
-                }else{
+                } else {
                         debug_putc(tmp);
                 }
         }*/
     tmp = 0;
-    while(c>=10000L) {
-        c-=10000L;
+    while (c >= 10000L) {
+        c -= 10000L;
         tmp++;
-        l=1;
+        l = 1;
     }
     if (tmp != 0) debug_putc('0' + tmp);
 
     tmp = 0;
-    while(c>=1000L) {
-        c-=1000L;
+    while (c >= 1000L) {
+        c -= 1000L;
         tmp++;
-        l=1;
+        l = 1;
     }
     if (l || (tmp != 0)) debug_putc('0' + tmp);
 
     tmp = 0;
-    while(c>=100) {
-        c-=100;
+    while (c >= 100) {
+        c -= 100;
         tmp++;
-        l=1;
+        l = 1;
     }
     if (l || (tmp != 0)) debug_putc('0' + tmp);
 
     tmp = 0;
-    while(c>=10) {
-        c-=10;
+    while (c >= 10) {
+        c -= 10;
         tmp++;
-        l=1;
+        l = 1;
     }
     if (l || (tmp != 0)) debug_putc('0' + tmp);
 
@@ -287,4 +287,4 @@ void debug_put_newline(void) {
     debug_putc('\n');
 }
 
-#endif
+#endif  // DEBUG

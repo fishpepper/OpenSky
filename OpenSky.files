@@ -543,3 +543,4 @@ src/wdt.c
 src/wdt.h
 stylecheck/cpplint_test_header.h
 git_version.h
+src/io.c

@@ -1,4 +1,6 @@
 /*
+    Copyright 2017 fishpepper <AT> gmail.com
+
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -39,7 +41,7 @@ int main(void) {
 
     // init ios
     io_init();
-    
+
     // init debug
     debug_init();
 
@@ -61,9 +63,9 @@ int main(void) {
     // init output
 #ifdef SBUS_ENABLED
     sbus_init();
-#else
+#else  // SBUS_ENABLED
     ppm_init();
-#endif
+#endif  // SBUS_ENABLED
 
     // init failsafe
     failsafe_init();
@@ -78,5 +80,5 @@ int main(void) {
     frsky_main();
 
     debug("main: frsky main ended?! THIS SHOULD NOT HAPPEN!");
-    while(1);
+    while (1) {}
 }

@@ -73,7 +73,7 @@ void hal_adc_process(void) {
         // THIS OUTPUT BREAKS CONNECTIVITY! USE FOR DEBUGGING ONLY.
         // fine, arm dma:
         hal_adc_dma_arm();
-    }else{
+    } else {
         // oops this should not happen
         debug_putc('D');
         // cancel and re arm dma
@@ -117,7 +117,7 @@ uint8_t hal_adc_get_scaled(uint8_t ch) {
         if (adc_data & (1<<8)) adc_data = 0; // bugfix: handle negative numbers
         // return fixed value
         return adc_data;
-    }else{
+    } else {
         adc_data = hal_adc_data[0]>>7;
         if (adc_data & (1<<8)) adc_data = 0; // bugfix: handle negative numbers
         #ifdef ADC1_USE_ACS712
@@ -138,12 +138,12 @@ uint8_t hal_adc_get_scaled(uint8_t ch) {
 void hal_adc_test(void) {
     debug("adc: running test\n"); debug_flush();
 
-    while(1) {
+    while (1) {
         debug("adc: re-arming adc\n"); debug_flush();
         hal_adc_dma_arm();
 
         debug("adc: waiting for adc completion\n"); debug_flush();
-        while(!hal_adc_dma_done()) {
+        while (!hal_adc_dma_done()) {
             debug_putc('.');
             delay_ms(1);
         }

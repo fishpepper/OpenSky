@@ -891,7 +891,7 @@ uint8_t CAN_WakeUp(CAN_TypeDef* CANx)
   CANx->MCR &= ~(uint32_t)CAN_MCR_SLEEP;
     
   /* Sleep mode status */
-  while(((CANx->MSR & CAN_MSR_SLAK) == CAN_MSR_SLAK)&&(wait_slak!=0x00))
+  while (((CANx->MSR & CAN_MSR_SLAK) == CAN_MSR_SLAK)&&(wait_slak!=0x00))
   {
    wait_slak--;
   }

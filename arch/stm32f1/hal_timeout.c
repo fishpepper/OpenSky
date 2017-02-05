@@ -64,7 +64,7 @@ uint8_t hal_timeout2_timed_out(void) {
 void hal_timeout_delay_ms(uint32_t timeout) {
     hal_timeout_100us_delay = 10*timeout;
 
-    while(hal_timeout_100us_delay > 0) {
+    while (hal_timeout_100us_delay > 0) {
     }
 }
 
@@ -72,7 +72,7 @@ void hal_timeout_delay_ms(uint32_t timeout) {
 void hal_timeout_delay_100us(uint32_t timeout) {
     hal_timeout_100us_delay = timeout;
 
-    while(hal_timeout_100us_delay > 0) {
+    while (hal_timeout_100us_delay > 0) {
     }
 }*/
 

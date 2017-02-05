@@ -47,7 +47,7 @@ void SBUS_USART_IRQHANDLER(void) {
             // no data in fifo -> disable tx int:
             USART_ITConfig(SBUS_USART, USART_IT_TXE, DISABLE);
             // debug_put_newline();
-        }else{
+        } else {
             // else: data to tx
             // debug_put_hex8(hal_uart_tx_buffer[hal_uart_tx_pos]);
             USART_SendData(SBUS_USART, hal_uart_tx_buffer[hal_uart_tx_pos++]);

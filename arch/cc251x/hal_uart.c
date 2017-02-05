@@ -186,7 +186,7 @@ static void hal_uart_set_mode(EXTERNAL_MEMORY union hal_uart_config_t *cfg) {
     // store config to U1GCR: (msb/lsb)
     if (cfg->bit.ORDER) {
         U0GCR |= U0GCR_ORDER;
-    }else{
+    } else {
         U0GCR &= ~U0GCR_ORDER;
     }
 
@@ -203,7 +203,7 @@ static void hal_uart_set_mode(EXTERNAL_MEMORY union hal_uart_config_t *cfg) {
     // store config to U1GCR: (msb/lsb)
     if (cfg->bit.ORDER) {
         U1GCR |= U1GCR_ORDER;
-    }else{
+    } else {
         U1GCR &= ~U1GCR_ORDER;
     }
 

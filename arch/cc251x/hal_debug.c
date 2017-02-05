@@ -1,4 +1,6 @@
 /*
+    Copyright 2017 fishpepper <AT> gmail.com
+
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -104,7 +106,7 @@ static void hal_debug_set_mode(EXTERNAL_MEMORY union hal_uart_config_t *cfg) {
     // store config to U1GCR: (msb/lsb)
     if (cfg->bit.ORDER) {
         U0GCR |= U0GCR_ORDER;
-    }else{
+    } else {
         U0GCR &= ~U0GCR_ORDER;
     }
 
@@ -121,7 +123,7 @@ static void hal_debug_set_mode(EXTERNAL_MEMORY union hal_uart_config_t *cfg) {
     // store config to U1GCR: (msb/lsb)
     if (cfg->bit.ORDER) {
         U1GCR |= U1GCR_ORDER;
-    }else{
+    } else {
         U1GCR &= ~U1GCR_ORDER;
     }
     // interrupt prio to 0 (0..3=highest)

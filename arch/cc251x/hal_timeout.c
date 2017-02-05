@@ -48,20 +48,20 @@ void hal_timeout_init(void) {
     timeout_set(0);
 
     /*LED_RED_OFF();
-    while(1) {
+    while (1) {
         timeout_set(990);
         LED_GREEN_OFF();
-        while(!timeout_timed_out()) {}
+        while (!timeout_timed_out()) {}
         timeout_set(10);
         LED_GREEN_ON();
-        while(!timeout_timed_out()) {}
+        while (!timeout_timed_out()) {}
     }*/
 
     /* // TEST timings
     P0DIR |= (1<<7);
-    while(1) {
+    while (1) {
         timeout_set(1);
-        while(!timeout_timed_out()) {}
+        while (!timeout_timed_out()) {}
         P0 |= (1<<7);
         LED_RED_ON();
         delay_ms(100);
@@ -95,7 +95,7 @@ void hal_timeout_set(uint16_t timeout_ms) {
 uint8_t hal_timeout_timed_out(void) {
     if (hal_timeout_countdown == 0) {
         return 1;
-    }else{
+    } else {
         return 0;
     }
 }
@@ -114,7 +114,7 @@ void hal_timeout2_set(uint16_t timeout_ms) {
 uint8_t hal_timeout2_timed_out(void) {
     if (hal_timeout2_countdown == 0) {
         return 1;
-    }else{
+    } else {
         return 0;
     }
 }

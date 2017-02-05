@@ -85,13 +85,13 @@ static void hal_adc_init_mode(void) {
     ADC_ResetCalibration(ADC);
 
     // Check the end of ADC1 reset calibration register
-    while(ADC_GetResetCalibrationStatus(ADC)) {}
+    while (ADC_GetResetCalibrationStatus(ADC)) {}
 
     // Start ADC calibration
     ADC_StartCalibration(ADC);
 
     // Check the end of ADC1 calibration
-    while(ADC_GetCalibrationStatus(ADC)) {}
+    while (ADC_GetCalibrationStatus(ADC)) {}
 }
 
 static void hal_adc_init_dma(void) {
@@ -123,7 +123,7 @@ static void hal_adc_init_dma(void) {
 
 #if ADC_DO_TEST
     // TEST ADC
-    while(1) {
+    while (1) {
         debug_putc('A');
         wdt_reset();
         if (ADC_GetFlagStatus(ADC, ADC_FLAG_EOC) == SET) {
@@ -147,7 +147,7 @@ void hal_adc_process(void) {
     if (DMA_GetITStatus(ADC_DMA_TC_FLAG)) {
         // fine, arm DMA again:
         hal_adc_dma_arm();
-    }else{
+    } else {
         // oops this should not happen
         debug_putc('D');
         // cancel and re arm dma ???
@@ -158,7 +158,7 @@ uint8_t hal_adc_get_scaled(uint8_t ch) {
     if (ch < 2) {
         // 12 bit adc -> scale to 8 bit -> shift by 4
         return hal_adc_data[ch]>>4;
-    }else{
+    } else {
         debug("hal_adc: channel index out of bounds ");
         debug_put_uint8(ch);
         debug ("allowed 0,1)\n");

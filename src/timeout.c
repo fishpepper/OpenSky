@@ -1,4 +1,6 @@
 /*
+    Copyright 2017 fishpepper <AT> gmail.com
+
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -27,19 +29,19 @@ void timeout_init(void) {
     // measure delay_us(x) accuracy
     timeout_set(2000);
     uint32_t c;
-    for(c=0; c<1000; c++) {
-        delay_us(1000); // 1ms
+    for (c = 0; c < 1000; c++) {
+        delay_us(1000);  // 1ms
     }
     uint32_t remaining = timeout_time_remaining();
     uint32_t duration  = 2000-remaining;
     debug("delay: delay_us() for 1000ms took ");
     debug_put_uint16(duration);
     debug("ms...\n");
-#endif
+#endif  // 0
 }
 
 // caution: do not use large timeouts, they will trigger the wdt!
 void timeout2_delay_100us(uint16_t us) {
     timeout2_set_100us(us);
-    while(!timeout2_timed_out()) {}
+    while (!timeout2_timed_out()) {}
 }

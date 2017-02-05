@@ -40,7 +40,7 @@ uint8_t hal_io_bind_request(void) {
     if (GPIO_ReadInputDataBit(BIND_JUMPER_GPIO, BIND_JUMPER_PIN)) {
         // HIGH -> button not pressed
         return 0;
-    }else{
+    } else {
         // LOW -> button pressed
         return 1;
     }

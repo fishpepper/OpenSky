@@ -312,7 +312,7 @@ ErrorStatus RCC_WaitForHSEStartUp(void)
   {
     HSEStatus = RCC_GetFlagStatus(RCC_FLAG_HSERDY);
     StartUpCounter++;
-  } while((StartUpCounter != HSE_STARTUP_TIMEOUT) && (HSEStatus == RESET));
+  } while ((StartUpCounter != HSE_STARTUP_TIMEOUT) && (HSEStatus == RESET));
 
   if (RCC_GetFlagStatus(RCC_FLAG_HSERDY) != RESET)
   {

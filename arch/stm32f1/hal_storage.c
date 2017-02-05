@@ -119,7 +119,7 @@ static void hal_storage_init_i2c_gpio(void) {
 
         // send 100khz clock train for some 100ms
         timeout_set(100);
-        while(!timeout_timed_out()) {
+        while (!timeout_timed_out()) {
             if (GPIO_ReadInputDataBit(EEPROM_GPIO, EEPROM_I2C_SDA_PIN) == 1) {
                 debug("hal_storage: i2c free again\n");
                 break;
@@ -174,7 +174,7 @@ static uint32_t hal_storage_check_len(uint16_t len) {
         debug_flush();
         // invalid
         return 0;
-    }else{
+    } else {
         // safe
         return 1;
     }
@@ -192,7 +192,7 @@ static uint32_t hal_storage_i2c_read_buffer(uint16_t address, uint8_t *buffer, u
     }
 
     timeout_set(EEPROM_I2C_TIMEOUT);
-    while(I2C_GetFlagStatus(EEPROM_I2C, I2C_FLAG_BUSY)) {
+    while (I2C_GetFlagStatus(EEPROM_I2C, I2C_FLAG_BUSY)) {
         if (timeout_timed_out()) {
             debug("hal_i2c: bus busy... timeout!\n");
             return 0;
@@ -205,7 +205,7 @@ static uint32_t hal_storage_i2c_read_buffer(uint16_t address, uint8_t *buffer, u
     // set on EV5 and clear it (cleared by reading SR1 then writing to DR)
     timeout_set(EEPROM_I2C_FLAG_TIMEOUT);
 
-    while(!I2C_CheckEvent(EEPROM_I2C, I2C_EVENT_MASTER_MODE_SELECT)) {
+    while (!I2C_CheckEvent(EEPROM_I2C, I2C_EVENT_MASTER_MODE_SELECT)) {
         if (timeout_timed_out()) {
             debug("hal_i2c: master flag error... timeout!\n");
             return 0;
@@ -218,7 +218,7 @@ static uint32_t hal_storage_i2c_read_buffer(uint16_t address, uint8_t *buffer, u
     // test on EV6 and clear it
     timeout_set(EEPROM_I2C_FLAG_TIMEOUT);
 
-    while(!I2C_CheckEvent(EEPROM_I2C, I2C_EVENT_MASTER_TRANSMITTER_MODE_SELECTED)) {
+    while (!I2C_CheckEvent(EEPROM_I2C, I2C_EVENT_MASTER_TRANSMITTER_MODE_SELECTED)) {
         if (timeout_timed_out()) {
             debug("hal_i2c: transmitter flag error... timeout!\n");
             return 0;
@@ -231,7 +231,7 @@ static uint32_t hal_storage_i2c_read_buffer(uint16_t address, uint8_t *buffer, u
     // test on EV8 and clear it
     timeout_set(EEPROM_I2C_FLAG_TIMEOUT);
 
-    while(!I2C_GetFlagStatus(EEPROM_I2C, I2C_FLAG_BTF) == RESET) {
+    while (!I2C_GetFlagStatus(EEPROM_I2C, I2C_FLAG_BTF) == RESET) {
         if (timeout_timed_out()) {
             debug("hal_i2c: btf flag error... timeout!\n");
             return 0;
@@ -245,7 +245,7 @@ static uint32_t hal_storage_i2c_read_buffer(uint16_t address, uint8_t *buffer, u
     // set on EV5 and clear it (cleared by reading SR1 then writing to DR)
     timeout_set(EEPROM_I2C_FLAG_TIMEOUT);
 
-    while(!I2C_CheckEvent(EEPROM_I2C, I2C_EVENT_MASTER_MODE_SELECT)) {
+    while (!I2C_CheckEvent(EEPROM_I2C, I2C_EVENT_MASTER_MODE_SELECT)) {
         if (timeout_timed_out()) {
             debug("hal_i2c: master flag error... timeout!\n");
             return 0;
@@ -258,7 +258,7 @@ static uint32_t hal_storage_i2c_read_buffer(uint16_t address, uint8_t *buffer, u
     // test on EV6 and clear it
     timeout_set(EEPROM_I2C_FLAG_TIMEOUT);
 
-    while(!I2C_CheckEvent(EEPROM_I2C, I2C_EVENT_MASTER_RECEIVER_MODE_SELECTED)) {
+    while (!I2C_CheckEvent(EEPROM_I2C, I2C_EVENT_MASTER_RECEIVER_MODE_SELECTED)) {
         if (timeout_timed_out()) {
             debug("hal_i2c: receiver flag error... timeout!\n");
             return 0;
@@ -274,13 +274,13 @@ static uint32_t hal_storage_i2c_read_buffer(uint16_t address, uint8_t *buffer, u
 
     // do not use dma etc, we do not need highspeed. do polling:
     uint16_t i;
-    for(i=0; i<len; i++) {
+    for (i=0; i<len; i++) {
 
         // wait on ADDR flag to be set (ADDR is still not cleared at this level)
         timeout_set(EEPROM_I2C_FLAG_TIMEOUT);
 
         /* Test on EV7 and clear it */
-        while(!I2C_CheckEvent(EEPROM_I2C, I2C_EVENT_MASTER_BYTE_RECEIVED)) {
+        while (!I2C_CheckEvent(EEPROM_I2C, I2C_EVENT_MASTER_BYTE_RECEIVED)) {
             if (timeout_timed_out()) {
                 debug("hal_i2c: byte rx error... timeout!\n");
                 return 0;
@@ -299,7 +299,7 @@ static uint32_t hal_storage_i2c_read_buffer(uint16_t address, uint8_t *buffer, u
         if (i == (len-1)) {
             // last byte? -> NACK
             I2C_AcknowledgeConfig(EEPROM_I2C, DISABLE);
-        }else{
+        } else {
             // more bytes -> ACK
             I2C_AcknowledgeConfig(EEPROM_I2C, ENABLE);
         }
@@ -308,8 +308,8 @@ static uint32_t hal_storage_i2c_read_buffer(uint16_t address, uint8_t *buffer, u
         // wait for read to finish
         timeout_set(EEPROM_I2C_FLAG_TIMEOUT*100);
 
-        while(!I2C_CheckEvent(EEPROM_I2C, I2C_EVENT_SLAVE_BYTE_RECEIVED)) {
-        // while(I2C_GetFlagStatus(EEPROM_I2C, I2C_FLAG_RXNE) == RESET) {
+        while (!I2C_CheckEvent(EEPROM_I2C, I2C_EVENT_SLAVE_BYTE_RECEIVED)) {
+        // while (I2C_GetFlagStatus(EEPROM_I2C, I2C_FLAG_RXNE) == RESET) {
             if (timeout_timed_out()) {
                 debug("hal_i2c: read error... timeout!\n");
                 return 0;
@@ -336,7 +336,7 @@ static uint32_t hal_storage_i2c_read_buffer(uint16_t address, uint8_t *buffer, u
     // wait to make sure that STOP control bit has been cleared
     timeout_set(EEPROM_I2C_FLAG_TIMEOUT);
 
-    while(EEPROM_I2C->CR1 & I2C_CR1_STOP) {
+    while (EEPROM_I2C->CR1 & I2C_CR1_STOP) {
         if (timeout_timed_out()) {
             debug("hal_i2c: stop flag error... timeout!\n");
             return 0;
@@ -399,7 +399,7 @@ static uint32_t hal_storage_i2c_write_byte(uint8_t address, uint8_t data) {
     }
 
     timeout_set(EEPROM_I2C_TIMEOUT);
-    while(I2C_GetFlagStatus(EEPROM_I2C, I2C_FLAG_BUSY)) {
+    while (I2C_GetFlagStatus(EEPROM_I2C, I2C_FLAG_BUSY)) {
         if (timeout_timed_out()) {
             debug("hal_i2c: bus busy... timeout!\n");
             return 0;
@@ -412,7 +412,7 @@ static uint32_t hal_storage_i2c_write_byte(uint8_t address, uint8_t data) {
     // set on EV5 and clear it (cleared by reading SR1 then writing to DR)
     timeout_set(EEPROM_I2C_FLAG_TIMEOUT);
 
-    while(!I2C_CheckEvent(EEPROM_I2C, I2C_EVENT_MASTER_MODE_SELECT)) {
+    while (!I2C_CheckEvent(EEPROM_I2C, I2C_EVENT_MASTER_MODE_SELECT)) {
         if (timeout_timed_out()) {
             debug("hal_i2c: master flag error... timeout!\n");
             return 0;
@@ -425,7 +425,7 @@ static uint32_t hal_storage_i2c_write_byte(uint8_t address, uint8_t data) {
     // test on EV6 and clear it
     timeout_set(EEPROM_I2C_FLAG_TIMEOUT);
 
-    while(!I2C_CheckEvent(EEPROM_I2C, I2C_EVENT_MASTER_TRANSMITTER_MODE_SELECTED)) {
+    while (!I2C_CheckEvent(EEPROM_I2C, I2C_EVENT_MASTER_TRANSMITTER_MODE_SELECTED)) {
         if (timeout_timed_out()) {
             debug("hal_i2c: transmitter flag error... timeout!\n");
             return 0;
@@ -438,7 +438,7 @@ static uint32_t hal_storage_i2c_write_byte(uint8_t address, uint8_t data) {
     // test on EV8 and clear it
     timeout_set(EEPROM_I2C_FLAG_TIMEOUT);
 
-    while(!I2C_CheckEvent(EEPROM_I2C, I2C_EVENT_MASTER_BYTE_TRANSMITTED)) {
+    while (!I2C_CheckEvent(EEPROM_I2C, I2C_EVENT_MASTER_BYTE_TRANSMITTED)) {
         if (timeout_timed_out()) {
             debug("hal_i2c: address tx error... timeout!\n");
             return 0;
@@ -451,7 +451,7 @@ static uint32_t hal_storage_i2c_write_byte(uint8_t address, uint8_t data) {
     // test on EV8 and clear it
     timeout_set(EEPROM_I2C_FLAG_TIMEOUT);
 
-    while(!I2C_CheckEvent(EEPROM_I2C, I2C_EVENT_MASTER_BYTE_TRANSMITTED)) {
+    while (!I2C_CheckEvent(EEPROM_I2C, I2C_EVENT_MASTER_BYTE_TRANSMITTED)) {
         if (timeout_timed_out()) {
             debug("hal_i2c: data tx error... timeout!\n");
             return 0;
@@ -468,7 +468,7 @@ static uint32_t hal_storage_i2c_write_byte(uint8_t address, uint8_t data) {
     // wait to make sure that STOP control bit has been cleared
     timeout_set(EEPROM_I2C_FLAG_TIMEOUT);
 
-    while(EEPROM_I2C->CR1 & I2C_CR1_STOP) {
+    while (EEPROM_I2C->CR1 & I2C_CR1_STOP) {
         if (timeout_timed_out()) {
             debug("hal_i2c: stop flag error... timeout!\n");
             return 0;

@@ -40,7 +40,7 @@ void hal_storage_read(uint8_t *storage_ptr, uint16_t len) {
     debug("hal_storage: loading from flash: "); debug_flush();
 
     // copy from persistant flash to ram:
-    for(i=0; i<len; i++) {
+    for (i=0; i<len; i++) {
         storage_ptr[i] = storage_on_flash[i];
         debug_put_hex8(storage_on_flash[i]); debug_putc(' '); debug_flush();
         wdt_reset();
@@ -176,7 +176,7 @@ static void hal_storage_flash_write(uint16_t address, uint8_t *data, uint16_t le
     debug("hal_storage: read back [");
     // copy from persistant flash to ram:
     flash_ptr = address;
-    for(i=0; i<len; i++) {
+    for (i=0; i<len; i++) {
         debug_put_hex8(*flash_ptr++); debug_putc(' '); debug_flush();
         wdt_reset();
     }

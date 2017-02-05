@@ -1,4 +1,6 @@
 /*
+    Copyright 2017 fishpepper <AT> gmail.com
+
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -42,5 +44,5 @@ void uart_start_transmission(uint8_t *buf, uint8_t len) {
 void uart_set_rx_callback(uart_rx_callback_t callback) {
     uart_rx_callback = callback;
 }
-#endif
+#endif  // SBUS_ENABLED
 

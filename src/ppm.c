@@ -1,4 +1,6 @@
 /*
+    Copyright 2017 fishpepper <AT> gmail.com
+
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -26,7 +28,7 @@
 // ppm signal:
 // s  CH1  s  CH2  s ... s   FILL_UP_TO_20.0ms
 // |`|_____|`|_____|`|_  |`|_____________________
-// 
+//
 // s   = sync pulse= 0.3ms
 // CH* = channel pulse low for 0.7-1.7ms -> total channel (incl sync) = 1.0-2.0ms
 // total channel duration: 8*2ms = 16ms -> frame filler >= 4ms
@@ -38,7 +40,7 @@ void ppm_init(void) {
     debug("ppm: init\n"); debug_flush();
 
     // initialise
-    for(i = 0; i<8; i++) {
+    for (i = 0; i < 8; i++) {
         ppm_data_ticks[i] = HAL_PPM_US_TO_TICKCOUNT(1000);
     }
 
@@ -49,20 +51,20 @@ void ppm_init(void) {
 
 
 void ppm_update(EXTERNAL_MEMORY uint16_t *data) {
-    uint8_t i=0;
+    uint8_t i = 0;
     uint16_t val;
     uint16_t eof_frame_duration = PPM_FRAME_LEN;
 
     // convert to ticks for timer
     // input is 0..4095, we should map this to 1000..2000us
     // frsky seems to send us*1.5 (~1480...3020) -> divide by 1.5 (=*2/3) to get us
-    for(i = 0; i<8; i++) {
+    for (i = 0; i < 8; i++) {
         val = data[i];
         // convert us to ticks:
         val = PPM_FRSKY_TO_TICKCOUNT(val);
 
         // make sure we end up with valid values:
-        val = max(HAL_PPM_US_TO_TICKCOUNT( 900), val);
+        val = max(HAL_PPM_US_TO_TICKCOUNT(900), val);
         val = min(HAL_PPM_US_TO_TICKCOUNT(2100), val);
 
         // subtract from sum:
@@ -103,7 +105,7 @@ void PPM_TIMER_ISR(void) {
         uint16_t pulse_len = HAL_PPM_US_TO_TICKCOUNT(1000);
 
         // clear flag
-        HAL_PPM_ISR_CLEAR_FLAG(); // THIS SHOULD NEVER BE THE LAST LINE IN AN ISR!
+        HAL_PPM_ISR_CLEAR_FLAG();  // THIS SHOULD NEVER BE THE LAST LINE IN AN ISR!
 
         // failsafe mode?
         if (failsafe_active) {
@@ -130,5 +132,5 @@ void PPM_TIMER_ISR(void) {
     }
 }
 
-#endif
+#endif  // SBUS_ENABLED
 

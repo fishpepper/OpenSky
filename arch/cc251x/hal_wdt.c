@@ -26,7 +26,7 @@ void hal_wdt_init(void) {
     if (!(CLKCON & CLKCON_OSC32K)) {
         debug("wdt: error! low speed clock not based on int rc");
         led_green_on();
-        while(1) {
+        while (1) {
             led_red_on();
             delay_ms(200);
             led_red_off();

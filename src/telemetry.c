@@ -1,4 +1,6 @@
 /*
+    Copyright 2017 fishpepper <AT> gmail.com
+
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -24,11 +26,11 @@
 volatile EXTERNAL_MEMORY telemetry_buffer_t telemetry_buffer;
 volatile EXTERNAL_MEMORY uint8_t telemetry_expected_id;
 
-#ifndef SBUS_ENABLED 
+#ifndef SBUS_ENABLED
   #ifdef HUB_TELEMETRY_ON_SBUS_UART
     #error ERROR: SBUS is not enabled, can not use/share port with telemery
-  #endif
-#endif
+  #endif  // HUB_TELEMETRY_ON_SBUS_UART
+#endif  // SBUS_ENABLED
 
 void telemetry_init(void) {
     debug("telemetry: init\n"); debug_flush();
@@ -46,17 +48,17 @@ void telemetry_init(void) {
     debug("telemetry: using sbus uart\n"); debug_flush();
     // attach callback
     uart_set_rx_callback(&telemetry_rx_callback);
-#else
+#else  // HUB_TELEMETRY_ON_SBUS_UART
     // init software serial port
     soft_serial_init();
 
     // attach callback
     soft_serial_set_rx_callback(&telemetry_rx_callback);
-#endif
+#endif  // HUB_TELEMETRY_ON_SBUS_UART
 
     #if TELEMETRY_DO_TEST
     telemetry_rx_echo_test();
-    #endif
+    #endif  // TELEMETRY_DO_TEST
 }
 
 
@@ -64,7 +66,7 @@ static void telemetry_rx_echo_test(void) {
     // just for testing purposes...
     volatile EXTERNAL_MEMORY uint8_t data;
 
-    while(1) {
+    while (1) {
         wdt_reset();
         if (telemetry_pop(&data)) {
             // debug_putc(data);
@@ -78,19 +80,19 @@ static void telemetry_rx_echo_test(void) {
 
 // hub telemetry input will be forwarded in frsky frames
 // see http:// www.rcgroups.com/forums/showthread.php?t=2547257 for a documentation
-// 
+//
 // buffer[0]  = bytes used
 // buffer[1]  = last received telemetry id
 // buffer[2]  = byte 1
 // ...
 // buffer[11] = byte 10
-// 
+//
 // NOTES:
 // * buffer[ 0] corresponds to frsky_buffer[ 6]
 // * buffer[11] corresponds to frsky_buffer[17]
 // * not all 10 bytes has to be filled in, only the number of bytes that were received
 //   will be sent in one frame
-// 
+//
 void telemetry_fill_buffer(volatile EXTERNAL_MEMORY uint8_t *buffer, uint8_t telemetry_id) {
     uint8_t telemetry_bytecount = 0;
     uint8_t i;
@@ -106,7 +108,7 @@ void telemetry_fill_buffer(volatile EXTERNAL_MEMORY uint8_t *buffer, uint8_t tel
     }
 
     // fetch all stored bytes (max 10)
-    for(i=2; i<2+10; i++) {
+    for (i = 2; i < (2 + 10); i++) {
         if (!telemetry_pop(&buffer[i])) {
             break;
         }

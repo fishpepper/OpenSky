@@ -22,7 +22,7 @@ void hal_delay_ms(uint16_t ms) {
     #define DELAY_MS_LOOP_A 86
     #define DELAY_MS_LOOP_B 30
 
-    while(ms--) {
+    while (ms--) {
         // this asm snippet gives us roughly 1ms delay:
         __asm
                 mov     r1, #DELAY_MS_LOOP_A
@@ -46,7 +46,7 @@ void hal_delay_ms(uint16_t ms) {
 void hal_delay_us(uint16_t us) {
     #define DELAY_US_LOOP 1
 
-    while(us--) {
+    while (us--) {
         __asm
             nop
             nop

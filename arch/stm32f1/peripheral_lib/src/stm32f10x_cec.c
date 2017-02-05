@@ -171,7 +171,7 @@ void CEC_Cmd(FunctionalState NewState)
   if (NewState == DISABLE)
   {
     /* Wait until the PE bit is cleared by hardware (Idle Line detected) */
-    while((CEC->CFGR & CEC_CFGR_PE) != (uint32_t)RESET)
+    while ((CEC->CFGR & CEC_CFGR_PE) != (uint32_t)RESET)
     {
     }  
   }  

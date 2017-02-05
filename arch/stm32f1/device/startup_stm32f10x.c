@@ -10,13 +10,13 @@ void Reset_Handler(void);
 void default_handler (void) {
 	uint64_t i;
 	led_red_on();
-	while(1) {
-		for(i=0; i<0x00FFFFF; i++) {}
+	while (1) {
+		for (i=0; i<0x00FFFFF; i++) {}
 		led_green_off();
-		for(i=0; i<0x00FFFFF; i++) {}
+		for (i=0; i<0x00FFFFF; i++) {}
 		led_green_on();
 	}
-	while(1);
+	while (1);
 }
 
 void __attribute__ ((weak)) __libc_init_array (void) {}
@@ -52,7 +52,7 @@ void Reset_Handler(void) {
   SystemInit();
   __libc_init_array();
   main();
-  while(1) {}
+  while (1) {}
 }
 
 /* Vector Table */

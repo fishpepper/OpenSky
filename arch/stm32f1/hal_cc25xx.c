@@ -106,7 +106,7 @@ inline void hal_cc25xx_set_register(uint8_t address, uint8_t data) {
     hal_spi_csn_lo();
 
     // wait for ready signal
-    while(GPIO_ReadInputDataBit(CC25XX_SPI_GPIO, CC25XX_SPI_MISO_PIN) == 1) {}
+    while (GPIO_ReadInputDataBit(CC25XX_SPI_GPIO, CC25XX_SPI_MISO_PIN) == 1) {}
 
     hal_spi_tx(address);
     hal_spi_tx(data);
@@ -122,7 +122,7 @@ inline uint8_t hal_cc25xx_get_register(uint8_t address) {
     hal_spi_csn_lo();
 
     // wait for RDY signal:
-    while(GPIO_ReadInputDataBit(CC25XX_SPI_GPIO, CC25XX_SPI_MISO_PIN) == 1) {}
+    while (GPIO_ReadInputDataBit(CC25XX_SPI_GPIO, CC25XX_SPI_MISO_PIN) == 1) {}
 
     // request address (read request has bit7 set)
     uint8_t status = hal_spi_tx(address | 0x80);
@@ -184,7 +184,7 @@ inline void hal_cc25xx_enable_receive(void) {
 inline uint8_t hal_cc25xx_get_gdo_status(void) {
     if (GPIO_ReadInputDataBit(CC25XX_GDO2_GPIO, GPIO_Pin_3)) {
         return 1;
-    }else{
+    } else {
         return 0;
     }
 }
@@ -198,7 +198,7 @@ inline void hal_cc25xx_register_read_multi(uint8_t address, uint8_t *buffer, uin
     hal_spi_csn_lo();
 
     // wait for ready signal
-    while(GPIO_ReadInputDataBit(CC25XX_SPI_GPIO, CC25XX_SPI_MISO_PIN) == 1) {}
+    while (GPIO_ReadInputDataBit(CC25XX_SPI_GPIO, CC25XX_SPI_MISO_PIN) == 1) {}
 
     // debug("read "); debug_put_uint8(len); debug_flush();
     // request address (read request)
@@ -209,7 +209,7 @@ inline void hal_cc25xx_register_read_multi(uint8_t address, uint8_t *buffer, uin
 
     hal_spi_dma_xfer(buffer, len);
     /*
-    while(len--) {
+    while (len--) {
         *buf = hal_spi_rx();
         buf++;
     }*/
@@ -223,7 +223,7 @@ inline void hal_cc25xx_register_write_multi(uint8_t address, uint8_t *buffer, ui
     hal_spi_csn_lo();
 
     // wait for RDY signal:
-    while(GPIO_ReadInputDataBit(CC25XX_SPI_GPIO, CC25XX_SPI_MISO_PIN) == 1) {}
+    while (GPIO_ReadInputDataBit(CC25XX_SPI_GPIO, CC25XX_SPI_MISO_PIN) == 1) {}
 
     // request address (write request)
     hal_spi_tx(address | BURST_FLAG);
@@ -265,12 +265,12 @@ inline void hal_cc25xx_process_packet(volatile uint8_t *packet_received, volatil
             // only accept valid packet lenbghts:
             if (len == maxlen) {
                 uint8_t i;
-                for(i=0; i<maxlen; i++) {
+                for (i=0; i<maxlen; i++) {
                     buffer[i] = tmp_buffer[i];
                 }
                 *packet_received = 1;
             }
-        }else{
+        } else {
             // no, ignore this
             len = 0;
         }
