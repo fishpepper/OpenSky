@@ -51,6 +51,7 @@ git_submodule_init :
 ifneq ($(wildcard $(TARGET_MAKEFILE)),)
   #fine, target exists
   include $(TARGET_MAKEFILE)
+  include $(ARCH_MAKEFILE)
 else
   #does not exist
   $(error UNSUPPORTED Target ($(TARGET)) given. could not find makefile at $(TARGET_MAKEFILE). aborting)
@@ -88,7 +89,17 @@ endif
 
 all  : board
 
+stylecheck: $(GENERIC_SRCS) $(HEADER)
+	cd $(SRC_DIR) && ../stylecheck/cpplint.py \
+		--filter=-build/include,-build/storage_class,-readability/casting,-runtime/arrays \
+		--extensions="h,c" --linelength=100 $(HEADER) $(GENERIC_SRCS) && cd .. || true
+	cd $(ARCH_DIR) && ../../stylecheck/cpplint.py \
+		--filter=-build/include,-build/storage_class,-readability/casting,-runtime/arrays \
+		--extensions="h,c" --linelength=100 $(HEADER) $(HAL_SRC) && cd .. || true
+
+
+
 git_version:
 	git log -n 1 --format=format:"#define GIT_COMMIT \"%h\"%n" HEAD > $@.h
 
-.PHONY: git_version ack_disclaimer git_submodule_init 
+.PHONY: git_version ack_disclaimer git_submodule_init stylecheck

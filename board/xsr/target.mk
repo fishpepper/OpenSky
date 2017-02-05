@@ -1,3 +1,4 @@
 
 # continue with normal stm32f1 build
-include arch/stm32f1/stm32f1.mk
+ARCH_DIR = arch/stm32f1
+ARCH_MAKEFILE = $(ARCH_DIR)/stm32f1.mk
