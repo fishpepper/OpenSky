@@ -87,7 +87,7 @@ ifeq ($(wildcard .i_know_what_i_am_doing),)
 	@touch .i_know_what_i_am_doing
 endif
 
-all  : board
+all  : stylecheck board
 
 stylecheck: $(GENERIC_SRCS) $(HEADER)
 	cd $(SRC_DIR) && ../stylecheck/cpplint.py \
