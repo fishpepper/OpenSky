@@ -1,5 +1,25 @@
-#ifndef __HAL_SOFT_SERIAL_H__
-#define __HAL_SOFT_SERIAL_H__
+/*
+    Copyright 2017 fishpepper <AT> gmail.com
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http:// www.gnu.org/licenses/>.
+
+   author: fishpepper <AT> gmail.com
+*/
+
+#ifndef HAL_SOFT_SERIAL_H_
+#define HAL_SOFT_SERIAL_H_
+
 #include "hal_cc25xx.h"
 #include "cc2510fx.h"
 #include "config.h"
@@ -15,15 +35,15 @@ void hal_soft_serial_init_interrupts(void);
 // = 169,27... -> 169 -> 0.16% error (thats ok..)
 #define HAL_SOFTSERIAL_BIT_DURATION_TICKS  (169)
 
-#define HUB_TELEMETRY_PIN_HI() (HUB_TELEMETRY_PORT & (1<<HUB_TELEMETRY_PIN))
-#define HUB_TELEMETRY_PIN_LO() (! HUB_TELEMETRY_PIN_HI())
+#define HUB_TELEMETRY_PIN_HI() (HUB_TELEMETRY_PORT & (1 << HUB_TELEMETRY_PIN))
+#define HUB_TELEMETRY_PIN_LO() (!HUB_TELEMETRY_PIN_HI())
 
-#define HAL_SOFT_SERIAL_UPDATE_TOP_VALUE(x)   { T4CC0 = x; }
+#define HAL_SOFT_SERIAL_UPDATE_TOP_VALUE(x) { T4CC0 = x; }
 
 extern void hal_soft_serial_update_interrupt(void) __interrupt T4_VECTOR;
 extern void hal_soft_serial_startbit_interrupt(void) __interrupt P0INT_VECTOR;
 
-#endif
+#endif  // HUB_TELEMETRY_ON_SBUS_UART
 
-#endif // __HAL_SOFT_SERIAL_H__
+#endif  // HAL_SOFT_SERIAL_H_
 

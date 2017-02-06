@@ -1,5 +1,24 @@
-#ifndef __FRSKY_H__
-#define __FRSKY_H__
+/*
+    Copyright 2017 fishpepper <AT> gmail.com
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http:// www.gnu.org/licenses/>.
+
+   author: fishpepper <AT> gmail.com
+*/
+
+#ifndef FRSKY_H_
+#define FRSKY_H_
 
 #include <stdint.h>
 #include "main.h"
@@ -10,7 +29,6 @@
 // #define FRSKY_COUNT_RXSTATS 100
 #define FRSKY_COUNT_RXSTATS 50
 
-// 
 // extern EXTERNAL_MEMORY uint8_t frsky_txid[2];
 // extern EXTERNAL_MEMORY uint8_t frsky_hop_table[FRSKY_HOPTABLE_SIZE];
 // extern EXTERNAL_MEMORY int8_t frsky_freq_offset;
@@ -68,7 +86,7 @@ uint8_t frsky_append_hub_data(uint8_t sensor_id, uint16_t value, uint8_t *buf);
 uint8_t frsky_bind_jumper_set(void);
 void frsky_do_bind(void);
 void frsky_store_config(void);
-#endif
+#endif  // 0
 
 
 // packet data example:
@@ -79,8 +97,10 @@ void frsky_store_config(void);
 #define FRSKY_VALID_FRAMELENGTH(_b) (_b[0] == 0x11)
 #define FRSKY_VALID_CRC(_b)     (_b[19] & 0x80)
 #define FRSKY_VALID_TXID(_b) ((_b[1] == storage.frsky_txid[0]) && (_b[2] == storage.frsky_txid[1]))
-#define FRSKY_VALID_PACKET_BIND(_b) (FRSKY_VALID_FRAMELENGTH(_b) && FRSKY_VALID_CRC(_b) && (_b[2] == 0x01))
-#define FRSKY_VALID_PACKET(_b)      (FRSKY_VALID_FRAMELENGTH(_b) && FRSKY_VALID_CRC(_b) && FRSKY_VALID_TXID(_b) )
+#define FRSKY_VALID_PACKET_BIND(_b) \
+    (FRSKY_VALID_FRAMELENGTH(_b) && FRSKY_VALID_CRC(_b) && (_b[2] == 0x01))
+#define FRSKY_VALID_PACKET(_b)      \
+    (FRSKY_VALID_FRAMELENGTH(_b) && FRSKY_VALID_CRC(_b) && FRSKY_VALID_TXID(_b) )
 
 /*
 #define FRSKY_HUB_TELEMETRY_HEADER 0x5E
@@ -90,4 +110,4 @@ void frsky_store_config(void);
 #define FRSKY_HUB_TELEMETRY_CURRENT        0x28
 */
 
-#endif
+#endif  // FRSKY_H_

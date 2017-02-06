@@ -1,18 +1,20 @@
 /*
-   This program is free software: you can redistribute it and/or modify
-   it under the terms of the GNU General Public License as published by
-   the Free Software Foundation, either version 3 of the License, or
-   (at your option) any later version.
+    Copyright 2017 fishpepper <AT> gmail.com
 
-   This program is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-   GNU General Public License for more details.
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
 
-   You should have received a copy of the GNU General Public License
-   along with this program.  If not, see <http:// www.gnu.org/licenses/>.
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
 
-author: fishpepper <AT> gmail.com
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http:// www.gnu.org/licenses/>.
+
+   author: fishpepper <AT> gmail.com
 */
 
 #include <stdint.h>
@@ -28,8 +30,7 @@ author: fishpepper <AT> gmail.com
 
 #include "hal_spi.h"
 
-static void pabort(const char *s)
-{
+static void pabort(const char *s) {
     perror(s);
     abort();
 }
@@ -87,7 +88,6 @@ void hal_spi_init(void) {
     printf("spi: mode: 0x%x\n", mode);
     printf("spi: bits per word: %d\n", bits);
     printf("spi: max speed: %d Hz (%f MHz)\n", speed, speed/1000000.0);
-
 }
 
 void hal_spi_dma_xfer(uint8_t *buffer, uint8_t len) {
@@ -97,10 +97,10 @@ void hal_spi_dma_xfer(uint8_t *buffer, uint8_t len) {
     int i;
     for (i=0; i < len; i++)
         fprintf(stderr, "> %x\n", buffer[i]);
-#endif
+#endif  // LOG_SPI
     struct spi_ioc_transfer tr = {
-        .tx_buf = (unsigned long)buffer,
-        .rx_buf = (unsigned long)buffer,
+        .tx_buf = (uint64_t)buffer,
+        .rx_buf = (uint64_t)buffer,
         .len = len,
         .delay_usecs = delay,
         .speed_hz = speed,
@@ -114,7 +114,5 @@ void hal_spi_dma_xfer(uint8_t *buffer, uint8_t len) {
     for (i=0; i < len; i++)
         fprintf(stderr, "< %x\n", buffer[i]);
     fprintf(stderr, "\n");
-#endif
+#endif  // LOG_SPI
 }
-
-

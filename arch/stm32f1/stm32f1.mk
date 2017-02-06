@@ -1,5 +1,5 @@
 # object files
-STARTUP      := startup_stm32f10x.c \
+STARTUP_SRCS := startup_stm32f10x.c \
                 system_stm32f10x.c
 
 DRIVER_SRCS  := stm32f10x_rcc.c \
@@ -29,10 +29,23 @@ HAL_SRCS     := hal_led.c \
                 hal_soft_serial.c \
                 hal_debug.c
 
-BOARD_SRCS   := $(STARTUP) \
-                $(DRIVER_SRCS) \
-                $(HAL_SRCS) \
+
+# Code Paths
+DEVICE_DIR   := $(ARCH_DIR)/device
+CORE_DIR     := $(ARCH_DIR)/core
+LINK_DIR     := $(ARCH_DIR)/linker
+PERIPH_DIR   := $(ARCH_DIR)/peripheral_lib
+
+ARCH_SRCS    := $(addprefix $(ARCH_DIR)/, $(HAL_SRCS)) 
+
+PERIPH_SRCS  := $(addprefix $(PERIPH_DIR)/src/, $(DRIVER_SRCS)) \
+                $(addprefix $(DEVICE_DIR)/, $(STARTUP_SRCS))
+
+BOARD_SRCS   := $(ARCH_SRCS) \
                 $(GENERIC_SRCS)
+
+ALL_SRCS     := $(BOARD_SRCS) \
+		$(PERIPH_SRCS)
 
 #crystal frequency
 CRYSTAL_FREQ = 12000000
@@ -62,32 +75,28 @@ AS       := $(ARM-PREFIX)as
 OBJ      := $(ARM-PREFIX)objcopy
 SIZE     := $(ARM-PREFIX)size
 
-# Code Paths
-ARCH_DIR := $(ROOT)/arch/stm32f1
-DEVICE   := $(ARCH_DIR)/device
-CORE     := $(ARCH_DIR)/core
-LINK     := $(ARCH_DIR)/linker
-PERIPH   := $(ARCH_DIR)/peripheral_lib
-
 INCLUDE_DIRS := $(INCLUDE_DIRS) \
                 $(TARGET_DIR) \
-                $(CORE) \
-                $(DEVICE) \
-                $(PERIPH)/inc \
+                $(CORE_DIR) \
+                $(DEVICE_DIR) \
+                $(PERIPH_DIR)/inc \
                 $(ARCH_DIR)
 
+ARCH_HEADERS := $(ARCH_SRCS:.c=.h)
+
+
 # Search path for standard files
-vpath %.c ./src
-vpath %.c $(ARCH_DIR)
+#vpath %.c ./src
+#vpath %.c $(ARCH_DIR)
 
 # Search path for perpheral library
-vpath %.c $(CORE)
-vpath %.c $(PERIPH)/src
-vpath %.c $(DEVICE)
+#vpath %.c $(CORE)
+#vpath %.c $(PERIPH)/src
+#vpath %.c $(DEVICE)
 
 # Processor specific
 PTYPE      = STM32F10X_MD
-LDSCRIPT   = $(LINK)/stm32f103c8.ld
+LDSCRIPT   = $(LINK_DIR)/stm32f103c8.ld
 
 # Compilation Flags
 
@@ -108,8 +117,8 @@ CFLAGS    += -mcpu=cortex-m3 \
 
 OPENOCD_PIDFILE = /tmp/openocd_opensky.pid
 
-TARGET_OBJS     = $(addsuffix .o,$(addprefix $(OBJECT_DIR)/$(TARGET)/,$(basename $(BOARD_SRCS))))
-TARGET_DEPS     = $(addsuffix .d,$(addprefix $(OBJECT_DIR)/$(TARGET)/,$(basename $(BOARD_SRCS))))
+TARGET_OBJS     = $(addsuffix .o,$(addprefix $(OBJECT_DIR)/$(TARGET)/,$(basename $(ALL_SRCS))))
+TARGET_DEPS     = $(addsuffix .d,$(addprefix $(OBJECT_DIR)/$(TARGET)/,$(basename $(ALL_SRCS))))
 TARGET_ELF      = $(OBJECT_DIR)/$(RESULT).elf
 TARGET_BIN      = $(OBJECT_DIR)/$(RESULT).bin
 

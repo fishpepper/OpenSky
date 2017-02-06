@@ -1,4 +1,6 @@
 /*
+    Copyright 2017 fishpepper <AT> gmail.com
+
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -36,7 +38,7 @@ void hal_ppm_init(void) {
     #else
     // non-inverted, clear on match, set on zero
     T1CCTL2 = T1CCTLx_MODE_COMPARE | T1CCTLx_CMP_CLRSET0;
-    #endif
+    #endif  // PPM_INVERTED
 
     // configure peripheral alternative1 for timer 1:
     // use alt config 1 -> clr flag -> P0_4 = output
@@ -47,10 +49,10 @@ void hal_ppm_init(void) {
 
     // select P0_4 for peripheral function
     // NOTE: make sure to set usart1 to alt2 config!
-    P0SEL |= (1<<PPM_OUT_PIN);
+    P0SEL |= (1 << PPM_OUT_PIN);
 
     // select P0_4 as output
-    P0DIR |= (1<<PPM_OUT_PIN);
+    P0DIR |= (1 << PPM_OUT_PIN);
 
     // prescaler = 128
     // tickspeed = 26MHz / 8 = 3,25MHz (TICKSPD is set in timeout.c!)
@@ -108,7 +110,7 @@ void hal_ppm_failsafe_enter(void) {
     #else
     // set on zero -> default is low
     P0 &= ~(1<<4);
-    #endif
+    #endif  // PPM_INVERTED
 }
 
-#endif
+#endif  // SBUS_ENABLED

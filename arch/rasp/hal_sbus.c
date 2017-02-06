@@ -1,18 +1,20 @@
 /*
-   This program is free software: you can redistribute it and/or modify
-   it under the terms of the GNU General Public License as published by
-   the Free Software Foundation, either version 3 of the License, or
-   (at your option) any later version.
+    Copyright 2017 fishpepper <AT> gmail.com
 
-   This program is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-   GNU General Public License for more details.
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
 
-   You should have received a copy of the GNU General Public License
-   along with this program.  If not, see <http:// www.gnu.org/licenses/>.
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
 
-author: fishpepper <AT> gmail.com
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http:// www.gnu.org/licenses/>.
+
+   author: fishpepper <AT> gmail.com
 */
 
 #include <stdio.h>
@@ -30,10 +32,9 @@ author: fishpepper <AT> gmail.com
 static int uart0_filestream = -1;
 
 void hal_sbus_init(EXTERNAL_MEMORY uint8_t *sbus_data_ptr) {
-
-    uart0_filestream = open("/dev/ttyAMA0", O_WRONLY | O_NOCTTY | O_NDELAY); // Open in non blocking read/write mode
-    if (uart0_filestream == -1)
-    {
+    // open in non blocking read/write mode
+    uart0_filestream = open("/dev/ttyAMA0", O_WRONLY | O_NOCTTY | O_NDELAY);
+    if (uart0_filestream == -1) {
         printf("Error - Unable to open UART.  Ensure it is not in use by another application\n");
     }
 
@@ -53,15 +54,13 @@ void hal_sbus_init(EXTERNAL_MEMORY uint8_t *sbus_data_ptr) {
 }
 
 void hal_sbus_start_transmission(uint8_t *data, uint8_t len) {
-    if (uart0_filestream != -1)
-    {
+    if (uart0_filestream != -1) {
         int count = write(uart0_filestream, data, len);
-        if (count < len)
-        {
+        if (count < len) {
             printf("UART TX error sent %u of %u\n", count, len);
         }
         // printf("%d bytes written\n", len);
     }
 }
 
-#endif
+#endif  // SBUS_ENABLED

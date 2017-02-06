@@ -1,4 +1,6 @@
 /*
+    Copyright 2017 fishpepper <AT> gmail.com
+
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -16,6 +18,8 @@
 */
 
 #include "hal_ppm.h"
+#include "hal_io.h"
+#include "hal_timeout.h"
 #include "ppm.h"
 #include "wdt.h"
 #include "led.h"
@@ -31,7 +35,7 @@ static int state = 1;
 static int failsafe = 0;
 
 void hal_ppm_init(void) {
-    hal_set_ppm(state);
+    hal_io_set_ppm(state);
 }
 
 void hal_ppm_failsafe_enter(void) {
@@ -51,17 +55,17 @@ void hal_ppm_tick() {
     if (state == 1) {
         state = 0;
         if (!failsafe)
-            hal_set_ppm(state);
+            hal_io_set_ppm(state);
         // Then lower the signal for another 200ms..
         hal_timeout_add_ppm(HAL_PPM_US_TO_TICKCOUNT(200));
-    } else { 
+    } else {
         state = 1;
         if (!failsafe)
-            hal_set_ppm(state);
+            hal_io_set_ppm(state);
 
         // Call the code, that will call hal_ppm_update_cvalue back to us.
         hal_ppm_irq_callback();
     }
 }
 
-#endif
+#endif  // SBUS_ENABLED

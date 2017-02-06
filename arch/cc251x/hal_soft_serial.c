@@ -1,4 +1,6 @@
 /*
+    Copyright 2017 fishpepper <AT> gmail.com
+
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -35,7 +37,7 @@ void hal_soft_serial_init(void) {
 
 void hal_soft_serial_init_gpio(void) {
     // set gpio as input
-    PORT2DIR(HUB_TELEMETRY_PORT) &= ~(1<<HUB_TELEMETRY_PIN);
+    PORT2DIR(HUB_TELEMETRY_PORT) &= ~(1 << HUB_TELEMETRY_PIN);
 }
 
 void hal_soft_serial_init_interrupts(void) {
@@ -47,11 +49,11 @@ void hal_soft_serial_init_interrupts(void) {
 
     // tickspeed = 26MHz / 8 = 3,25MHz (TICKSPD is set in hal_timeout.c!)
     // 1us = 3.25 ticks -> DIV2 -> 1us = 1.625 ticks
-    T4CTL = T4CTL_DIV_2 | // /2
-            T4CTL_START | // start
-            T4CTL_OVFIM | // OVInt enabled
-            T4CTL_CLR   | // clear
-            T4CTL_MODE_MODULO; // 01 = count to CC and the overflow
+    T4CTL = T4CTL_DIV_2 |  // /2
+            T4CTL_START |  // start
+            T4CTL_OVFIM |  // OVInt enabled
+            T4CTL_CLR   |  // clear
+            T4CTL_MODE_MODULO;  // 01 = count to CC and the overflow
 
     // ch0 cmp: bit length
     T4CC0 = HAL_SOFTSERIAL_BIT_DURATION_TICKS;
@@ -80,14 +82,14 @@ void hal_soft_serial_init_interrupts(void) {
 #else
     // falling edge triggers isr
     PICTL   |= PICTL_P0ICON;
-#endif
+#endif  // HUB_TELEMETRY_INVERTED
 
     // T4 highest int prio (group4)
-    IP0 |= (1<<4);
-    IP1 |= (1<<4);
+    IP0 |= (1 << 4);
+    IP1 |= (1 << 4);
     // P0 highest int prio (group5)
-    IP0 |= (1<<5);
-    IP1 |= (1<<5);
+    IP0 |= (1 << 5);
+    IP1 |= (1 << 5);
 
     // enable interrupts from P0
     P0IF = 0;
@@ -96,7 +98,7 @@ void hal_soft_serial_init_interrupts(void) {
 }
 
 
-void hal_soft_serial_update_interrupt(void) __interrupt T4_VECTOR{
+void hal_soft_serial_update_interrupt(void) __interrupt T4_VECTOR {
     if (T4OVFIF) {
         // DEBUG_PIN_TOGGLE();
 
@@ -116,7 +118,7 @@ void hal_soft_serial_update_interrupt(void) __interrupt T4_VECTOR{
     }
 }
 
-void hal_soft_serial_startbit_interrupt(void) __interrupt P0INT_VECTOR{
+void hal_soft_serial_startbit_interrupt(void) __interrupt P0INT_VECTOR {
     uint8_t isr_cause = P0IFG;
 
     // clear int flags WARNING: order seems to be important! CLR first IFG then IF!
@@ -124,7 +126,7 @@ void hal_soft_serial_startbit_interrupt(void) __interrupt P0INT_VECTOR{
     // clear P0 int flags (important: several P0 pins can cause the isr, clean all of them!)
     P0IF = 0;
 
-    if (isr_cause & (1<<HUB_TELEMETRY_PIN)) {
+    if (isr_cause & (1 << HUB_TELEMETRY_PIN)) {
         // DEBUG_PIN_TOGGLE();
         // reset t3 counter:
         T4CTL |= T4CTL_CLR;
@@ -146,4 +148,4 @@ void hal_soft_serial_startbit_interrupt(void) __interrupt P0INT_VECTOR{
     }
 }
 
-#endif
+#endif  // HUB_TELEMETRY_ON_SBUS_UART

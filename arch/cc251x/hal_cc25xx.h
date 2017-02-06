@@ -1,5 +1,24 @@
-#ifndef __HAL_CC25XX_H__
-#define __HAL_CC25XX_H__
+/*
+    Copyright 2017 fishpepper <AT> gmail.com
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http:// www.gnu.org/licenses/>.
+
+   author: fishpepper <AT> gmail.com
+*/
+
+#ifndef HAL_CC25XX_H_
+#define HAL_CC25XX_H_
 #include <stdint.h>
 #include "hal_defines.h"
 #include "config.h"
@@ -19,12 +38,14 @@
   #define RF_LNA_DISABLE() { PORT2BIT(RF_LNA_PORT, RF_LNA_PIN) = ~RF_LNA_ON_LEVEL; }
   #define RF_PA_ENABLE()   { PORT2BIT(RF_PA_PORT, RF_PA_PIN) = RF_PA_ON_LEVEL; }
   #define RF_PA_DISABLE()  { PORT2BIT(RF_PA_PORT, RF_PA_PIN) = ~RF_PA_ON_LEVEL; }
-#endif
+#endif  // RF_LNA_PORT
 
 #ifdef RF_HIGH_GAIN_MODE_PORT
-  #define RF_HIGH_GAIN_MODE_ENABLE()  { PORT2BIT(RF_HIGH_GAIN_MODE_PORT, RF_HIGH_GAIN_MODE_PIN) = RF_HIGH_GAIN_MODE_ON_LEVEL; }
-  #define RF_HIGH_GAIN_MODE_DISBALE() { PORT2BIT(RF_HIGH_GAIN_MODE_PORT, RF_HIGH_GAIN_MODE_PIN) = ~RF_HIGH_GAIN_MODE_ON_LEVEL; }
-#endif
+  #define RF_HIGH_GAIN_MODE_ENABLE()  { \
+    PORT2BIT(RF_HIGH_GAIN_MODE_PORT, RF_HIGH_GAIN_MODE_PIN) = RF_HIGH_GAIN_MODE_ON_LEVEL; }
+  #define RF_HIGH_GAIN_MODE_DISBALE() { \
+    PORT2BIT(RF_HIGH_GAIN_MODE_PORT, RF_HIGH_GAIN_MODE_PIN) = ~RF_HIGH_GAIN_MODE_ON_LEVEL; }
+#endif  // RF_HIGH_GAIN_MODE_PORT
 
 #define hal_cc25xx_set_antenna(x) (0)
 #define hal_cc25xx_process_packet(packet_received, buffer, maxlen) {}
@@ -34,7 +55,7 @@ void hal_cc25xx_init(void);
 void hal_cc25xx_disable_rf_interrupt(void);
 
 #define hal_cc25xx_rx_sleep() { delay_us(1000); }
-#define hal_cc25xx_tx_sleep() { delay_us( 900); }
+#define hal_cc25xx_tx_sleep() { delay_us(900); }
 
 void hal_cc25xx_enter_rxmode(void);
 void hal_cc25xx_enter_txmode(void);
@@ -242,4 +263,4 @@ SFRX(TEST1,  0xDF24);
 SFRX(TEST0,  0xDF25);
 
 
-#endif // __HAL_CC25XX_H__
+#endif  // HAL_CC25XX_H_

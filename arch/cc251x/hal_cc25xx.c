@@ -1,4 +1,6 @@
 /*
+    Copyright 2017 fishpepper <AT> gmail.com
+
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -38,23 +40,23 @@ void hal_cc25xx_init(void) {
 
     // if we support LNA/PA make sure to config the pin as output:
     #ifdef RF_LNA_PORT
-      PORT2DIR(RF_LNA_PORT) |= (1<<RF_LNA_PIN);
-      PORT2DIR(RF_PA_PORT) |= (1<<RF_PA_PIN);
+      PORT2DIR(RF_LNA_PORT) |= (1 << RF_LNA_PIN);
+      PORT2DIR(RF_PA_PORT)  |= (1 << RF_PA_PIN);
       // set default to LNA active
       RF_PA_DISABLE();
       RF_LNA_ENABLE();
-    #endif
+    #endif  // RF_LNA_PORT
 
     // if we support HIGH GAIN mode config in as output:
     #ifdef RF_HIGH_GAIN_MODE_PORT
-      PORT2DIR(RF_HIGH_GAIN_MODE_PORT) |= (1<<RF_HIGH_GAIN_MODE_PIN);
+      PORT2DIR(RF_HIGH_GAIN_MODE_PORT) |= (1 << RF_HIGH_GAIN_MODE_PIN);
       // enable high gain mode?
       #ifdef RF_HIGH_GAIN_MODE_ENABLED
         RF_HIGH_GAIN_MODE_ENABLE();
       #else
         RF_HIGH_GAIN_MODE_DISABLE();
-      #endif
-   #endif
+      #endif  // RF_HIGH_GAIN_MODE_ENABLED
+    #endif  // RF_HIGH_GAIN_MODE_PORT
 }
 
 void hal_cc25xx_disable_rf_interrupt(void) {
@@ -68,7 +70,7 @@ void hal_cc25xx_enter_rxmode(void) {
     delay_us(20);
     RF_PA_DISABLE();
     delay_us(5);
-#endif
+#endif  // RF_LNA_PORT
 
     // set up dma for radio--->buffer
     hal_cc25xx_setup_rf_dma(CC25XX_MODE_RX);
@@ -88,7 +90,7 @@ void hal_cc25xx_enter_txmode(void) {
     delay_us(20);
     RF_PA_ENABLE();
     delay_us(5);
-#endif
+#endif  // RF_LNA_PORT
 
     // abort ch0
     DMAARM = DMA_ARM_ABORT | DMA_ARM_CH0;
@@ -157,7 +159,7 @@ void hal_cc25xx_enable_receive(void) {
 
 
 
-void hal_cc25xx_rf_interrupt(void) __interrupt RF_VECTOR{
+void hal_cc25xx_rf_interrupt(void) __interrupt RF_VECTOR {
     // clear int flag
     RFIF &= ~(1<<4);
 

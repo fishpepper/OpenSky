@@ -25,7 +25,7 @@ void hal_debug_init(void) {
 
 #ifndef DEBUG_UART
 #error "ERROR: DEBUG_UART not defined"
-#endif
+#endif  // DEBUG_UART
 
 #if DEBUG_UART == USART0_P0
     // USART0 use ALT1 -> Clear flag -> Port P0_3 = TX
@@ -45,7 +45,7 @@ void hal_debug_init(void) {
     // configure pin P1_5 (TX) as special function
     P1SEL |= (1<<5);
     // set P0_3 as normal IO
-    P0SEL &= ~(1<<3);     
+    P0SEL &= ~(1<<3);
 
     // make tx pin output:
     P1DIR |= (1<<5);
@@ -68,7 +68,7 @@ void hal_debug_init(void) {
     P0DIR |= (1<<4);
 #else
   #error "ERROR: UNSUPPORTED DEBUG UART"
-#endif
+#endif  // DEBUG_UART == ...
 
     // this assumes cpu runs from XOSC (26mhz) !
     // set baudrate
@@ -78,17 +78,17 @@ void hal_debug_init(void) {
 #else
     U1BAUD = CC2510_BAUD_M_115200;
     U1GCR = (U1GCR & ~0x1F) | (CC2510_BAUD_E_115200);
-#endif
+#endif  // DEBUG_UART == ...
 
     // set up config
-    uart_config.bit.START = 0; // startbit level = low
-    uart_config.bit.STOP  = 1; // stopbit level = high
-    uart_config.bit.SPB   = 0; // 1 stopbit
-    uart_config.bit.PARITY = 0; // no parity
-    uart_config.bit.BIT9   = 0; // 8bit
-    uart_config.bit.D9     = 0; // 8 Bits
-    uart_config.bit.FLOW   = 0; // no hw flow control
-    uart_config.bit.ORDER  = 0; // lsb first
+    uart_config.bit.START = 0;   // startbit level = low
+    uart_config.bit.STOP  = 1;   // stopbit level = high
+    uart_config.bit.SPB   = 0;   // 1 stopbit
+    uart_config.bit.PARITY = 0;  // no parity
+    uart_config.bit.BIT9   = 0;  // 8bit
+    uart_config.bit.D9     = 0;  // 8 Bits
+    uart_config.bit.FLOW   = 0;  // no hw flow control
+    uart_config.bit.ORDER  = 0;  // lsb first
     hal_debug_set_mode(&uart_config);
 
     // enable interrupts:
@@ -129,7 +129,7 @@ static void hal_debug_set_mode(EXTERNAL_MEMORY union hal_uart_config_t *cfg) {
     // interrupt prio to 0 (0..3=highest)
     IP0 &= ~(1<<3);
     IP1 &= ~(1<<3);
-#endif
+#endif  // DEBUG_UART == ...
 }
 
 
@@ -154,7 +154,7 @@ void hal_debug_start_transmission(uint8_t ch) {
 
     // send this char
     U1DBUF = ch;
-#endif
+#endif  // DEBUG_UART == ...
 }
 
 

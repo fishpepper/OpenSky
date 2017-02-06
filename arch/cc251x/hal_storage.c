@@ -1,4 +1,6 @@
 /*
+    Copyright 2017 fishpepper <AT> gmail.com
+
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -24,7 +26,8 @@
 
 
 __xdata HAL_DMA_DESC flash_dma_config;
-__code __at (STORAGE_LOCATION) uint8_t storage_on_flash[STORAGE_PAGE_SIZE]; // no ini value -> sdcc does not init this!
+// no ini value -> sdcc does not init this!
+__code __at(STORAGE_LOCATION) uint8_t storage_on_flash[STORAGE_PAGE_SIZE];
 
 void hal_storage_init(void) {
     debug("hal_storage: init\n"); debug_flush();
@@ -40,7 +43,7 @@ void hal_storage_read(uint8_t *storage_ptr, uint16_t len) {
     debug("hal_storage: loading from flash: "); debug_flush();
 
     // copy from persistant flash to ram:
-    for (i=0; i<len; i++) {
+    for (i = 0; i < len; i++) {
         storage_ptr[i] = storage_on_flash[i];
         debug_put_hex8(storage_on_flash[i]); debug_putc(' '); debug_flush();
         wdt_reset();
@@ -48,12 +51,12 @@ void hal_storage_read(uint8_t *storage_ptr, uint16_t len) {
 }
 
 static void hal_storage_flash_write(uint16_t address, uint8_t *data, uint16_t len) {
-    uint16_t i=0;
-    uint8_t *flash_ptr=0;
+    uint16_t i = 0;
+    uint8_t *flash_ptr = 0;
 
     debug("hal_storage: will write page at 0x"); debug_flush();
-    debug_put_hex8(address>>8);
-    debug_put_hex8(address&0xff);
+    debug_put_hex8(address >> 8);
+    debug_put_hex8(address & 0xff);
     debug_put_newline();
 
     // this is VERY important:
@@ -101,10 +104,10 @@ static void hal_storage_flash_write(uint16_t address, uint8_t *data, uint16_t le
     SET_WORD(DMA0CFGH, DMA0CFGL, flash_dma_config);
 
     // waiting for the flash controller to be ready
-    while (FCTL & FCTL_BUSY);
+    while (FCTL & FCTL_BUSY) {}
 
     // configure flash controller for 26mhz clock
-    FWT = 0x2A; // (21 * 26) / (16);
+    FWT = 0x2A;  // (21 * 26) / (16);
 
     // set up address:
     SET_WORD(FADDRH, FADDRL, ((uint16_t)address)>>1);
@@ -112,7 +115,7 @@ static void hal_storage_flash_write(uint16_t address, uint8_t *data, uint16_t le
     // re enable ints
     sei();
 
-    debug("hal_storage: erasing page\n");debug_flush();
+    debug("hal_storage: erasing page\n"); debug_flush();
 
     // disable interrupts
     cli();
@@ -124,8 +127,8 @@ static void hal_storage_flash_write(uint16_t address, uint8_t *data, uint16_t le
     // has to be 2byte aligned. use a hack to place it at a given adress:
     hal_storage_flash_erase_page();
 
-    // Wait for the erase operation to complete. // 
-    while (FCTL & FCTL_BUSY);
+    // Wait for the erase operation to complete
+    while (FCTL & FCTL_BUSY) {}
 
     // FCTL = 0;
 
@@ -135,7 +138,7 @@ static void hal_storage_flash_write(uint16_t address, uint8_t *data, uint16_t le
     debug("hal_storage: erase done\n"); debug_flush();
 
     debug("hal_storage: will write ["); debug_flush();
-    i=0;
+    i = 0;
     while (i < len) {
         debug_put_hex8(((uint8_t *)data)[i++]);
         debug_put_hex8(((uint8_t *)data)[i++]);
@@ -164,7 +167,7 @@ static void hal_storage_flash_write(uint16_t address, uint8_t *data, uint16_t le
     }
 
     // wait until flash controller not busy
-    while (FCTL & (FCTL_BUSY | FCTL_SWBUSY));
+    while (FCTL & (FCTL_BUSY | FCTL_SWBUSY)) {}
 
     sei();
 
@@ -176,7 +179,7 @@ static void hal_storage_flash_write(uint16_t address, uint8_t *data, uint16_t le
     debug("hal_storage: read back [");
     // copy from persistant flash to ram:
     flash_ptr = address;
-    for (i=0; i<len; i++) {
+    for (i = 0; i < len; i++) {
         debug_put_hex8(*flash_ptr++); debug_putc(' '); debug_flush();
         wdt_reset();
     }
@@ -187,16 +190,16 @@ static void hal_storage_flash_write(uint16_t address, uint8_t *data, uint16_t le
 
 void hal_storage_flash_enable_write(void) {
     __asm
-    .even // IMPORTANT: PLACE THIS ON A 2BYTE BOUNDARY!
-    ORL _FCTL, #0x02; // FCTL |=  FCTL_WRITE
-    NOP; 
+    .even              // IMPORTANT: PLACE THIS ON A 2BYTE BOUNDARY!
+    ORL _FCTL, #0x02;  // FCTL |=  FCTL_WRITE
+    NOP;
     __endasm;
 }
 
 void hal_storage_flash_erase_page(void) {
     __asm
-    .even // IMPORTANT: PLACE THIS ON A 2BYTE BOUNDARY!
-    ORL _FCTL, #0x01; // FCTL |= FCTL_ERASE
-    NOP;            // required sequence!
+    .even              // IMPORTANT: PLACE THIS ON A 2BYTE BOUNDARY!
+    ORL _FCTL, #0x01;  // FCTL |= FCTL_ERASE
+    NOP;               // required sequence!
     __endasm;
 }

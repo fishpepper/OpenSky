@@ -1,4 +1,6 @@
 /*
+    Copyright 2017 fishpepper <AT> gmail.com
+
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -34,10 +36,10 @@ void hal_adc_init(void) {
     hal_adc_data[1] = 0;
 
     // pin config -> dir = input
-    PORT2DIR(ADC_PORT) &= ~((1<<ADC1) | (1<<ADC0));
+    PORT2DIR(ADC_PORT) &= ~((1 << ADC1) | (1 << ADC0));
 
     // set special function ADC for those pins:
-    ADCCFG = (1<<ADC1) | (1<<ADC0);
+    ADCCFG = (1 << ADC1) | (1 << ADC0);
 
     // set up adc:
     // - external vref (avcc)
@@ -61,7 +63,7 @@ void hal_adc_init(void) {
     // for testing only, do not use under normal use
 #if ADC_DO_TEST
     adc_test();
-#endif
+#endif  // ADC_DO_TEST
 }
 
 void hal_adc_dma_arm(void) {
@@ -83,7 +85,7 @@ void hal_adc_process(void) {
 
 
 void hal_adc_dma_init(uint8_t dma_id, uint16_t __xdata *dest_adr, uint8_t trig) {
-    hal_dma_config[dma_id].PRIORITY       = DMA_PRI_LOW; // example used high...
+    hal_dma_config[dma_id].PRIORITY       = DMA_PRI_LOW;  // example used high...
     hal_dma_config[dma_id].M8             = DMA_M8_USE_7_BITS;
     hal_dma_config[dma_id].IRQMASK        = DMA_IRQMASK_DISABLE;
     hal_dma_config[dma_id].TRIG           = trig;
@@ -113,13 +115,13 @@ uint8_t hal_adc_get_scaled(uint8_t ch) {
     //      therefore we have to check for negative numbers and set them to zero
     if (ch == 0) {
         // convert to 8 bit (see above)
-        adc_data = hal_adc_data[1]>>7;
-        if (adc_data & (1<<8)) adc_data = 0; // bugfix: handle negative numbers
+        adc_data = hal_adc_data[1] >> 7;
+        if (adc_data & (1 << 8)) adc_data = 0;  // bugfix: handle negative numbers
         // return fixed value
         return adc_data;
     } else {
-        adc_data = hal_adc_data[0]>>7;
-        if (adc_data & (1<<8)) adc_data = 0; // bugfix: handle negative numbers
+        adc_data = hal_adc_data[0] >> 7;
+        if (adc_data & (1 << 8)) adc_data = 0;  // bugfix: handle negative numbers
         #ifdef ADC1_USE_ACS712
         // acs712 is connected to ADC1
         // when powered by 5V we can use a trick
@@ -130,7 +132,7 @@ uint8_t hal_adc_get_scaled(uint8_t ch) {
         return 255-(adc_data);
         #else
         return adc_data;
-        #endif
+        #endif  // ADC1_USE_ACS712
     }
 }
 
@@ -150,12 +152,14 @@ void hal_adc_test(void) {
         debug("\nadc: done. res[0] = "); debug_flush();
 
         debug_put_uint16(hal_adc_data[0]>>4);
-        debug_putc('x'); debug_put_hex8(hal_adc_data[0]>>12); debug_put_hex8((hal_adc_data[0]>>4)&0xff);
+        debug_putc('x'); debug_put_hex8(hal_adc_data[0]>>12);
+        debug_put_hex8((hal_adc_data[0]>>4)&0xff);
 
         debug(", res[1] = "); debug_flush();
 
         debug_put_uint16(hal_adc_data[1]>>4);
-        debug_putc('x'); debug_put_hex8(hal_adc_data[1]>>12); debug_put_hex8((hal_adc_data[1]>>4)&0xff);
+        debug_putc('x'); debug_put_hex8(hal_adc_data[1]>>12);
+        debug_put_hex8((hal_adc_data[1]>>4)&0xff);
 
         debug_put_newline();
 
@@ -165,4 +169,4 @@ void hal_adc_test(void) {
         wdt_reset();
     }
 }
-#endif
+#endif  // ADC_DO_TEST

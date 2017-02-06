@@ -1,4 +1,6 @@
 /*
+    Copyright 2017 fishpepper <AT> gmail.com
+
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -86,19 +88,19 @@ static void hal_cc25xx_init_gpio(void) {
 inline uint32_t hal_cc25xx_set_antenna(uint8_t id) {
     // select antenna 0 or 1:
     if (id) {
-        CC25XX_ANT_SW_CTX_GPIO->BRR  = (CC25XX_ANT_SW_CTX_PIN); // 0
-        CC25XX_ANT_SW_CRX_GPIO->BSRR = (CC25XX_ANT_SW_CRX_PIN); // 1
+        CC25XX_ANT_SW_CTX_GPIO->BRR  = (CC25XX_ANT_SW_CTX_PIN);  // 0
+        CC25XX_ANT_SW_CRX_GPIO->BSRR = (CC25XX_ANT_SW_CRX_PIN);  // 1
     } else {
-        CC25XX_ANT_SW_CTX_GPIO->BSRR = (CC25XX_ANT_SW_CTX_PIN); // 1
-        CC25XX_ANT_SW_CRX_GPIO->BRR  = (CC25XX_ANT_SW_CRX_PIN); // 0
+        CC25XX_ANT_SW_CTX_GPIO->BSRR = (CC25XX_ANT_SW_CTX_PIN);  // 1
+        CC25XX_ANT_SW_CRX_GPIO->BRR  = (CC25XX_ANT_SW_CRX_PIN);  // 0
     }
     return id;
 }
 
 inline void hal_cc25xx_set_gdo_mode(void) {
-    cc25xx_set_register(IOCFG0, 0x01); // 6);
+    cc25xx_set_register(IOCFG0, 0x01);  // 6);
     // cc25xx_set_register(IOCFG1, ???);
-    cc25xx_set_register(IOCFG2, 0x01); // 6);
+    cc25xx_set_register(IOCFG2, 0x01);  // 6);
 }
 
 inline void hal_cc25xx_set_register(uint8_t address, uint8_t data) {
@@ -159,18 +161,17 @@ uint8_t hal_cc25xx_transmission_completed(void) {
 
 inline void hal_cc25xx_enter_rxmode(void) {
     // add pa/lna config bit setting here
-    CC25XX_LNA_SW_CRX_GPIO->BSRR = (CC25XX_LNA_SW_CRX_PIN); // 1
+    CC25XX_LNA_SW_CRX_GPIO->BSRR = (CC25XX_LNA_SW_CRX_PIN);  // 1
     delay_us(20);
-    CC25XX_LNA_SW_CTX_GPIO->BRR  = (CC25XX_LNA_SW_CTX_PIN); // 0
+    CC25XX_LNA_SW_CTX_GPIO->BRR  = (CC25XX_LNA_SW_CTX_PIN);  // 0
     delay_us(5);
-
 }
 
 inline void hal_cc25xx_enter_txmode(void) {
     // add pa/lna config bit setting here
-    CC25XX_LNA_SW_CRX_GPIO->BRR  = (CC25XX_LNA_SW_CRX_PIN); // 0
+    CC25XX_LNA_SW_CRX_GPIO->BRR  = (CC25XX_LNA_SW_CRX_PIN);  // 0
     delay_us(20);
-    CC25XX_LNA_SW_CTX_GPIO->BSRR = (CC25XX_LNA_SW_CTX_PIN); // 1
+    CC25XX_LNA_SW_CTX_GPIO->BSRR = (CC25XX_LNA_SW_CTX_PIN);  // 1
     delay_us(5);
 }
 
@@ -235,7 +236,8 @@ inline void hal_cc25xx_register_write_multi(uint8_t address, uint8_t *buffer, ui
     hal_spi_csn_hi();
 }
 
-inline void hal_cc25xx_process_packet(volatile uint8_t *packet_received, volatile uint8_t *buffer, uint8_t maxlen) {
+inline void hal_cc25xx_process_packet(volatile uint8_t *packet_received,
+                                      volatile uint8_t *buffer, uint8_t maxlen) {
     if (hal_cc25xx_get_gdo_status() == 1) {
         // data received, fetch data
         // timeout_set_100us(5);
@@ -248,14 +250,14 @@ inline void hal_cc25xx_process_packet(volatile uint8_t *packet_received, volatil
         uint8_t len1, len2, len, i;
 
         // try this 10 times befor giving up:
-        for (i=0; i<10; i++) {
+        for (i = 0; i < 10; i++) {
             len1 = hal_cc25xx_get_register_burst(RXBYTES) & 0x7F;
             len2 = hal_cc25xx_get_register_burst(RXBYTES) & 0x7F;
-            if (len1==len2) break;
+            if (len1 == len2) break;
         }
 
         // valid len found?
-        if (len1==len2) {
+        if (len1 == len2) {
             len = len1;
 
             // packet received, grab data
@@ -265,7 +267,7 @@ inline void hal_cc25xx_process_packet(volatile uint8_t *packet_received, volatil
             // only accept valid packet lenbghts:
             if (len == maxlen) {
                 uint8_t i;
-                for (i=0; i<maxlen; i++) {
+                for (i = 0; i < maxlen; i++) {
                     buffer[i] = tmp_buffer[i];
                 }
                 *packet_received = 1;

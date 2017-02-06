@@ -1,5 +1,24 @@
-#ifndef __TELEMETRY_H__
-#define __TELEMETRY_H__
+/*
+    Copyright 2017 fishpepper <AT> gmail.com
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http:// www.gnu.org/licenses/>.
+
+   author: fishpepper <AT> gmail.com
+*/
+
+#ifndef TELEMETRY_H_
+#define TELEMETRY_H_
 
 #include "hal_defines.h"
 #include <stdint.h>
@@ -22,4 +41,4 @@ static void telemetry_rx_echo_test(void);
 void telemetry_fill_buffer(volatile EXTERNAL_MEMORY uint8_t *buffer, uint8_t telemetry_id);
 uint8_t telemetry_pop(volatile EXTERNAL_MEMORY uint8_t *byte);
 
-#endif // __TELEMETRY_H__
+#endif  // TELEMETRY_H_

@@ -1,5 +1,24 @@
-#ifndef __HAL_DMA_H__
-#define __HAL_DMA_H__
+/*
+    Copyright 2017 fishpepper <AT> gmail.com
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http:// www.gnu.org/licenses/>.
+
+   author: fishpepper <AT> gmail.com
+*/
+
+#ifndef HAL_DMA_H_
+#define HAL_DMA_H_
 
 #include <stdint.h>
 
@@ -25,18 +44,30 @@ typedef struct {
 
 extern __xdata HAL_DMA_DESC hal_dma_config[5];
 
-#define DMA_VLEN_USE_LEN                       0x00      // Use LEN for transfer count
-#define DMA_VLEN_FIRST_BYTE_P_1                0x01      // Transfer the number of bytes specified by the first byte +1
-#define DMA_VLEN_FIRST_BYTE                    0x02      // Transfer the number of bytes indicated by the first byte (itself included)
-#define DMA_VLEN_FIRST_BYTE_P_2                0x03      // Transfer the number of bytes specified by the first byte +2
-#define DMA_VLEN_FIRST_BYTE_P_3                0x04      // Transfer the number of bytes specified by the first byte +3
-#define DMA_LEN_MAX                            0xFF      // The maximum length is always decided by the first byte
-#define DMA_WORDSIZE_BYTE                      0x00      // Transfer a byte at a time
-#define DMA_WORDSIZE_WORD                      0x01      // Transfer a 16-bit word at a time
-#define DMA_TMODE_SINGLE                       0x00      // Transfer a single byte/word after each DMA trigger
-#define DMA_TMODE_BLOCK                        0x01      // Transfer block of data (length len) after each DMA trigger
-#define DMA_TMODE_SINGLE_REPEATED              0x02      // Transfer single byte/word (after len transfers, rearm DMA)
-#define DMA_TMODE_BLOCK_REPEATED               0x03      // Transfer block of data (after len transfers, rearm DMA)
+// Use LEN for transfer count
+#define DMA_VLEN_USE_LEN                       0x00
+// Transfer the number of bytes specified by the first byte +1
+#define DMA_VLEN_FIRST_BYTE_P_1                0x01
+// Transfer the number of bytes indicated by the first byte (itself included)
+#define DMA_VLEN_FIRST_BYTE                    0x02
+// Transfer the number of bytes specified by the first byte +2
+#define DMA_VLEN_FIRST_BYTE_P_2                0x03
+// Transfer the number of bytes specified by the first byte +3
+#define DMA_VLEN_FIRST_BYTE_P_3                0x04
+// The maximum length is always decided by the first byte
+#define DMA_LEN_MAX                            0xFF
+// Transfer a byte at a time
+#define DMA_WORDSIZE_BYTE                      0x00
+// Transfer a 16-bit word at a time
+#define DMA_WORDSIZE_WORD                      0x01
+// Transfer a single byte/word after each DMA trigger
+#define DMA_TMODE_SINGLE                       0x00
+// Transfer block of data (length len) after each DMA trigger
+#define DMA_TMODE_BLOCK                        0x01
+// Transfer single byte/word (after len transfers, rearm DMA)
+#define DMA_TMODE_SINGLE_REPEATED              0x02
+// Transfer block of data (after len transfers, rearm DMA)
+#define DMA_TMODE_BLOCK_REPEATED               0x03
 
 #define DMA_TRIG_NONE           0   // No trigger, setting DMAREQ.DMAREQx bit starts transfer
 #define DMA_TRIG_PREV           1   // DMA channel is triggered by completion of previous channel
@@ -70,26 +101,40 @@ extern __xdata HAL_DMA_DESC hal_dma_config[5];
 #define DMA_TRIG_ENC_DW        29   // AES encryption processor requests download input data
 #define DMA_TRIG_ENC_UP        30   // AES encryption processor requests upload output data
 
-#define DMA_SRCINC_0                           0x00      // Increment source pointer by 0 bytes/words after each transfer
-#define DMA_SRCINC_1                           0x01      // Increment source pointer by 1 bytes/words after each transfer
-#define DMA_SRCINC_2                           0x02      // Increment source pointer by 2 bytes/words after each transfer
-#define DMA_SRCINC_M1                          0x03      // Decrement source pointer by 1 bytes/words after each transfer
+// Increment source pointer by 0 bytes/words after each transfer
+#define DMA_SRCINC_0                           0x00
+// Increment source pointer by 1 bytes/words after each transfer
+#define DMA_SRCINC_1                           0x01
+// Increment source pointer by 2 bytes/words after each transfer
+#define DMA_SRCINC_2                           0x02
+// Decrement source pointer by 1 bytes/words after each transfer
+#define DMA_SRCINC_M1                          0x03
 
-#define DMA_DESTINC_0                          0x00      // Increment destination pointer by 0 bytes/words after each transfer
-#define DMA_DESTINC_1                          0x01      // Increment destination pointer by 1 bytes/words after each transfer
-#define DMA_DESTINC_2                          0x02      // Increment destination pointer by 2 bytes/words after each transfer
-#define DMA_DESTINC_M1                         0x03      // Decrement destination pointer by 1 bytes/words after each transfer
+// Increment destination pointer by 0 bytes/words after each transfer
+#define DMA_DESTINC_0                          0x00
+// Increment destination pointer by 1 bytes/words after each transfer
+#define DMA_DESTINC_1                          0x01
+// Increment destination pointer by 2 bytes/words after each transfer
+#define DMA_DESTINC_2                          0x02
+// Decrement destination pointer by 1 bytes/words after each transfer
+#define DMA_DESTINC_M1                         0x03
 
-#define DMA_IRQMASK_DISABLE                    0x00      // Disable interrupt generation
-#define DMA_IRQMASK_ENABLE                     0x01      // Enable interrupt generation upon DMA channel done
+// Disable interrupt generation
+#define DMA_IRQMASK_DISABLE                    0x00
+// Enable interrupt generation upon DMA channel done
+#define DMA_IRQMASK_ENABLE                     0x01
 
 #define DMA_M8_USE_8_BITS                      0x00      // Use all 8 bits for transfer count
 #define DMA_M8_USE_7_BITS                      0x01      // Use 7 LSB for transfer count
 
-#define DMA_PRI_LOW                            0x00      // Low, CPU has priority
-#define DMA_PRI_GUARANTEED                     0x01      // Guaranteed, DMA at least every second try
-#define DMA_PRI_HIGH                           0x02      // High, DMA has priority
-#define DMA_PRI_ABSOLUTE                       0x03      // Highest, DMA has priority. Reserved for DMA port access.
+// Low, CPU has priority
+#define DMA_PRI_LOW                            0x00
+// Guaranteed, DMA at least every second try
+#define DMA_PRI_GUARANTEED                     0x01
+// High, DMA has priority
+#define DMA_PRI_HIGH                           0x02
+// Highest, DMA has priority. Reserved for DMA port access.
+#define DMA_PRI_ABSOLUTE                       0x03
 
 #define DMA_ARM_ABORT 0x80
 #define DMA_ARM_CH0 (1<<0)
@@ -104,4 +149,4 @@ extern __xdata HAL_DMA_DESC hal_dma_config[5];
 #define DMAIRQ_DMAIF3 (1<<3)
 #define DMAIRQ_DMAIF4 (1<<4)
 
-#endif
+#endif  // HAL_DMA_H_

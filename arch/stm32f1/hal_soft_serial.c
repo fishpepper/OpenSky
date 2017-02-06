@@ -1,4 +1,6 @@
 /*
+    Copyright 2017 fishpepper <AT> gmail.com
+
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -24,7 +26,7 @@
 #include "stm32f10x_rcc.h"
 #include "stm32f10x_gpio.h"
 #include "stm32f10x_tim.h"
-#include "misc.h" // stm32 nvic
+#include "misc.h"  // stm32 nvic
 
 void hal_soft_serial_init(void) {
     hal_soft_serial_init_gpio();
@@ -39,7 +41,7 @@ static void hal_soft_serial_init_rcc(void) {
     // timer clock enable
     RCC_APBxPeriphClockCmd(SOFT_SERIAL_TIMER_CLK_RCC, SOFT_SERIAL_TIMER_CLK, ENABLE);
     // release reset cmd (?)
-    RCC_APBxPeriphResetCmd(SOFT_SERIAL_TIMER_CLK_RCC,SOFT_SERIAL_TIMER_CLK,DISABLE);
+    RCC_APBxPeriphResetCmd(SOFT_SERIAL_TIMER_CLK_RCC, SOFT_SERIAL_TIMER_CLK, DISABLE);
 }
 
 static void hal_soft_serial_init_gpio(void) {
@@ -82,15 +84,15 @@ static void hal_soft_serial_init_timer(void) {
     tim_ic_init.TIM_ICPolarity     = TIM_ICPolarity_Falling;
   #else
     tim_ic_init.TIM_ICPolarity     = TIM_ICPolarity_Rising;
-  #endif
+  #endif  // SOFT_SERIAL_PIN_HAS_INVERTER
 #else
   #ifdef SOFT_SERIAL_PIN_HAS_INVERTER
-    // board has inverter -> invert 
+    // board has inverter -> invert
     tim_ic_init.TIM_ICPolarity     = TIM_ICPolarity_Rising;
   #else
     tim_ic_init.TIM_ICPolarity     = TIM_ICPolarity_Falling;
-  #endif
-#endif
+  #endif  // SOFT_SERIAL_PIN_HAS_INVERTER
+#endif  // HUB_TELEMETRY_INVERTED
     tim_ic_init.TIM_ICSelection    = TIM_ICSelection_DirectTI;
     tim_ic_init.TIM_ICPrescaler    = TIM_ICPSC_DIV1;
     tim_ic_init.TIM_ICFilter       = 0x0;

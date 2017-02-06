@@ -1,5 +1,24 @@
-#ifndef __CC25XX_H__
-#define __CC25XX_H__
+/*
+    Copyright 2017 fishpepper <AT> gmail.com
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http:// www.gnu.org/licenses/>.
+
+   author: fishpepper <AT> gmail.com
+*/
+
+#ifndef CC25XX_H_
+#define CC25XX_H_
 
 #include "hal_cc25xx.h"
 
@@ -25,9 +44,9 @@ void cc25xx_wait_for_transmission_complete(void);
 #define cc25xx_transmit_packet(buffer, len) hal_cc25xx_transmit_packet(buffer, len)
 
 #define cc25xx_get_current_antenna() (cc25xx_current_antenna)
-#define cc25xx_partnum_valid(p, v) hal_cc25xx_partnum_valid(p,v)
+#define cc25xx_partnum_valid(p, v) hal_cc25xx_partnum_valid(p, v)
 #define CC25XX_MODE_RX 0
 #define CC25XX_MODE_TX 1
 
-#endif // __CC25XX_H__
+#endif  // CC25XX_H_
 

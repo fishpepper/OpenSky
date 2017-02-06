@@ -1,4 +1,6 @@
 /*
+    Copyright 2017 fishpepper <AT> gmail.com
+
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -72,8 +74,8 @@ void hal_uart_init(void) {
     // make tx pin output:
     P1DIR |= (1<<6);
 #else
- #error "UNSUPPORTED UART"
-#endif
+    #error "UNSUPPORTED UART"
+#endif  // SBUS_UART == ...
 
     // set baudrate
 #if (SBUS_UART == USART0_P1) || (SBUS_UART == USART0_P0)
@@ -82,7 +84,7 @@ void hal_uart_init(void) {
 #else
     U1BAUD = CC2510_BAUD_M_100000;
     U1GCR = (U1GCR & ~0x1F) | (CC2510_BAUD_E_100000);
-#endif
+#endif  // SBUS_UART == ...
 
     // set up config for USART -> 8E2
     #ifdef SBUS_INVERTED
@@ -92,22 +94,22 @@ void hal_uart_init(void) {
         // the parity, the startbit, and the data
         // by using the SBUS_PREPARE_DATA() macro
         // we can effectively invert the usart in software :)
-        sbus_uart_config.bit.START  = 1; // startbit level = low
-        sbus_uart_config.bit.STOP   = 0; // stopbit level = high
-        sbus_uart_config.bit.D9     = 1; // UNEven parity
+        sbus_uart_config.bit.START  = 1;  // startbit level = low
+        sbus_uart_config.bit.STOP   = 0;  // stopbit level = high
+        sbus_uart_config.bit.D9     = 1;  // UNEven parity
     #else
         // standard usart, non-inverted mode
         // NOTE: most sbus implementations use inverted mode
-        sbus_uart_config.bit.START  = 0; // startbit level = low
-        sbus_uart_config.bit.STOP   = 1; // stopbit level = high
-        sbus_uart_config.bit.D9     = 0; // Even parity
-    #endif
+        sbus_uart_config.bit.START  = 0;  // startbit level = low
+        sbus_uart_config.bit.STOP   = 1;  // stopbit level = high
+        sbus_uart_config.bit.D9     = 0;  // Even parity
+    #endif  // SBUS_INVERTED
 
-    sbus_uart_config.bit.SPB    = 1; // 1 = 2 stopbits
-    sbus_uart_config.bit.PARITY = 1; // 1 = parity enabled, D9=0 -> even parity
-    sbus_uart_config.bit.BIT9   = 1; // 8bit
-    sbus_uart_config.bit.FLOW   = 0; // no hw flow control
-    sbus_uart_config.bit.ORDER  = 0; // lsb first
+    sbus_uart_config.bit.SPB    = 1;  // 1 = 2 stopbits
+    sbus_uart_config.bit.PARITY = 1;  // 1 = parity enabled, D9=0 -> even parity
+    sbus_uart_config.bit.BIT9   = 1;  // 8bit
+    sbus_uart_config.bit.FLOW   = 0;  // no hw flow control
+    sbus_uart_config.bit.ORDER  = 0;  // lsb first
 
     // activate uart config
     hal_uart_set_mode(&sbus_uart_config);
@@ -120,7 +122,7 @@ void hal_uart_init(void) {
     hal_dma_config[3].TRIG           = DMA_TRIG_UTX0;
 #else
     hal_dma_config[3].TRIG           = DMA_TRIG_UTX1;
-#endif
+#endif  // SBUS_UART == ...
     hal_dma_config[3].TMODE          = DMA_TMODE_SINGLE;
     hal_dma_config[3].WORDSIZE       = DMA_WORDSIZE_BYTE;
 
@@ -130,7 +132,8 @@ void hal_uart_init(void) {
     SET_WORD(hal_dma_config[3].DESTADDRH, hal_dma_config[3].DESTADDRL, &X_U0DBUF);
 #else
     SET_WORD(hal_dma_config[3].DESTADDRH, hal_dma_config[3].DESTADDRL, &X_U1DBUF);
-#endif
+#endif  // SBUS_UART == ...
+
     hal_dma_config[3].VLEN           = DMA_VLEN_USE_LEN;
 
     // len will be set during tx start
@@ -168,11 +171,11 @@ void hal_uart_init(void) {
 
     // enable RX interrupt
     URX1IE = 1;
-#endif
+#endif  // HUB_TELEMETRY_ON_SBUS_UART
 
     // enable global ints
     EA = 1;
-#endif
+#endif  // SBUS_UART == ...
 }
 
 static void hal_uart_set_mode(EXTERNAL_MEMORY union hal_uart_config_t *cfg) {
@@ -210,7 +213,7 @@ static void hal_uart_set_mode(EXTERNAL_MEMORY union hal_uart_config_t *cfg) {
     // interrupt prio to 1 (0..3=highest)
     IP0 |= (1<<3);
     IP1 &= ~(1<<3);
-#endif
+#endif  // SBUS_UART
 }
 
 void hal_uart_start_transmission(uint8_t *data, uint8_t len) {
@@ -232,24 +235,24 @@ void hal_uart_start_transmission(uint8_t *data, uint8_t len) {
     U0DBUF = data[0];
 #else
     U1DBUF = data[0];
-#endif
+#endif  // SBUS_UART
 }
 
 #ifdef HUB_TELEMETRY_ON_SBUS_UART
 void HAL_UART_RX_ISR(void) {
     uint8_t rx;
-    
-    HAL_UART_RX_ISR_CLEAR_FLAG(); // THIS SHOULD NEVER BE THE LAST LINE IN AN ISR!
+
+    HAL_UART_RX_ISR_CLEAR_FLAG();  // THIS SHOULD NEVER BE THE LAST LINE IN AN ISR!
 
 #ifdef SBUS_INVERTED
-    rx = 0xFF ^ HAL_UART_RX_GETCH(); // remove data inversion 
+    rx = 0xFF ^ HAL_UART_RX_GETCH();  // remove data inversion
 #else
     rx = HAL_UART_RX_GETCH();
-#endif
+#endif  // SBUS_INVERTED
 
     if (uart_rx_callback != 0) {
         // execute callback
         uart_rx_callback(rx);
     }
 }
-#endif
+#endif  // HUB_TELEMETRY_ON_SBUS_UART

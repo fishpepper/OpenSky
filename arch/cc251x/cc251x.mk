@@ -1,7 +1,7 @@
 
 CC       = sdcc
 
-HAL_SRC      := hal_led.c \
+HAL_SRCS     := hal_led.c \
                 hal_debug.c \
                 hal_uart.c \
                 hal_clocksource.c \
@@ -18,11 +18,11 @@ HAL_SRC      := hal_led.c \
                 hal_ppm.c \
                 hal_soft_serial.c
 
-# fetch this dir during include
-ARCH_DIR     := arch/cc251x
+ARCH_SRCS    := $(addprefix $(ARCH_DIR)/, $(HAL_SRCS))
+ARCH_HEADERS := $(ARCH_SRCS:.c=.h)
 
 BOARD_SRCS   := $(GENERIC_SRCS) \
-                $(HAL_SRC)
+                $(ARCH_SRCS)
 
 INCLUDE_DIRS := $(INCLUDE_DIRS) \
                 /usr/share/sdcc/include \
@@ -78,8 +78,8 @@ TARGET_OBJS     = $(addsuffix .rel,$(addprefix $(OBJECT_DIR)/$(TARGET)/,$(basena
 TARGET_DEPS     = $(addsuffix .d,$(addprefix $(OBJECT_DIR)/$(TARGET)/,$(basename $(BOARD_SRCS))))
 
 # Search path for standard files
-vpath %.c ./src
-vpath %.c ./$(ARCH_DIR)
+#vpath %.c ./src
+#vpath %.c ./$(ARCH_DIR)
 
 board: $(TARGET_UPDATE) $(TARGET_FULL)
 

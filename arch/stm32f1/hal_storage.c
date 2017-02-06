@@ -1,4 +1,6 @@
 /*
+    Copyright 2017 fishpepper <AT> gmail.com
+
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -94,7 +96,6 @@ static void hal_storage_init_i2c_mode(void) {
 
     // enable i2c
     I2C_Cmd(EEPROM_I2C, ENABLE);
-
 }
 
 static void hal_storage_init_i2c_gpio(void) {
@@ -167,7 +168,7 @@ static void hal_storage_init_i2c_gpio(void) {
 }
 
 static uint32_t hal_storage_check_len(uint16_t len) {
-    if (len>255) {
+    if (len > 255) {
         debug("hal_storage: ERROR, invalid data len ");
         debug_put_uint16(len);
         debug(" (max is 255)!\n");
@@ -274,8 +275,7 @@ static uint32_t hal_storage_i2c_read_buffer(uint16_t address, uint8_t *buffer, u
 
     // do not use dma etc, we do not need highspeed. do polling:
     uint16_t i;
-    for (i=0; i<len; i++) {
-
+    for (i = 0; i < len; i++) {
         // wait on ADDR flag to be set (ADDR is still not cleared at this level)
         timeout_set(EEPROM_I2C_FLAG_TIMEOUT);
 
@@ -315,10 +315,7 @@ static uint32_t hal_storage_i2c_read_buffer(uint16_t address, uint8_t *buffer, u
                 return 0;
             }
         }
-
     }
-
-
 
     // stop transmission
     // clear ADDR register by reading SR1 then SR2 register (SR1 has already been read) */
@@ -326,7 +323,6 @@ static uint32_t hal_storage_i2c_read_buffer(uint16_t address, uint8_t *buffer, u
 
     // send STOP Condition
     I2C_GenerateSTOP(EEPROM_I2C, ENABLE);
-
 
     if (HAL_STORAGE_I2C_DEBUG) {
         debug(". done.\n");
@@ -376,7 +372,7 @@ static uint32_t hal_storage_i2c_write_buffer(uint8_t address, uint8_t *buffer, u
     }
 
     // write data
-    for (i = 0; i<len; i++) {
+    for (i = 0; i < len; i++) {
         if (!hal_storage_i2c_write_byte(address + i, buffer[i])) {
             return 0;
         }

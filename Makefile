@@ -6,7 +6,10 @@ ROOT         := $(patsubst %/,%,$(dir $(lastword $(MAKEFILE_LIST))))
 SRC_DIR       = $(ROOT)/src
 INCLUDE_DIRS  = $(SRC_DIR)
 
-GENERIC_SRCS  = $(notdir $(wildcard $(SRC_DIR)/*.c))
+GENERIC_SRCS    = $(wildcard $(SRC_DIR)/*.c)
+GENERIC_HEADERS = $(GENERIC_SRCS:.c=.h)
+
+
 
 #a special file can trigger the use of a fixed id (see storage.c)
 #i use this during development to avoid uneccessary re-binding for vd5m targets
@@ -89,14 +92,13 @@ endif
 
 all  : stylecheck board
 
-stylecheck: $(GENERIC_SRCS) $(HEADER)
-	cd $(SRC_DIR) && ../stylecheck/cpplint.py \
+stylecheck: $(GENERIC_SRCS) $(GENERIC_HEADERS) $(ARCH_SRCS) $(ARCH_HEADERS)
+	./stylecheck/cpplint.py \
 		--filter=-build/include,-build/storage_class,-readability/casting,-runtime/arrays \
-		--extensions="h,c" --linelength=100 $(HEADER) $(GENERIC_SRCS) && cd .. || true
-	cd $(ARCH_DIR) && ../../stylecheck/cpplint.py \
+		--extensions="h,c" --root=src --linelength=100 $(GENERIC_HEADERS) $(GENERIC_SRCS) || true
+	./stylecheck/cpplint.py \
 		--filter=-build/include,-build/storage_class,-readability/casting,-runtime/arrays \
-		--extensions="h,c" --linelength=100 $(HEADER) $(HAL_SRC) && cd .. || true
-
+		--extensions="h,c" --root=$(ARCH_DIR) --linelength=100 $(ARCH_HEADERS) $(ARCH_SRCS) || true
 
 
 git_version:

@@ -1,5 +1,24 @@
-#ifndef __HAL_CC25XX_H__
-#define __HAL_CC25XX_H__
+/*
+    Copyright 2017 fishpepper <AT> gmail.com
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http:// www.gnu.org/licenses/>.
+
+   author: fishpepper <AT> gmail.com
+*/
+
+#ifndef HAL_CC25XX_H__
+#define HAL_CC25XX_H__
 
 #include <stdint.h>
 
@@ -26,7 +45,8 @@ static void hal_cc25xx_init_gpio(void);
 uint32_t hal_cc25xx_set_antenna(uint8_t id);
 void hal_cc25xx_set_gdo_mode(void);
 uint8_t hal_cc25xx_get_gdo_status(void);
-void hal_cc25xx_process_packet(volatile uint8_t *packet_received, volatile uint8_t *buffer, uint8_t maxlen);
+void hal_cc25xx_process_packet(volatile uint8_t *packet_received,
+                               volatile uint8_t *buffer, uint8_t maxlen);
 void hal_cc25xx_transmit_packet(volatile uint8_t *buffer, uint8_t len);
 
 void hal_cc25xx_read_fifo(uint8_t *buf, uint8_t len);
@@ -162,5 +182,5 @@ uint8_t hal_cc25xx_transmission_completed(void);
 #define CC25XX_FIFO     0x3F
 
 
-#endif // __HAL_CC25XX_H__
+#endif  // HAL_CC25XX_H_
 

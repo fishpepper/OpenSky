@@ -1,4 +1,6 @@
 /*
+    Copyright 2017 fishpepper <AT> gmail.com
+
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -53,7 +55,7 @@ static void hal_spi_init_mode(void) {
     spi_init.SPI_CPOL      = SPI_CPOL_Low;
     spi_init.SPI_CPHA      = SPI_CPHA_1Edge;
     spi_init.SPI_NSS       = SPI_NSS_Soft;
-    spi_init.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_8; // 3mhz
+    spi_init.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_8;  // = 3 MHz
     spi_init.SPI_FirstBit  = SPI_FirstBit_MSB;
     spi_init.SPI_CRCPolynomial = 7;
     SPI_Init(CC25XX_SPI, &spi_init);
@@ -72,10 +74,10 @@ static void hal_spi_init_dma(void) {
     dma_init.DMA_PeripheralBaseAddr = (uint32_t)&CC25XX_SPI->DR;
     dma_init.DMA_PeripheralDataSize = DMA_PeripheralDataSize_Byte;
     dma_init.DMA_PeripheralInc      = DMA_PeripheralInc_Disable;
-    dma_init.DMA_MemoryBaseAddr     = 0; // will be set later
+    dma_init.DMA_MemoryBaseAddr     = 0;  // will be set later
     dma_init.DMA_MemoryDataSize     = DMA_MemoryDataSize_Byte;
     dma_init.DMA_MemoryInc          = DMA_MemoryInc_Enable;
-    dma_init.DMA_BufferSize         = 1; // will be set later
+    dma_init.DMA_BufferSize         = 1;  // will be set later
     dma_init.DMA_Mode               = DMA_Mode_Normal;
     dma_init.DMA_Priority           = DMA_Priority_VeryHigh;
     dma_init.DMA_M2M                = DMA_M2M_Disable;
@@ -86,10 +88,10 @@ static void hal_spi_init_dma(void) {
     dma_init.DMA_PeripheralBaseAddr = (uint32_t)&CC25XX_SPI->DR;
     dma_init.DMA_PeripheralDataSize = DMA_PeripheralDataSize_Byte;
     dma_init.DMA_PeripheralInc      = DMA_PeripheralInc_Disable;
-    dma_init.DMA_MemoryBaseAddr     = 0; // will be set later
+    dma_init.DMA_MemoryBaseAddr     = 0;  // will be set later
     dma_init.DMA_MemoryDataSize     = DMA_MemoryDataSize_Byte;
     dma_init.DMA_MemoryInc          = DMA_MemoryInc_Enable;
-    dma_init.DMA_BufferSize         = 1; // will be set later
+    dma_init.DMA_BufferSize         = 1;  // will be set later
     dma_init.DMA_Mode               = DMA_Mode_Normal;
     dma_init.DMA_Priority           = DMA_Priority_VeryHigh;
     dma_init.DMA_M2M                = DMA_M2M_Disable;
@@ -98,7 +100,6 @@ static void hal_spi_init_dma(void) {
     // start disabled
     DMA_Cmd(CC25XX_SPI_TX_DMA_CHANNEL, DISABLE);
     DMA_Cmd(CC25XX_SPI_RX_DMA_CHANNEL, DISABLE);
-
 }
 
 // data in buffer will be sent and will be overwritten with
@@ -126,20 +127,20 @@ void hal_spi_dma_xfer(uint8_t *buffer, uint8_t len) {
     // debug("TRIG\n"); debug_flush();
 #if 0
     // Wait until the command is sent to the DR
-    while (!DMA_GetFlagStatus(CC25XX_SPI_TX_DMA_TC_FLAG)) {};
+    while (!DMA_GetFlagStatus(CC25XX_SPI_TX_DMA_TC_FLAG)) {}
 
     // debug("ACTIVE\n"); debug_flush();
 
     // wait for tx to be finished:
-    while (DMA_GetFlagStatus(CC25XX_SPI_TX_DMA_TC_FLAG)) {};
-    while (DMA_GetFlagStatus(CC25XX_SPI_RX_DMA_TC_FLAG)) {};
+    while (DMA_GetFlagStatus(CC25XX_SPI_TX_DMA_TC_FLAG)) {}
+    while (DMA_GetFlagStatus(CC25XX_SPI_RX_DMA_TC_FLAG)) {}
 
     // wait for SPI to be no longer busy
     while (SPI_I2S_GetFlagStatus(CC25XX_SPI, SPI_I2S_FLAG_BSY) != RESET) {}
     // debug("!BUSY\n"); debug_flush();
-#endif
+#endif  // 0
 
-    while (SPI_I2S_GetFlagStatus(CC25XX_SPI, SPI_I2S_FLAG_TXE) == RESET);
+    while (SPI_I2S_GetFlagStatus(CC25XX_SPI, SPI_I2S_FLAG_TXE) == RESET) {}
     while (SPI_I2S_GetFlagStatus(CC25XX_SPI, SPI_I2S_FLAG_BSY) != RESET) {}
 
     // while ((SPI1->SR & 2) == 0);  // wait while TXE flag is 0 (TX is not empty)
@@ -150,7 +151,7 @@ void hal_spi_dma_xfer(uint8_t *buffer, uint8_t len) {
     DMA_Cmd(CC25XX_SPI_TX_DMA_CHANNEL, DISABLE);
 
     // clear DMA flags
-    SPI_I2S_DMACmd(CC25XX_SPI,SPI_I2S_DMAReq_Rx | SPI_I2S_DMAReq_Tx, DISABLE);
+    SPI_I2S_DMACmd(CC25XX_SPI, SPI_I2S_DMAReq_Rx | SPI_I2S_DMAReq_Tx, DISABLE);
 }
 
 
@@ -177,12 +178,12 @@ static void hal_spi_init_gpio(void) {
 
 uint8_t hal_spi_tx(uint8_t address) {
     // wait for SPI Tx buffer empty
-    while (SPI_I2S_GetFlagStatus(CC25XX_SPI, SPI_I2S_FLAG_TXE) == RESET);
+    while (SPI_I2S_GetFlagStatus(CC25XX_SPI, SPI_I2S_FLAG_TXE) == RESET) {}
     // send SPI data
     SPI_I2S_SendData(CC25XX_SPI, address);
 
     // read response
-    while (SPI_I2S_GetFlagStatus(CC25XX_SPI, SPI_I2S_FLAG_RXNE) == RESET);
+    while (SPI_I2S_GetFlagStatus(CC25XX_SPI, SPI_I2S_FLAG_RXNE) == RESET) {}
     uint8_t result = SPI_I2S_ReceiveData(CC25XX_SPI);
     return result;
 }

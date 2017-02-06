@@ -1,4 +1,6 @@
 /*
+    Copyright 2017 fishpepper <AT> gmail.com
+
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -18,7 +20,7 @@
 #include "hal_uart.h"
 #include  "stm32f10x_rcc.h"
 #include  "stm32f10x_usart.h"
-#include  "misc.h" // this is actually a stm32 include (nvic stuff)
+#include  "misc.h"  // this is actually a stm32 include (nvic stuff)
 #include  "debug.h"
 #include  "led.h"
 
@@ -98,7 +100,8 @@ static void hal_debug_init_gpio(void) {
 static void hal_debug_init_rcc(void) {
     // configure clocks for uart:
     // enable GPIO clock
-    RCC_APBxPeriphClockCmd(DEBUG_USART_GPIO_CLK_RCC, DEBUG_USART_GPIO_CLK | RCC_APB2Periph_AFIO, ENABLE);
+    RCC_APBxPeriphClockCmd(DEBUG_USART_GPIO_CLK_RCC,
+                           DEBUG_USART_GPIO_CLK | RCC_APB2Periph_AFIO, ENABLE);
 
     // enable USART clock
     RCC_APBxPeriphClockCmd(DEBUG_USART_CLK_RCC, DEBUG_USART_CLK, ENABLE);

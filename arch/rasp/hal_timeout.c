@@ -1,21 +1,24 @@
 /*
-   This program is free software: you can redistribute it and/or modify
-   it under the terms of the GNU General Public License as published by
-   the Free Software Foundation, either version 3 of the License, or
-   (at your option) any later version.
+    Copyright 2017 fishpepper <AT> gmail.com
 
-   This program is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-   GNU General Public License for more details.
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
 
-   You should have received a copy of the GNU General Public License
-   along with this program.  If not, see <http:// www.gnu.org/licenses/>.
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
 
-author: fishpepper <AT> gmail.com
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http:// www.gnu.org/licenses/>.
+
+   author: fishpepper <AT> gmail.com
 */
 
 #include "hal_timeout.h"
+#include "hal_ppm.h"
 #include "debug.h"
 #include "wdt.h"
 
@@ -53,8 +56,8 @@ static inline void timer_add(struct timespec *timer, int us) {
 /* Subtract the ‘struct timeval’ values X and Y,
    storing the result in RESULT.
    Return 1 if the difference is negative, otherwise 0. */
-static inline int timeval_subtract(struct timespec *result, struct timespec *x, struct timespec *y)
-{
+static inline int timeval_subtract(struct timespec *result,
+                                   struct timespec *x, struct timespec *y) {
     /* Perform the carry for the later subtraction by updating y. */
     if (x->tv_nsec < y->tv_nsec) {
         int nsec = (y->tv_nsec - x->tv_nsec) / 1000000000 + 1;
@@ -120,10 +123,8 @@ void hal_timeout_delay_us(int32_t timeout_us) {
     timer_add(&delay_timer, timeout_us);
 
     do {
-
         /* If ppm happens before delay timer times out. (delay_timer gt timer_ppm) */
         if (timeval_gt(&delay_timer, &timer_ppm)) {
-
             /* Calculate how far to sleep */
             if (timeval_subtract(&sleep, &now, &timer_ppm) > 0) {
                 nanosleep(&sleep, &rem);

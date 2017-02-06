@@ -1,4 +1,6 @@
 /*
+    Copyright 2017 fishpepper <AT> gmail.com
+
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -25,7 +27,7 @@
 #include "stm32f10x_usart.h"
 #include "stm32f10x_gpio.h"
 #include "stm32f10x_rcc.h"
-#include "misc.h" // this defines stm32 nvic stuff
+#include "misc.h"  // this defines stm32 nvic stuff
 
 #ifdef SBUS_ENABLED
 
@@ -55,17 +57,16 @@ void SBUS_USART_IRQHANDLER(void) {
     }
 
 #ifdef HUB_TELEMETRY_ON_SBUS_UART
-    if (USART_GetITStatus(SBUS_USART, USART_IT_RXE) != RESET) {
+    if (USART_GetITStatus(SBUS_USART, USART_IT_RXNE) != RESET) {
         // RXE interrupt
         uint8_t rx = USART_ReceiveData(SBUS_USART);
-        
+
         if (uart_rx_callback != 0) {
             // execute callback
             uart_rx_callback(rx);
         }
     }
-#endif
-    
+#endif  // HUB_TELEMETRY_ON_SBUS_UART
 }
 
 
@@ -117,18 +118,18 @@ static void hal_uart_init_mode(void) {
     uart_init.USART_Parity              = USART_Parity_Even;
     uart_init.USART_HardwareFlowControl = USART_HardwareFlowControl_None;
     uart_init.USART_Mode                = USART_Mode_Tx;
-    
+
 #ifdef HUB_TELEMETRY_ON_SBUS_UART
     uart_init.USART_Mode                |= USART_Mode_Rx;
-#endif
-    
+#endif  // HUB_TELEMETRY_ON_SBUS_UART
+
     USART_Init(SBUS_USART, &uart_init);
 
     USART_Cmd(SBUS_USART, ENABLE);
-    
+
 #ifdef HUB_TELEMETRY_ON_SBUS_UART
     USART_ITConfig(SBUS_USART, USART_IT_RXNE, ENABLE);
-#endif
+#endif  // HUB_TELEMETRY_ON_SBUS_UART
 }
 
 void hal_uart_start_transmission(uint8_t *buffer, uint8_t len) {
@@ -142,4 +143,4 @@ void hal_uart_start_transmission(uint8_t *buffer, uint8_t len) {
     USART_ITConfig(SBUS_USART, USART_IT_TXE, ENABLE);
 }
 
-#endif
+#endif  // SBUS_ENABLED

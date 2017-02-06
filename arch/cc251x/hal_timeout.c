@@ -1,4 +1,6 @@
 /*
+    Copyright 2017 fishpepper <AT> gmail.com
+
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -33,11 +35,11 @@ void hal_timeout_init(void) {
 
     // prepare timer3 for 1/25th ms steps:
     // TICKSPD 011 -> /8 = 3250 kHz timer clock input
-    T3CTL = T3CTL_DIV_2 | // /2
+    T3CTL = T3CTL_DIV_2 |   // /2
             T3CTL_START |   // start
             T3CTL_OVFIM |   // OVInt enabled
-            T3CTL_CLR  |   // clear
-            T3CTL_MODE_MODULO; // 01 = count to CC and the overflow
+            T3CTL_CLR   |   // clear
+            T3CTL_MODE_MODULO;  // 01 = count to CC and the overflow
 
     // 3250/2/65 = 25khz
     T3CC0 = 65-1;
@@ -68,7 +70,6 @@ void hal_timeout_init(void) {
         P0 &= ~(1<<7);
         LED_RED_OFF();
     }*/
-
 }
 
 // prepare a new timeout
@@ -120,7 +121,7 @@ uint8_t hal_timeout2_timed_out(void) {
 }
 
 
-void hal_timeout_interrupt(void) __interrupt T3_VECTOR{
+void hal_timeout_interrupt(void) __interrupt T3_VECTOR {
     // clear flag
     T3IF = 0;
 

@@ -13,9 +13,11 @@ HAL_SRCS     := hal_adc.c \
                 hal_ppm.c \
                 hal_debug.c
 
-BOARD_SRCS   := $(STARTUP) \
-                $(DRIVER_SRCS) \
-                $(HAL_SRCS) \
+ARCH_DIR = arch/rasp
+ARCH_SRCS    := $(addprefix $(ARCH_DIR)/, $(HAL_SRCS))
+ARCH_HEADERS := $(ARCH_SRCS:.c=.h)
+
+BOARD_SRCS   := $(ARCH_SRCS) \
                 $(GENERIC_SRCS)
 
 # fetch this dir during include
@@ -39,13 +41,6 @@ LD   = gcc
 AR   = ar
 AS   = gcc
 OBJ  = objcopy
-
-# Code Paths
-ARCH_DIR = arch/rasp
-DEVICE   = $(ARCH_DIR)/device
-CORE     = $(ARCH_DIR)/core
-LINK     = $(ARCH_DIR)/linker
-PERIPH   = $(ARCH_DIR)/peripheral_lib
 
 # Search path for standard files
 vpath %.c $(SRC_DIR)

@@ -1,4 +1,6 @@
 /*
+    Copyright 2017 fishpepper <AT> gmail.com
+
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -26,17 +28,17 @@ void hal_delay_ms(uint16_t ms) {
         // this asm snippet gives us roughly 1ms delay:
         __asm
                 mov     r1, #DELAY_MS_LOOP_A
-            00000$: // delay_ms_loop_outer
+            00000$:  // delay_ms_loop_outer
                 dec     r1
                 mov     a, r1
                 jz      00002$
                 mov     r2, #DELAY_MS_LOOP_B
-            00001$: // delay_ms_loop_inner
+            00001$:  // delay_ms_loop_inner
                 dec     r2
                 mov     a, r2
                 jz      00000$
                 sjmp    00001$
-            00002$: // delay_ms_done
+            00002$:  // delay_ms_done
         __endasm;
     }
 }

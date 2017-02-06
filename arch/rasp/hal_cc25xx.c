@@ -1,22 +1,25 @@
 /*
-   This program is free software: you can redistribute it and/or modify
-   it under the terms of the GNU General Public License as published by
-   the Free Software Foundation, either version 3 of the License, or
-   (at your option) any later version.
+    Copyright 2017 fishpepper <AT> gmail.com
 
-   This program is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-   GNU General Public License for more details.
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
 
-   You should have received a copy of the GNU General Public License
-   along with this program.  If not, see <http:// www.gnu.org/licenses/>.
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
 
-author: fishpepper <AT> gmail.com
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http:// www.gnu.org/licenses/>.
+
+   author: fishpepper <AT> gmail.com
 */
 
 #include "hal_cc25xx.h"
 #include "hal_spi.h"
+#include "hal_io.h"
 #include "cc25xx.h"
 #include "debug.h"
 #include "timeout.h"
@@ -37,7 +40,7 @@ inline uint32_t hal_cc25xx_set_antenna(uint8_t id) {
 }
 
 const char *registers[] = {
-    "IOCFG2", // 0x00
+    "IOCFG2",  // 0x00
     "IOCFG1",
     "IOCFG0",
     "FIFOTHR",
@@ -53,7 +56,7 @@ const char *registers[] = {
     "FREQ2",
     "FREQ1",
     "FREQ0",
-    "MDMCFG4", // 0x10
+    "MDMCFG4",  // 0x10
     "MDMCFG3",
     "MDMCFG2",
     "MDMCFG1",
@@ -69,7 +72,7 @@ const char *registers[] = {
     "AGCCTRL0",
     "WOREVT1",
     "WOREVT0",
-    "WORCTRL", // 0x20
+    "WORCTRL",  // 0x20
     "FREND1",
     "FREND0",
     "FSCAL3",
@@ -85,7 +88,7 @@ const char *registers[] = {
     "TEST1",
     "TEST0",
     "RESERVED",
-    "PARTNUM", // 0x30
+    "PARTNUM",  // 0x30
     "VERSION",
     "FREQEST",
     "LQI",
@@ -99,27 +102,29 @@ const char *registers[] = {
     "RXBYTES",
     "RCCTRL1_STATUS",
     "RCCTRL0_STATUS",
-    "PA_TABLE0" // 0x3E
+    "PA_TABLE0"  // 0x3E
 };
 
 
 inline void hal_cc25xx_set_gdo_mode(void) {
-    cc25xx_set_register(IOCFG0, 0x01); // 6);
+    cc25xx_set_register(IOCFG0, 0x01);  // 6);
     // cc25xx_set_register(IOCFG1, ???);
-    cc25xx_set_register(IOCFG2, 0x01); // 6);
+    cc25xx_set_register(IOCFG2, 0x01);  // 6);
 }
 
-static int count =0;
+static int count = 0;
 inline void hal_cc25xx_set_register(uint8_t address, uint8_t data) {
     uint8_t buffer[2] = {address, data};
     hal_spi_dma_xfer(buffer, sizeof(buffer));
-    // printf("\nset_register 0x%x (0x%x) '%s' data 0x%x\n", address & 0x3f, address, registers[address & 0x3f], data);
+    // printf("\nset_register 0x%x (0x%x) '%s' data 0x%x\n", \
+    // address & 0x3f, address, registers[address & 0x3f], data);
 }
 
 inline uint8_t hal_cc25xx_get_register(uint8_t address) {
     uint8_t buffer[2] = {address | 0x80, 0xff};
     hal_spi_dma_xfer(buffer, sizeof(buffer));
-    // printf("\nget_register 0x%x (0x%x) '%s' got 0x%x\n", address & 0x3f, address, registers[address & 0x3f], buffer[1]);
+    // printf("\nget_register 0x%x (0x%x) '%s' got 0x%x\n", \
+    // address & 0x3f, address, registers[address & 0x3f], buffer[1]);
     return buffer[1];
 }
 
@@ -154,15 +159,15 @@ uint8_t hal_cc25xx_get_status(void) {
 }
 
 uint8_t hal_cc25xx_transmission_completed(void) {
-    return 1; // return ((hal_cc25xx_get_status() & (0x70)) == CC2500_STATUS_STATE_RX);
+    return 1;  // return ((hal_cc25xx_get_status() & (0x70)) == CC2500_STATUS_STATE_RX);
 }
 
 inline void hal_cc25xx_enter_rxmode(void) {
-    hal_set_amp(0);
+    hal_io_set_amp(0);
 }
 
 inline void hal_cc25xx_enter_txmode(void) {
-    hal_set_amp(1);
+    hal_io_set_amp(1);
 }
 
 
@@ -191,7 +196,8 @@ inline void hal_cc25xx_register_write_multi(uint8_t address, uint8_t *buffer, ui
     hal_spi_dma_xfer(buffer2, len+1);
 }
 
-inline void hal_cc25xx_process_packet(volatile uint8_t *packet_received, volatile uint8_t *buffer, uint8_t maxlen) {
+inline void hal_cc25xx_process_packet(volatile uint8_t *packet_received,
+                                      volatile uint8_t *buffer, uint8_t maxlen) {
     if (hal_spi_get_gdo0() == 1) {
         // data received, fetch data
         // timeout_set_100us(5);
@@ -204,14 +210,14 @@ inline void hal_cc25xx_process_packet(volatile uint8_t *packet_received, volatil
         uint8_t len1, len2, len, i;
 
         // try this 10 times befor giving up:
-        for (i=0; i<10; i++) {
+        for (i = 0; i < 10; i++) {
             len1 = hal_cc25xx_get_register_burst(RXBYTES) & 0x7F;
             len2 = hal_cc25xx_get_register_burst(RXBYTES) & 0x7F;
-            if (len1==len2) break;
+            if (len1 == len2) break;
         }
 
         // valid len found?
-        if (len1==len2 && len1 > 0) {
+        if (len1 == len2 && len1 > 0) {
             // debug("process_packet got: "); debug_put_uint8(len1);
             // debug(" expecting: "); debug_put_uint8(maxlen);
             len = len1;
@@ -223,7 +229,7 @@ inline void hal_cc25xx_process_packet(volatile uint8_t *packet_received, volatil
             // only accept valid packet lenbghts:
             if (len == maxlen) {
                 uint8_t i;
-                for (i=0; i<maxlen; i++) {
+                for (i = 0; i < maxlen; i++) {
                     buffer[i] = tmp_buffer[i];
                 }
                 *packet_received = 1;

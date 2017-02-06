@@ -1,4 +1,6 @@
 /*
+    Copyright 2017 fishpepper <AT> gmail.com
+
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -22,7 +24,7 @@
 #include "stm32f10x_rcc.h"
 #include "stm32f10x_gpio.h"
 #include "stm32f10x_tim.h"
-#include "misc.h" // stm32 nvic stuff
+#include "misc.h"  // stm32 nvic stuff
 
 #ifndef SBUS_ENABLED
 
@@ -82,7 +84,7 @@ static void hal_ppm_init_timer(void) {
     tim_oc_init.TIM_OCMode      = TIM_OCMode_PWM2;
 #else
     tim_oc_init.TIM_OCMode      = TIM_OCMode_PWM1;
-#endif
+#endif  // PPM_INVERTED
     tim_oc_init.TIM_OutputState = TIM_OutputState_Enable;
     tim_oc_init.TIM_Pulse       = PPM_SYNC_PULS_LEN_TICKS;
     tim_oc_init.TIM_OCPolarity  = TIM_OCPolarity_High;
@@ -129,7 +131,7 @@ void hal_ppm_failsafe_enter(void) {
 #else
     // set on zero -> default is low
     PPM_GPIO->BRR  = (PPM_PIN);
-#endif
+#endif  // PPM_INVERTED
 }
 
 void hal_ppm_failsafe_exit(void) {
@@ -141,7 +143,7 @@ void hal_ppm_failsafe_exit(void) {
 }
 
 static void hal_ppm_init_ocx(uint8_t ch, TIM_TypeDef *TIMx, TIM_OCInitTypeDef *tim_oc_init) {
-    switch(PPM_TIMER_CH) {
+    switch (PPM_TIMER_CH) {
         default:
             break;
         case(TIM_Channel_4):
@@ -163,4 +165,4 @@ static void hal_ppm_init_ocx(uint8_t ch, TIM_TypeDef *TIMx, TIM_OCInitTypeDef *t
     }
 }
 
-#endif
+#endif  // SBUS_ENABLED

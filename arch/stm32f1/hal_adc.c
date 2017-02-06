@@ -1,4 +1,6 @@
 /*
+    Copyright 2017 fishpepper <AT> gmail.com
+
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -62,11 +64,16 @@ static void hal_adc_init_mode(void) {
 
     // ADC configuration
     adc_init.ADC_Mode = ADC_Mode_Independent;
-    adc_init.ADC_ScanConvMode         = ENABLE;// We will convert multiple channels
-    adc_init.ADC_ContinuousConvMode   = ENABLE; // ! select continuous conversion mode
-    adc_init.ADC_ExternalTrigConv     = ADC_ExternalTrigConv_None; // select no external triggering
-    adc_init.ADC_DataAlign            = ADC_DataAlign_Right; // right 12-bit data alignment in ADC data register
-    adc_init.ADC_NbrOfChannel          = 2; // 2 channels conversion
+    // convert multiple channels
+    adc_init.ADC_ScanConvMode         = ENABLE;
+    // select continuous conversion mode
+    adc_init.ADC_ContinuousConvMode   = ENABLE;
+    // select no external triggering
+    adc_init.ADC_ExternalTrigConv     = ADC_ExternalTrigConv_None;
+    // right 12-bit data alignment in ADC data register
+    adc_init.ADC_DataAlign            = ADC_DataAlign_Right;
+    // 2 channels conversion
+    adc_init.ADC_NbrOfChannel          = 2;
 
     // load structure values to control and status registers
     ADC_Init(ADC, &adc_init);
@@ -101,16 +108,25 @@ static void hal_adc_init_dma(void) {
     DMA_DeInit(ADC_DMA_CHANNEL);
 
     // set up dma to convert 2 adc channels to two mem locations:
-    dma_init.DMA_M2M                 = DMA_M2M_Disable; // channel will be used for memory to memory transfer
-    dma_init.DMA_Mode                = DMA_Mode_Circular; // setting normal mode (non circular)
-    dma_init.DMA_Priority            = DMA_Priority_High; // medium priority
-    dma_init.DMA_PeripheralDataSize  = DMA_PeripheralDataSize_HalfWord; // source and destination 16bit
+    // channel will be used for memory to memory transfer
+    dma_init.DMA_M2M                 = DMA_M2M_Disable;
+    // setting normal mode (non circular)
+    dma_init.DMA_Mode                = DMA_Mode_Circular;
+    // medium priority
+    dma_init.DMA_Priority            = DMA_Priority_High;
+    // source and destination 16bit
+    dma_init.DMA_PeripheralDataSize  = DMA_PeripheralDataSize_HalfWord;
     dma_init.DMA_MemoryDataSize      = DMA_MemoryDataSize_HalfWord;
-    dma_init.DMA_MemoryInc           = DMA_MemoryInc_Enable; // automatic memory destination increment enable.
-    dma_init.DMA_PeripheralInc       = DMA_PeripheralInc_Disable; // source address increment disable
-    dma_init.DMA_DIR                 = DMA_DIR_PeripheralSRC; // Location assigned to peripheral register will be source
-    dma_init.DMA_BufferSize          = 2; // chunk of data to be transfered
-    dma_init.DMA_PeripheralBaseAddr  = (uint32_t)&ADC->DR; // source and destination start addresses
+    // automatic memory destination increment enable.
+    dma_init.DMA_MemoryInc           = DMA_MemoryInc_Enable;
+    // source address increment disable
+    dma_init.DMA_PeripheralInc       = DMA_PeripheralInc_Disable;
+    // Location assigned to peripheral register will be source
+    dma_init.DMA_DIR                 = DMA_DIR_PeripheralSRC;
+    // chunk of data to be transfered
+    dma_init.DMA_BufferSize          = 2;
+    // source and destination start addresses
+    dma_init.DMA_PeripheralBaseAddr  = (uint32_t)&ADC->DR;
     dma_init.DMA_MemoryBaseAddr      = (uint32_t)hal_adc_data;
     // send values to DMA registers
     DMA_Init(ADC_DMA_CHANNEL, &dma_init);
@@ -135,7 +151,7 @@ static void hal_adc_init_dma(void) {
             ADC_SoftwareStartConvCmd(ADC, ENABLE);
         }
     }
-#endif
+#endif  // ADC_DO_TEST
 }
 
 static void hal_adc_dma_arm(void) {
@@ -161,7 +177,7 @@ uint8_t hal_adc_get_scaled(uint8_t ch) {
     } else {
         debug("hal_adc: channel index out of bounds ");
         debug_put_uint8(ch);
-        debug ("allowed 0,1)\n");
+        debug("allowed 0,1)\n");
         debug_flush();
         return 0;
     }
