@@ -724,6 +724,12 @@ void frsky_main(void) {
                 sbus_start_transmission(SBUS_FRAME_LOST);
             }
 
+            if (send_telemetry) {
+                // last packet was outbound telemetry, send last rx packet on sbus
+                sbus_start_transmission(SBUS_FRAME_NOT_LOST);
+                send_telemetry = 0;
+            }
+
             // check for packets
             if (packet_received > 0) {
                 debug_putc('0' + cc25xx_get_current_antenna());
@@ -844,9 +850,6 @@ void frsky_main(void) {
 
                    // build & send packet
                    frsky_send_telemetry(requested_telemetry_id);
-
-                   // mark as done
-                   send_telemetry = 0;
                 }
             }
         } else {
