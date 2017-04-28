@@ -29,7 +29,7 @@
 #define LED_RED_PIN    1
 
 // DEBUG
-#define DEBUG_UART USART1_P0
+#define DEBUG_UART USART1_P1
 
 // SBUS
 // enable SBUS output -> this will DISABLE ppm!

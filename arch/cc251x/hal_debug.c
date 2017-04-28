@@ -66,6 +66,17 @@ void hal_debug_init(void) {
 
     // make tx pin output:
     P0DIR |= (1<<4);
+#elif DEBUG_UART == USART1_P1
+    // USART1 use ALT2 -> Set flag -> Port P1_6 = TX
+    PERCFG |= (PERCFG_U1CFG);
+
+    // configure pin P1_6 (TX) as special function
+    P1SEL |= (1<<6);
+    // set P0_4 as normal IO
+    P0SEL &= ~(1<<4);
+
+    // make tx pin output:
+    P1DIR |= (1<<6);
 #else
   #error "ERROR: UNSUPPORTED DEBUG UART"
 #endif  // DEBUG_UART == ...
