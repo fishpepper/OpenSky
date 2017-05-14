@@ -47,6 +47,13 @@ void hal_cc25xx_init(void) {
       RF_LNA_ENABLE();
     #endif  // RF_LNA_PORT
 
+    // if we support Diversity make sure to config the pin as output:
+    #ifdef RF_ANTENNA_SWITCH_PORT
+      PORT2DIR(RF_ANTENNA_SWITCH_PORT) |= (1 << RF_ANTENNA_SWITCH_PIN);
+      // select first antenna
+      RF_ANTENNA_SELECT_A();
+    #endif  // RF_ANTENNA_SWITCH_PORT
+
     // if we support HIGH GAIN mode config in as output:
     #ifdef RF_HIGH_GAIN_MODE_PORT
       PORT2DIR(RF_HIGH_GAIN_MODE_PORT) |= (1 << RF_HIGH_GAIN_MODE_PIN);
@@ -57,6 +64,18 @@ void hal_cc25xx_init(void) {
         RF_HIGH_GAIN_MODE_DISABLE();
       #endif  // RF_HIGH_GAIN_MODE_ENABLED
     #endif  // RF_HIGH_GAIN_MODE_PORT
+}
+
+uint32_t hal_cc25xx_set_antenna(uint8_t id) {
+    // select antenna 0 or 1:
+    #ifdef RF_ANTENA_SWITCH_PORT
+      if (id) {
+          RF_ANTENNA_SELECT_B();
+      } else {
+          RF_ANTENNA_SELECT_A();
+      }
+    #endif  // RF_ANTENNA_SWITCH_PORT
+    return id;
 }
 
 void hal_cc25xx_disable_rf_interrupt(void) {

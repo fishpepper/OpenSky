@@ -40,6 +40,11 @@
   #define RF_PA_DISABLE()  { PORT2BIT(RF_PA_PORT, RF_PA_PIN) = ~RF_PA_ON_LEVEL; }
 #endif  // RF_LNA_PORT
 
+#ifdef RF_ANTENNA_SWITCH_PORT
+  #define RF_ANTENNA_SELECT_A() { PORT2BIT(RF_ANTENNA_SWITCH_PORT, RF_ANTENNA_SWITCH_PIN) = RF_ANTENNA_A_LEVEL; }
+  #define RF_ANTENNA_SELECT_B() { PORT2BIT(RF_ANTENNA_SWITCH_PORT, RF_ANTENNA_SWITCH_PIN) = ~RF_ANTENNA_A_LEVEL; }
+#endif  // RF_ANTENNA_SWITCH_PORT
+
 #ifdef RF_HIGH_GAIN_MODE_PORT
   #define RF_HIGH_GAIN_MODE_ENABLE()  { \
     PORT2BIT(RF_HIGH_GAIN_MODE_PORT, RF_HIGH_GAIN_MODE_PIN) = RF_HIGH_GAIN_MODE_ON_LEVEL; }
@@ -47,7 +52,7 @@
     PORT2BIT(RF_HIGH_GAIN_MODE_PORT, RF_HIGH_GAIN_MODE_PIN) = ~RF_HIGH_GAIN_MODE_ON_LEVEL; }
 #endif  // RF_HIGH_GAIN_MODE_PORT
 
-#define hal_cc25xx_set_antenna(x) (0)
+uint32_t hal_cc25xx_set_antenna(uint8_t id);
 #define hal_cc25xx_process_packet(packet_received, buffer, maxlen) {}
 
 void hal_cc25xx_init(void);
