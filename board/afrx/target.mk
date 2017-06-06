@@ -6,4 +6,3 @@ FLASH_SIZE=0x8000
 # continue with normal cc251x build
 ARCH_DIR = arch/cc251x
 ARCH_MAKEFILE = $(ARCH_DIR)/cc251x.mk
-
