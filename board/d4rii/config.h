@@ -17,13 +17,19 @@
 #define SBUS_INVERTED
 
 // PPM (only used if sbus is disabled)
-// invert SBUS output (normal is non inverted)
 // #define PPM_INVERTED
 
-// hub telemetry input (soft serial)
-// #define HUB_TELEMETRY_ON_SBUS_UART
-// #define HUB_TELEMETRY_INVERTED 
-// #define PPM_INVERTED
+// hub telemetry input (soft serial if only HUB_TELEMETRY_INVERTED, sbus uart if HUB_TELEMETRY_ON_SBUS_UART)
+#define HUB_TELEMETRY_ON_SBUS_UART  //  rx pin on side if inverted
+#define HUB_TELEMETRY_INVERTED 
+
+// if #define SBUS_ENABLED, #define SBUS_INVERTED, #define HUB_TELEMETRY_ON_SBUS_UART, and #define HUB_TELEMETRY_INVERTED
+// you can share the rx/tx side uart with the sbus tx and telemetry rx both with inverted signals on betaflight uart set to RX, frsky telemetry, and autobuad
+// for frsky. cuts down the uart usage from two to one, and also will have telemetry while disarmed!
+// ***have not tested non-inverted yet***
+
+//  debugging
+// #define DEBUG_ME
 
 #ifdef SBUS_INVERTED
     // DEBUG is on SERVO4 output:
@@ -163,24 +169,25 @@
 #define SOFT_SPI_MOSI             GPIO_Pin_1
 #define SOFT_SPI_SCK              GPIO_Pin_2
 
+#ifndef HUB_TELEMETRY_ON_SBUS_UART
 // hub telemetry input NOTE: this has to be a timer io
-#define SOFT_SERIAL_PIN_HAS_INVERTER  // there is an inverter on GPIOA.10!
-#define SOFT_SERIAL_GPIO          GPIOA
-#define SOFT_SERIAL_CLK           RCC_APB2Periph_GPIOA
-#define SOFT_SERIAL_CLK_RCC       2
-#define SOFT_SERIAL_PIN           GPIO_Pin_10
-#define SOFT_SERIAL_TIMER         TIM1
-#define SOFT_SERIAL_TIMER_CLK     RCC_APB2Periph_TIM1
-#define SOFT_SERIAL_TIMER_CLK_RCC 2
-#define SOFT_SERIAL_TIMER_IT_IC   TIM_IT_CC3
-#define SOFT_SERIAL_TIMER_CH      TIM_Channel_3
-#define SOFT_SERIAL_TIMER_GET_CAPTURE()  TIM_GetCapture3(SOFT_SERIAL_TIMER)
-#define SOFT_SERIAL_TIMER_IT_UP   TIM_IT_Update
-#define SOFT_SERIAL_TIMER_IC_IRQHandler TIM1_CC_IRQHandler
-#define SOFT_SERIAL_TIMER_UP_IRQHandler TIM1_UP_TIM16_IRQHandler
-#define SOFT_SERIAL_TIMER_IC_IRQn TIM1_CC_IRQn
-#define SOFT_SERIAL_TIMER_UP_IRQn TIM1_UP_IRQn
-
+  #define SOFT_SERIAL_PIN_HAS_INVERTER  // there is an inverter on GPIOA.10!
+  #define SOFT_SERIAL_GPIO          GPIOA
+  #define SOFT_SERIAL_CLK           RCC_APB2Periph_GPIOA
+  #define SOFT_SERIAL_CLK_RCC       2
+  #define SOFT_SERIAL_PIN           GPIO_Pin_10
+  #define SOFT_SERIAL_TIMER         TIM1
+  #define SOFT_SERIAL_TIMER_CLK     RCC_APB2Periph_TIM1
+  #define SOFT_SERIAL_TIMER_CLK_RCC 2
+  #define SOFT_SERIAL_TIMER_IT_IC   TIM_IT_CC3
+  #define SOFT_SERIAL_TIMER_CH      TIM_Channel_3
+  #define SOFT_SERIAL_TIMER_GET_CAPTURE()  TIM_GetCapture3(SOFT_SERIAL_TIMER)
+  #define SOFT_SERIAL_TIMER_IT_UP   TIM_IT_Update
+  #define SOFT_SERIAL_TIMER_IC_IRQHandler TIM1_CC_IRQHandler
+  #define SOFT_SERIAL_TIMER_UP_IRQHandler TIM1_UP_TIM16_IRQHandler
+  #define SOFT_SERIAL_TIMER_IC_IRQn TIM1_CC_IRQn
+  #define SOFT_SERIAL_TIMER_UP_IRQn TIM1_UP_IRQn
+#endif // hub telemetry on softserial
 
 // THIS CONFIGURES IRQ PRIORITIES - DO NOT MESS THIS UP!
 // this is the most critical stuff:
