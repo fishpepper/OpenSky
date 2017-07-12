@@ -28,6 +28,8 @@
 #include "stm32f10x_tim.h"
 #include "misc.h"  // stm32 nvic
 
+#ifndef HUB_TELEMETRY_ON_SBUS_UART
+
 void hal_soft_serial_init(void) {
     hal_soft_serial_init_gpio();
     hal_soft_serial_init_rcc();
@@ -185,4 +187,4 @@ void SOFT_SERIAL_TIMER_UP_IRQHandler(void) {
     }
 }
 
-
+#endif  // if not HUB_TELEMETRY_ON_SBUS_UART
