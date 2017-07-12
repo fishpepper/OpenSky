@@ -85,8 +85,8 @@ Serial Port:
 (Pin 1 = left = the same side as the LEDs)
 [1] = GND
 [2] = AD2 input (max 3.3V!)
-[3] = inverted SBUS (if enabled in main.h) or Debug UART 
-[4] = NC
+[3] = inverted SBUS (if enabled in main.h) or Debug UART if debug on
+[4] = telemetry frsky if enabled (either inverted 9600buad or inverted shared sbus @ sbus buad rate)
 </pre>
 
 ## rasp
