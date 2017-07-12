@@ -184,9 +184,24 @@ Connect an inverted serial cable to the 4pin connector (FTDI devices can be conf
 [4] = inverted RX ---> connect to TX
 </pre>
 
+Non-inverted way.
+<pre>
+GND
+POWER
+rx/tx before the rx and tx signal inverters on the d4rii (picture in post of rcgroups forum)
+</pre>
+
 TODO: add flash command to makefile/doc
 
 # Random notes:
+objcopy -O ihex obj/opensky_d4rii.elf obj/opensky_D4RII.hex	 							// turns elf into hex after compiling, in obj folder
+
+flashing via stm32flash-0.5 from command promt..
+
+.\stm32flash.exe -k -b 57600 -m 8e1 COM16					 							          // unlock flash
+
+.\stm32flash.exe -w opensky_D4RII.hex -n 20 -b 57600 -m 8e1 COM16 				// to flash opensky_d4rii.hex
+
 
 Just in case you need to mount a new antenna: My vd5m came with a 3.5cm antenna wire. However it should be 31.5mm long (1/4 wavelength at 2.4GHz)
 
