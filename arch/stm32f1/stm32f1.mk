@@ -121,9 +121,10 @@ TARGET_OBJS     = $(addsuffix .o,$(addprefix $(OBJECT_DIR)/$(TARGET)/,$(basename
 TARGET_DEPS     = $(addsuffix .d,$(addprefix $(OBJECT_DIR)/$(TARGET)/,$(basename $(ALL_SRCS))))
 TARGET_ELF      = $(OBJECT_DIR)/$(RESULT).elf
 TARGET_BIN      = $(OBJECT_DIR)/$(RESULT).bin
+TARGET_HEX      = $(OBJECT_DIR)/$(RESULT).hex
 
 # Build executable
-board: $(TARGET_ELF) 
+board: $(TARGET_HEX) 
 
 $(TARGET_ELF): $(TARGET_OBJS)
 	$(V1) exit
@@ -133,6 +134,9 @@ $(TARGET_ELF): $(TARGET_OBJS)
 
 $(TARGET_BIN): $(TARGET_ELF)
 	$(V1) $(OBJ) -O binary $< $@
+
+$(TARGET_HEX): $(TARGET_ELF)
+	$(V1) $(OBJ) -O ihex $< $@
 
 $(OBJECT_DIR)/$(TARGET)/%.o: %.c
 	$(V1) mkdir -p $(dir $@)
@@ -148,14 +152,14 @@ clean:
 	$(V1) echo Cleaning: $(TARGET)
 	$(V1) rm -f $(OBJECT_DIR)/$(TARGET)/*.o $(OBJECT_DIR)/$(TARGET)/*.d $(OBJECT_DIR)/*.elf $(OBJECT_DIR)/*.bin
 
-debug: $(RESULT).elf
+debug: $(TARGET_ELF)
 	openocd -f /usr/share/openocd/scripts/interface/stlink-v2.cfg -f /usr/share/openocd/scripts/target/stm32f1x.cfg & echo $$! > $(OPENOCD_PIDFILE)
 	sleep 1
-	arm-none-eabi-gdb --eval-command="target remote localhost:3333" $(RESULT).elf
+	arm-none-eabi-gdb --eval-command="target remote localhost:3333" $(TARGET_ELF)
 	if [ -a $(OPENOCD_PIDFILE) ]; then kill `cat $(OPENOCD_PIDFILE)`; fi;
 
-flash : $(RESULT).bin
+flash : $(TARGET_BIN)
 	if [ -a $(OPENOCD_PIDFILE) ]; then kill `cat $(OPENOCD_PIDFILE)`; fi;
-	st-flash write $(RESULT).bin 0x8000000
+	st-flash write $(TARGET_BIN) 0x8000000
 
 .PHONY: board clean flash debug

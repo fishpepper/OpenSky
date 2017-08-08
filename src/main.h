@@ -23,11 +23,7 @@
 #include "hal_defines.h"
 
 // debugging data
-#ifdef DEBUG_ME
-  #define DEBUG 1
-#else
-  #define DEBUG 0
-#endif  //  if debug or not
+#define DEBUG 1
 
 // useful for debugging. DO NOT USE!
 #define ADC_DO_TEST 0

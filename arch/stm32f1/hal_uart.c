@@ -28,7 +28,7 @@
 #include "stm32f10x_gpio.h"
 #include "stm32f10x_rcc.h"
 #include "misc.h"  // this defines stm32 nvic stuff
-#include "uart.h" 
+#include "uart.h"
 
 #ifdef SBUS_ENABLED
 

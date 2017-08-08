@@ -8,6 +8,9 @@
 #define LED_RED_PIN               GPIO_Pin_11
 #define LED_GREEN_PIN             GPIO_Pin_12
 
+// usually you want to have sbus inverted and hub telemetry inverted
+// both will run at sbus baudrate. current betafligh versions allow
+// shared frsky sbus and hub telemetry on the same uart port !
 
 // enable SBUS output -> this will DISABLE ppm!
 #define SBUS_ENABLED
@@ -20,16 +23,8 @@
 // #define PPM_INVERTED
 
 // hub telemetry input (soft serial if only HUB_TELEMETRY_INVERTED, sbus uart if HUB_TELEMETRY_ON_SBUS_UART)
-#define HUB_TELEMETRY_ON_SBUS_UART  //  rx pin on side if inverted
+#define HUB_TELEMETRY_ON_SBUS_UART 
 #define HUB_TELEMETRY_INVERTED 
-
-// if #define SBUS_ENABLED, #define SBUS_INVERTED, #define HUB_TELEMETRY_ON_SBUS_UART, and #define HUB_TELEMETRY_INVERTED
-// you can share the rx/tx side uart with the sbus tx and telemetry rx both with inverted signals on betaflight uart set to RX, frsky telemetry, and autobuad
-// for frsky. cuts down the uart usage from two to one, and also will have telemetry while disarmed!
-// ***have not tested non-inverted yet***
-
-//  debugging
-// #define DEBUG_ME
 
 #ifdef SBUS_INVERTED
     // DEBUG is on SERVO4 output:
