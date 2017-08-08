@@ -158,6 +158,9 @@ debug: $(TARGET_ELF)
 	arm-none-eabi-gdb --eval-command="target remote localhost:3333" $(TARGET_ELF)
 	if [ -a $(OPENOCD_PIDFILE) ]; then kill `cat $(OPENOCD_PIDFILE)`; fi;
 
+unlock:
+	openocd -f /usr/share/openocd/scripts/interface/stlink-v2.cfg -f /usr/share/openocd/scripts/target/stm32f1x.cfg -c "init" -c "reset halt" -c "stm32f1x unlock 0" -c "exit" 
+
 flash : $(TARGET_BIN)
 	if [ -a $(OPENOCD_PIDFILE) ]; then kill `cat $(OPENOCD_PIDFILE)`; fi;
 	st-flash write $(TARGET_BIN) 0x8000000
