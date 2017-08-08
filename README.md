@@ -167,7 +167,12 @@ SWDIO  = R12 (the non-gnd side connected to STM32 pin 34)
 SWDCLK = RP2, pin4 (connected to to STM32 pin 37)
 </pre>
 
-Connect the STLink, power the target and run "make flash" to program the device.
+Connect the STLink, power the target and run 
+<pre>
+make TARGET=D4RII unlock
+make TARGET=D4RII flash
+</pre>
+to program the device.
 
 ### Serial bootloader
 
