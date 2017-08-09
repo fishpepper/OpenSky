@@ -80,7 +80,7 @@ static void hal_ppm_init_timer(void) {
 
     // Output Compare Active Mode configuration:
     TIM_OCStructInit(&tim_oc_init);
-#if PPM_INVERTED
+#ifdef PPM_INVERTED
     tim_oc_init.TIM_OCMode      = TIM_OCMode_PWM2;
 #else
     tim_oc_init.TIM_OCMode      = TIM_OCMode_PWM1;
