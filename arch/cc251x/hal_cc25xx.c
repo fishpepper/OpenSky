@@ -54,7 +54,7 @@ void hal_cc25xx_init(void) {
       RF_ANTENNA_SELECT_A();
     #endif  // RF_ANTENNA_SWITCH_PORT
 
-    // if we support HIGH GAIN mode config in as output:
+    // if we support HIGH GAIN mode config pin as output:
     #ifdef RF_HIGH_GAIN_MODE_PORT
       PORT2DIR(RF_HIGH_GAIN_MODE_PORT) |= (1 << RF_HIGH_GAIN_MODE_PIN);
       // enable high gain mode?
@@ -64,6 +64,17 @@ void hal_cc25xx_init(void) {
         RF_HIGH_GAIN_MODE_DISABLE();
       #endif  // RF_HIGH_GAIN_MODE_ENABLED
     #endif  // RF_HIGH_GAIN_MODE_PORT
+
+    // if we support Bypass mode make sure to config the pin as output:
+    #ifdef RF_BYPASS_PORT
+      PORT2DIR(RF_BYPASS_MODE_PORT) |= (1 << RF_BYPASS_MODE_PIN);
+      // set default to Bypass off
+      #ifdef RF_BYPASS_MODE_ENABLED
+        RF_BYPASS_MODE_ENABLE();
+      #else
+        RF_BYPASS_MODE_DISABLE();
+      #endif  // RF_BYPASS_MODE_ENABLED
+    #endif  // RF_BYPASS_PORT
 }
 
 uint32_t hal_cc25xx_set_antenna(uint8_t id) {

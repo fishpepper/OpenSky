@@ -52,6 +52,11 @@
     PORT2BIT(RF_HIGH_GAIN_MODE_PORT, RF_HIGH_GAIN_MODE_PIN) = ~RF_HIGH_GAIN_MODE_ON_LEVEL; }
 #endif  // RF_HIGH_GAIN_MODE_PORT
 
+#ifdef RF_BYPASS_MODE_PORT
+  #define RF_BYPASS_MODE_ENABLE()  { PORT2BIT(RF_BYPASS_MODE_PORT, RF_BYPASS_MODE_PIN) = RF_BYPASS_MODE_ON_LEVEL; }
+  #define RF_BYPASS_MODE_DISABLE() { PORT2BIT(RF_BYPASS_MODE_PORT, RF_BYPASS_MODE_PIN) = ~RF_BYPASS_MODE_ON_LEVEL; }
+#endif  // RF_BYPASS_MODE_PORT
+
 uint32_t hal_cc25xx_set_antenna(uint8_t id);
 #define hal_cc25xx_process_packet(packet_received, buffer, maxlen) {}
 

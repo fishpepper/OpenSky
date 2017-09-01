@@ -67,12 +67,19 @@
 #define RF_ANTENNA_SWITCH_PIN       5
 #define RF_ANTENNA_A_LEVEL          1
 
-// enable high gain?
-// #define RF_HIGH_GAIN_MODE_ENABLED
-// gain control pin
-// #define RF_HIGH_GAIN_MODE_PORT      P1
-// #define RF_HIGH_GAIN_MODE_PIN       6
-// #define RF_HIGH_GAIN_MODE_ON_LEVEL  1
+// enable High Gain?
+#define RF_HIGH_GAIN_MODE_ENABLED
+// Gain control pin
+#define RF_HIGH_GAIN_MODE_PORT      P1
+#define RF_HIGH_GAIN_MODE_PIN       6
+#define RF_HIGH_GAIN_MODE_ON_LEVEL  1
+
+// enable Bypass?
+// #define RF_BYPASS_MODE_ENABLED
+// Bypass control pin
+#define RF_BYPASS_MODE_PORT         P1
+#define RF_BYPASS_MODE_PIN          7
+#define RF_BYPASS_MODE_ON_LEVEL     1
 
 // bootloader config
 #define BOOTLOADER_LED_GREEN_PORT   LED_GREEN_PORT
