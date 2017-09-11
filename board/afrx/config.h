@@ -54,7 +54,7 @@
 
 // LNA control pin
 #define RF_LNA_PORT                 P1
-#define RF_LNA_PIN                  3
+#define RF_LNA_PIN                  6
 #define RF_LNA_ON_LEVEL             1
 
 // PA control pin
@@ -71,14 +71,14 @@
 #define RF_HIGH_GAIN_MODE_ENABLED
 // Gain control pin
 #define RF_HIGH_GAIN_MODE_PORT      P1
-#define RF_HIGH_GAIN_MODE_PIN       6
+#define RF_HIGH_GAIN_MODE_PIN       7
 #define RF_HIGH_GAIN_MODE_ON_LEVEL  1
 
 // enable Bypass?
 // #define RF_BYPASS_MODE_ENABLED
 // Bypass control pin
 #define RF_BYPASS_MODE_PORT         P1
-#define RF_BYPASS_MODE_PIN          7
+#define RF_BYPASS_MODE_PIN          3
 #define RF_BYPASS_MODE_ON_LEVEL     1
 
 // bootloader config
