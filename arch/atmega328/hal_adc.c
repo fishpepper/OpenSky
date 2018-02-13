@@ -1,6 +1,4 @@
 /*
-    Copyright 2017 fishpepper <AT> gmail.com
-
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -12,14 +10,20 @@
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http:// www.gnu.org/licenses/>.
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-   author: fishpepper <AT> gmail.com
+   author: fishpepper <AT> gmail.com, jimmyw <AT> github
 */
 
-#ifndef SPI_H_
-#define SPI_H_
+#include "hal_adc.h"
 
-void spi_init(void);
+void hal_adc_init(void) {
+}
 
-#endif  // SPI_H_
+uint8_t hal_adc_get_scaled(uint8_t ch) {
+  return ch;
+}
+
+void hal_adc_process(void) {
+}
+
