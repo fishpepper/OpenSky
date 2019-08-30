@@ -33,7 +33,7 @@ before_install:
   - export PATH=$PATH:$GCC_DIR/bin
   - export TOOLROOT=$GCC_DIR/bin
   - export SDCC_ARCHIVE=sdcc-3.3.0-i386-unknown-linux2.5.tar.bz2
-  - export SDCC_URL=http://downloads.sourceforge.net/project/sdcc/sdcc-linux-x86/3.3.0/$SDCC_ARCHIVE
+  - export SDCC_URL=https://master.dl.sourceforge.net/project/sdcc/sdcc-linux-x86/3.3.0/$SDCC_ARCHIVE
   - if [ ! -e $HOME/sdcc-3.3.0/bin ]; then wget $SDCC_URL -O $SDCC_ARCHIVE; tar xjf $SDCC_ARCHIVE -C $HOME; fi
   - export PATH=$PATH:$HOME/sdcc-3.3.0/bin
 
