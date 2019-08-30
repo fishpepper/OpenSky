@@ -1,6 +1,4 @@
 /*
-    Copyright 2017 fishpepper <AT> gmail.com
-
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -12,16 +10,11 @@
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http:// www.gnu.org/licenses/>.
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-   author: fishpepper <AT> gmail.com
+   author: fishpepper <AT> gmail.com, jimmyw <AT> github
 */
 
-#include "spi.h"
-#include "hal_spi.h"
-#include "debug.h"
-
-void spi_init(void) {
-    debug("spi: init\n"); debug_flush();
-    hal_spi_init();
+void hal_soft_serial_init(void) {
 }
+
